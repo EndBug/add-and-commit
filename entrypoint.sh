@@ -2,7 +2,7 @@
 set -eu
 
 # Set up .netrc file with GitHub credentials
-git_setup ( ) {
+git_setup() {
   cat <<- EOF > $HOME/.netrc
         machine github.com
         login $GITHUB_ACTOR
@@ -18,9 +18,13 @@ EOF
     git config --global user.name "Add & Commit GitHub Action"
 }
 
+add() {
+    find $INPUT_PATH -name *.* | while read x; do git add $x; done
+}
+
 # This is needed to make the check work for untracked files
 echo "Staging files in commit path..."
-git add "${INPUT_PATH}"
+add
 
 echo "Checking for uncommitted changes in the git working tree..."
 # This section only runs if there have been file changes
@@ -36,7 +40,7 @@ then
     git checkout "${GITHUB_REF:11}"
 
     echo "Adding files..."
-    git add "${INPUT_PATH}"
+    add
 
     echo "Creating commit..."
     git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
