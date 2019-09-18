@@ -26,7 +26,7 @@ Add a step like this to your workflow:
 - `author_name` : the name of the user that will be displayed as the author of the commit
 - `author_email` : the email of the user that will be displayed as the author of the commit
 - `message` : the message for the commit
-- `path` : the path to stage files from
+- `path` : the path(s) to stage files from
 
 ### Environment variables:
 
