@@ -19,7 +19,7 @@ EOF
 }
 
 add() {
-    find $INPUT_PATH -name *.* | while read x; do git add $x; done
+    find $INPUT_PATH -name "*.*" | while read x; do git add $x; done
 }
 
 # This is needed to make the check work for untracked files
