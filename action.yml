@@ -17,8 +17,12 @@ inputs:
   path:
     description: 'The path to stage files from'
     required: true
-    default: './**/*.*'
-
+    default: '.'
+  pattern:
+    description: 'The pattern that mathces file names'
+    required: false
+    default: "*.*"
+    
 runs:
   using: 'docker'
   image: 'Dockerfile'

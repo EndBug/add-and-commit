@@ -11,12 +11,13 @@ Add a step like this to your workflow:
 
 ```yaml
 - name: Commit changes # This is the step name that will be displayed in your runs
-  uses: EndBug/add-and-commit@latest # You can change this to use a specific version
+  uses: EndBug/add-and-commit@v2.0.0 # You can change this to use a specific version
   with: # See more info about inputs below
     author_name: Your Name
     author_email: mail@example.com
     message: "Your commit message"
-    path: ./*.js
+    path: "."
+    pattern: "*.js"
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
 ```
@@ -27,6 +28,7 @@ Add a step like this to your workflow:
 - `author_email` : the email of the user that will be displayed as the author of the commit
 - `message` : the message for the commit
 - `path` : the path(s) to stage files from
+- `pattern` : the pattern that matches file names
 
 ### Environment variables:
 
@@ -61,12 +63,13 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@latest 
+      uses: EndBug/add-and-commit@v2.0.0 
       with:
         author_name: Your Name
         author_email: mail@example.com
         message: "Your commit message"
-        path: ./*.js
+        path: "."
+        pattern: "*.js"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
