@@ -11,7 +11,7 @@ Add a step like this to your workflow:
 
 ```yaml
 - name: Commit changes # This is the step name that will be displayed in your runs
-  uses: EndBug/add-and-commit@v1.0.0 # You can change this to use a specific version
+  uses: EndBug/add-and-commit@latest # You can change this to use a specific version
   with: # See more info about inputs below
     author_name: Your Name
     author_email: mail@example.com
@@ -61,7 +61,7 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v1.0.0 
+      uses: EndBug/add-and-commit@latest 
       with:
         author_name: Your Name
         author_email: mail@example.com
