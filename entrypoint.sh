@@ -19,7 +19,8 @@ EOF
 }
 
 add() {
-    find $INPUT_PATH -name "$INPUT_PATTERN" | while read x; do git add $x; done
+    if $INPUT_FORCE find $INPUT_PATH -name "$INPUT_PATTERN" | while read x; do git add -f $x; done
+    else find $INPUT_PATH -name "$INPUT_PATTERN" | while read x; do git add $x; done
 }
 
 # This is needed to make the check work for untracked files

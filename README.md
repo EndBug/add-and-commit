@@ -18,6 +18,7 @@ Add a step like this to your workflow:
     message: "Your commit message"
     path: "."
     pattern: "*.js"
+    force: false
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
 ```
@@ -29,6 +30,7 @@ Add a step like this to your workflow:
 - `message` : the message for the commit
 - `path` : the path(s) to stage files from
 - `pattern` : the pattern that matches file names
+- `force` : whether to use the force option on git add, in order to bypass eventual gitignores
 
 ### Environment variables:
 
@@ -63,7 +65,7 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v2.0.0 
+      uses: EndBug/add-and-commit@v2.0.1 
       with:
         author_name: Your Name
         author_email: mail@example.com
