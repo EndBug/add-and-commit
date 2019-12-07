@@ -44,7 +44,7 @@ This action only **adds** files so in order to commit a file deletion you need t
 ```yaml
 - run: git rm delete_me.txt
 
-- uses: EndBug/add-and-commit@issue-6
+- uses: EndBug/add-and-commit@v2.1.1
   with:
     author_name: Your Name
     author_email: mail@example.com
