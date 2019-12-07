@@ -37,6 +37,25 @@ Add a step like this to your workflow:
 The only `env` variable required is the token for the action to run: GitHub generates one automatically, but you need to pass it through `env` to make it available to actions. You can find more about `GITHUB_TOKEN` [here](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret).  
 With that said, you can just copy the example line and don't worry about it. If you do want to use a different token you can pass that in, but I wouldn't see any possible advantage in doing so.
 
+### Deleting files:
+
+This action only **adds** files so in order to commit a file deletion you need to stage that separately: for that, you can run `git rm` in a previous step. Here's a quick example:
+
+```yaml
+- run: git rm delete_me.txt
+
+- uses: EndBug/add-and-commit@issue-6
+  with:
+    author_name: Your Name
+    author_email: mail@example.com
+    message: "Remove file"
+    path: "."
+    pattern: "*.js"  # The path is not important, the file will get removed anyway: that means you can still use the action as usual
+    force: true
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
 ### Example:
 
 You want to lint your JavaScript files, located in the `src` folder, with ESLint so that fixable changes are done without your intervention. You can use a workflow like this:

@@ -37,9 +37,15 @@ then
 
     git fetch 
 
-    # Switch to branch from current Workflow run
-    echo "Creating and switching branch..."
-    git branch "${GITHUB_REF:11}"
+    # Verify if the branch needs to be created
+    if ! git rev-parse --verify --quiet "${GITHUB_REF:11}"
+    then 
+        echo "Creating branch..."
+        git branch "${GITHUB_REF:11}"
+    fi
+
+    # Switch to branch from current workflow run
+    echo "Switching branch..."
     git checkout "${GITHUB_REF:11}"
 
     echo "Adding files..."
