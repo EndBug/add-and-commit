@@ -1,8 +1,9 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as path from 'path'
 
 try {
-  exec.exec('entrypoint.sh')
+  exec.exec(path.join(__dirname, './entrypoint.sh')).catch(e => { throw e });
 } catch (e) {
   core.setFailed(e)
 }
