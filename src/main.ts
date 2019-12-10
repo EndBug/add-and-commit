@@ -5,7 +5,7 @@ import { spawn } from 'child_process';
 
 try {
   spawn('ls')
-  spawn(`${__dirname}/../entrypoint.sh`)
+  spawn(path.join(__dirname, '../src/entrypoint.sh'))
 } catch (e) {
   core.setFailed(e)
 }
