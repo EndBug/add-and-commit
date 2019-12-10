@@ -4,7 +4,7 @@ import * as path from 'path'
 
 try {
   exec.exec('ls')
-  exec.exec(`${__dirname}/../entrypoint.sh`).catch(core.setFailed);
+  exec.exec(`../src/entrypoint.sh`).catch(core.setFailed);
 } catch (e) {
   core.setFailed(e)
 }
