@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
+import * as exec from '@actions/exec'
 import * as path from 'path'
-import { exec } from 'child_process';
 
 try {
-  exec('ls')
-  exec(`../src/entrypoint.sh`)
+  exec.exec('ls dir')
+  exec.exec(`${__dirname}/../entrypoint.sh`).catch(core.setFailed);
 } catch (e) {
   core.setFailed(e)
 }
