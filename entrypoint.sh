@@ -1,6 +1,12 @@
 #!/bin/sh
 set -eu
 
+echo "fetching author, name and email"
+AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email')
+AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name')
+
+echo "'$AUTHOR_NAME' and '$AUTHOR_EMAIL'"
+
 # Set up .netrc file with GitHub credentials
 git_setup() {
   cat <<- EOF > $HOME/.netrc
@@ -14,8 +20,8 @@ git_setup() {
 EOF
     chmod 600 $HOME/.netrc
 
-    git config --global user.email "actions@github.com"
-    git config --global user.name "Add & Commit GitHub Action"
+    git config --global user.email "$AUTHOR_EMAIL"
+    git config --global user.name "$AUTHOR_NAME"
 }
 
 add() {
