@@ -1,36 +1,36 @@
-name: 'Add & Commit'
-description: 'Add & commit files from a path directly from GitHub Actions'
+name: Add & Commit
+description: Add & commit files from a path directly from GitHub Actions
 
 inputs:
   author_name:
-    description: 'The name of the user that will be displayed as the author of the commit'
-    required: true
-    default: 'Add & Commit GitHub Action'
-  author_email:
-    description: 'The email of the user that will be displayed as the author of the commit'
-    required: true
-    default: 'actions@github.com'
-  force:
-    description: 'Whether to use the force option on git add, in order to bypass eventual gitignores'
+    description: The name of the user that will be displayed as the author of the commit
     required: false
-    default: false
+    default: Add & Commit GitHub Action
+  author_email:
+    description: The email of the user that will be displayed as the author of the commit
+    required: false
+    default: actions@github.com
+  force:
+    description: Whether to use the force option on git add, in order to bypass eventual gitignores
+    required: false
+    default: "false"
   message:
-    description: 'The message for the commit'
-    required: true
-    default: 'Commit from GitHub Actions'
+    description: The message for the commit
+    required: false
+    default: Commit from GitHub Actions
   path:
-    description: 'The path to stage files from'
-    required: true
-    default: '.'
+    description: The path to stage files from
+    required: false
+    default: "."
   pattern:
-    description: 'The pattern that mathces file names'
+    description: The pattern that mathces file names
     required: false
     default: "*.*"
-    
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
 
-branding: 
-  icon: 'git-commit'
-  color: black
+runs:
+  using: node12
+  main: lib/main.js
+
+branding:
+  icon: git-commit
+  color: gray-dark
