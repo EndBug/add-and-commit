@@ -58,7 +58,7 @@ then
     add
 
     echo "Creating commit..."
-    git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
+    git commit -m "$INPUT_MESSAGE" --author="$AUTHOR_NAME <$AUTHOR_EMAIL>"
 
     echo "Pushing to repo..."
     git push --set-upstream origin "${GITHUB_REF:11}"
