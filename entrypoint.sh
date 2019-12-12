@@ -2,10 +2,21 @@
 set -eu
 
 echo "fetching author, name and email"
-AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
-AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g')
+if [[ -v INPUT_AUTHOR_NAME ]];
+then
+    AUTHOR_NAME=$INPUT_AUTHOR_NAME;
+else
+    AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g')
+fi;
 
-echo "'$AUTHOR_NAME' and '$AUTHOR_EMAIL'"
+if [[ -v INPUT_AUTHOR_EMNAIL ]];
+then
+    AUTHOR_EMAIL=$INPUT_AUTHOR_EMNAIL
+else
+    AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
+fi
+
+echo "Using infomration '$AUTHOR_NAME' and '$AUTHOR_EMAIL'"
 
 # Set up .netrc file with GitHub credentials
 git_setup() {
