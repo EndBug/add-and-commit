@@ -1,7 +1,6 @@
 #!/bin/sh
 set -eu
 
-echo "fetching author, name and email"
 if [[ -v INPUT_AUTHOR_NAME ]];
 then
     AUTHOR_NAME=$INPUT_AUTHOR_NAME;
