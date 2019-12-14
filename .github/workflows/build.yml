@@ -2,7 +2,7 @@ name: Build
 on:
   push:
     branches-ignore:
-      - releases/**
+      - dist
 
 jobs:
   build:
