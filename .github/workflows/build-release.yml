@@ -6,8 +6,8 @@ on:
 
 jobs:
   build:
-    name: Build compiled JS version
-    runs-on: ubuntu-latest
+    name: Build release version
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
@@ -20,11 +20,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Commit modules
+        uses: EndBug/add-and-commit@releases/test
+        with:
+          force: true
+          message: "[auto] Commit modules"
+          path: node_modules
+          pattern: "*.*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Compile TypeScript into compressed JavaScript
         run: npm run build
 
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v2.2.0
+      - name: Commit compiler version
+        uses: EndBug/add-and-commit@releases/test
         with:
           force: true
           message: "[auto] Update compiled version"
