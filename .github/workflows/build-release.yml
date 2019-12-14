@@ -1,0 +1,44 @@
+name: Build release
+on:
+  push:
+    branches:
+      - dist
+
+jobs:
+  build:
+    name: Build compiled JS version
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12.0.0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Commit dependencies
+        uses: EndBug/add-and-commit@v2.3.0
+        with:
+          force: true
+          message: "[auto] Update dependencies"
+          path: node_modules
+          pattern: "*.*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compile TypeScript into compressed JavaScript
+        run: npm run build
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v2.3.0
+        with:
+          force: true
+          message: "[auto] Commit compiled files"
+          path: lib
+          pattern: "*.js"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
