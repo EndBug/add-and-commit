@@ -14,8 +14,8 @@ git_setup() {
 EOF
     chmod 600 $HOME/.netrc
 
-    git config --global user.email "actions@github.com"
-    git config --global user.name "Add & Commit GitHub Action"
+    git config --global user.email "$INPUT_AUTHOR_EMAIL"
+    git config --global user.name "$INPUT_AUTHOR_NAME"
 }
 
 add() {
