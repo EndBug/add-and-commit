@@ -1,14 +1,14 @@
 #!/bin/sh
 set -eu
 
-if [ -z "$INPUT_AUTHOR_NAME" ]
-then AUTHOR_NAME=$INPUT_AUTHOR_NAME
-else AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g')
+if [ -z "$INPUT_AUTHOR_NAME" ] # Check if the variable is empty
+then AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g') # If so, fetch the author from the event
+else AUTHOR_NAME=$INPUT_AUTHOR_NAME # If not, use that value
 fi
 
 if [ -z "$INPUT_AUTHOR_EMAIL" ]
-then AUTHOR_EMAIL=$INPUT_AUTHOR_EMAIL
-else AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
+then AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
+else AUTHOR_EMAIL=$INPUT_AUTHOR_EMAIL
 fi
 
 echo "Using '$AUTHOR_NAME' and '$AUTHOR_EMAIL' as author information."
