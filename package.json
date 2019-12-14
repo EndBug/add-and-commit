@@ -4,7 +4,7 @@
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/main.js",
   "scripts": {
-    "build": "npm run compile && npm run compress && rm build/*.js",
+    "build": "npm run compile && npm run compress && rm build/*.js && cp src/*.sh lib",
     "compile": "tsc",
     "compress": "node-minify --compressor babel-minify --input build/*.js --output lib/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -28,12 +28,13 @@
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
     "@actions/core": "^1.1.3",
-    "@actions/exec": "^1.0.2"
+    "shelljs": "^0.8.3"
   },
   "devDependencies": {
     "@node-minify/babel-minify": "^4.1.2",
     "@node-minify/cli": "^4.1.2",
     "@types/node": "^12.7.12",
+    "@types/shelljs": "^0.8.6",
     "typescript": "^3.6.4"
   }
 }

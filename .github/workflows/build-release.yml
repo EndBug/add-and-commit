@@ -29,8 +29,8 @@ jobs:
           author_name: Federico Grandi
           author_email: fgrandi30@gmail.com
           force: true
-          message: "[auto] Commit release files"
-          path: "."
+          message: "[auto] Update compiled version"
+          path: lib
           pattern: "*.*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

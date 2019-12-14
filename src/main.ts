@@ -1,10 +1,9 @@
 import * as core from '@actions/core'
-import * as exec from '@actions/exec'
-
-const cwd = process.env.GITHUB_WORKSPACE || '/github/workspace'
+import * as shell from 'shelljs'
+import * as path from 'path'
 
 try {
-  exec.exec('./entrypoint.sh', [], { cwd })
+  shell.exec(path.join(__dirname, '../src/entrypoint.sh'))
 } catch (e) {
   core.setFailed(e)
 }
