@@ -11,7 +11,7 @@ Add a step like this to your workflow:
 
 ```yaml
 - name: Commit changes # This is the step name that will be displayed in your runs
-  uses: EndBug/add-and-commit@v2.1.1 # You can change this to use a specific version
+  uses: EndBug/add-and-commit@v2.3.0 # You can change this to use a specific version
   with: # See more info about inputs below
     author_name: Your Name
     author_email: mail@example.com
@@ -25,8 +25,8 @@ Add a step like this to your workflow:
 
 ### Inputs:
 
-- `author_name` : the name of the user that will be displayed as the author of the commit
-- `author_email` : the email of the user that will be displayed as the author of the commit
+- `author_name` : the name of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
+- `author_email` : the email of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
 - `message` : the message for the commit
 - `path` : the path(s) to stage files from
 - `pattern` : the pattern that matches file names
@@ -44,7 +44,7 @@ This action only **adds** files so in order to commit a file deletion you need t
 ```yaml
 - run: git rm delete_me.txt
 
-- uses: EndBug/add-and-commit@v2.1.1
+- uses: EndBug/add-and-commit@v2.3.0
   with:
     author_name: Your Name
     author_email: mail@example.com
@@ -84,7 +84,7 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v2.1.1 
+      uses: EndBug/add-and-commit@v2.3.0 
       with:
         author_name: Your Name
         author_email: mail@example.com

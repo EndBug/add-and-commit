@@ -1,6 +1,6 @@
 {
   "name": "add-and-commit",
-  "version": "2.1.1",
+  "version": "2.3.0",
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/main.js",
   "scripts": {
