@@ -4,7 +4,7 @@
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/main.js",
   "scripts": {
-    "build": "npm run compile && npm run compress && rm build/*.js",
+    "build": "npm run compile && npm run compress && rm build/*.js && cp src/*.sh lib",
     "compile": "tsc",
     "compress": "node-minify --compressor babel-minify --input build/*.js --output lib/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"

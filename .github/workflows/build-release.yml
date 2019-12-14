@@ -31,6 +31,6 @@ jobs:
           force: true
           message: "[auto] Update compiled version"
           path: lib
-          pattern: "*.js"
+          pattern: "*.*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
