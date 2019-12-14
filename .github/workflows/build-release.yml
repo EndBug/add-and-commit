@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build release version
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
@@ -19,9 +19,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Stage modules
-        run: git add node_modules -f
 
       - name: Compile TypeScript into compressed JavaScript
         run: npm run build
