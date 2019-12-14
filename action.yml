@@ -3,13 +3,11 @@ description: 'Add & commit files from a path directly from GitHub Actions'
 
 inputs:
   author_name:
-    description: 'The name of the user that will be displayed as the author of the commit'
-    required: true
-    default: 'Add & Commit GitHub Action'
+    description: 'The name of the user that will be displayed as the author of the commit, defaults to author name of head commit'
+    required: false
   author_email:
-    description: 'The email of the user that will be displayed as the author of the commit'
-    required: true
-    default: 'actions@github.com'
+    description: 'The email of the user that will be displayed as the author of the commit, defaults to author email of head commit'
+    required: false
   force:
     description: 'Whether to use the force option on git add, in order to bypass eventual gitignores'
     required: false

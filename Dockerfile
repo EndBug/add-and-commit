@@ -9,6 +9,8 @@ LABEL "repository"="https://github.com/EndBug/add-and-commit"
 LABEL "homepage"="https://github.com/EndBug/add-and-commit"
 LABEL "maintainer"="Federico Grandi <fgrandi30@gmail.com>"
 
+RUN apk add jq
+
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["sh", "/entrypoint.sh"]

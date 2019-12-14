@@ -1,6 +1,18 @@
 #!/bin/sh
 set -eu
 
+if [ -z "$INPUT_AUTHOR_NAME" ] # Check if the variable is empty
+then AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g') # If so, fetch the author from the event
+else AUTHOR_NAME=$INPUT_AUTHOR_NAME # If not, use that value
+fi
+
+if [ -z "$INPUT_AUTHOR_EMAIL" ]
+then AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
+else AUTHOR_EMAIL=$INPUT_AUTHOR_EMAIL
+fi
+
+echo "Using '$AUTHOR_NAME' and '$AUTHOR_EMAIL' as author information."
+
 # Set up .netrc file with GitHub credentials
 git_setup() {
   cat <<- EOF > $HOME/.netrc
@@ -14,8 +26,8 @@ git_setup() {
 EOF
     chmod 600 $HOME/.netrc
 
-    git config --global user.email "actions@github.com"
-    git config --global user.name "Add & Commit GitHub Action"
+    git config --global user.email "$AUTHOR_EMAIL"
+    git config --global user.name "$AUTHOR_NAME"
 }
 
 add() {
@@ -52,7 +64,7 @@ then
     add
 
     echo "Creating commit..."
-    git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
+    git commit -m "$INPUT_MESSAGE" --author="$AUTHOR_NAME <$AUTHOR_EMAIL>"
 
     echo "Pushing to repo..."
     git push --set-upstream origin "${GITHUB_REF:11}"
