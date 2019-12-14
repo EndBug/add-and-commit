@@ -20,15 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Commit modules
-        uses: EndBug/add-and-commit@releases/test
-        with:
-          force: true
-          message: "[auto] Commit modules"
-          path: node_modules
-          pattern: "*.*"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stage modules
+        run: git add node_modules -f
 
       - name: Compile TypeScript into compressed JavaScript
         run: npm run build
@@ -37,7 +30,7 @@ jobs:
         uses: EndBug/add-and-commit@releases/test
         with:
           force: true
-          message: "[auto] Update compiled version"
+          message: "[auto] Add compiled version"
           path: lib
           pattern: "*.*"
         env:
