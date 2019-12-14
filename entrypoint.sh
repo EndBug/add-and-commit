@@ -1,12 +1,12 @@
 #!/bin/sh
 set -eu
 
-if [[ -v INPUT_AUTHOR_NAME ]]
+if [ -z "$INPUT_AUTHOR_NAME" ]
 then AUTHOR_NAME=$INPUT_AUTHOR_NAME
 else AUTHOR_NAME=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.name' | sed 's/"//g')
 fi
 
-if [[ -v INPUT_AUTHOR_EMAIL ]]
+if [ -z "$INPUT_AUTHOR_EMAIL" ]
 then AUTHOR_EMAIL=$INPUT_AUTHOR_EMAIL
 else AUTHOR_EMAIL=$(cat "$GITHUB_EVENT_PATH" | jq '.head_commit.author.email' | sed 's/"//g')
 fi
