@@ -70,12 +70,12 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout repo
-      uses: actions/checkout@master
+      uses: actions/checkout@v1
 
     - name: Set up Node.js
-      uses: actions/setup-node@master
+      uses: actions/setup-node@v1
       with:
-        node-version: 10.0.0
+        node-version: 12.x
     
     - name: Install dependencies
       run: npm install
@@ -84,7 +84,7 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v2.3.0 
+      uses: EndBug/add-and-commit@v2 
       with:
         author_name: Your Name
         author_email: mail@example.com
