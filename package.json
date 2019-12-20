@@ -7,7 +7,7 @@
     "build": "npm run compile && npm run minify && rm build/*.js",
     "compile": "tsc",
     "minify": "minify build -d lib",
-    "dist": "echo \"Preparing for distribution...\" && npm i && npm run build && git add -f node_modules && git add lib && git commit -m \"Commit dist files\"",
+    "dist": "echo \"Preparing for distribution...\" && npm i --only=prod && git add -f node_modules && git commit -m \"Commit dist files\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
