@@ -4,9 +4,10 @@
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/main.js",
   "scripts": {
-    "build": "npm run compile && npm run compress && rm build/*.js && cp src/*.sh lib",
+    "build": "npm run compile && npm run minify && rm build/*.js",
     "compile": "tsc",
-    "compress": "node-minify --compressor babel-minify --input build/*.js --output lib/main.js",
+    "minify": "minify build -d lib",
+    "dist": "echo \"Preparing for distribution...\" && npm i && npm run build && git add -f node_modules && git add lib && git commit -m \"Commit dist files\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -35,6 +36,9 @@
     "@node-minify/cli": "^4.1.2",
     "@types/node": "^12.7.12",
     "@types/shelljs": "^0.8.6",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
+    "eslint": "^6.8.0",
     "typescript": "^3.6.4"
   }
 }
