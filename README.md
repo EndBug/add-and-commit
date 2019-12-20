@@ -11,7 +11,7 @@ Add a step like this to your workflow:
 
 ```yaml
 - name: Commit changes # This is the step name that will be displayed in your runs
-  uses: EndBug/add-and-commit@v2.3.0 # You can change this to use a specific version
+  uses: EndBug/add-and-commit@v2 # You can change this to use a specific version
   with: # See more info about inputs below
     author_name: Your Name
     author_email: mail@example.com
@@ -44,7 +44,7 @@ This action only **adds** files so in order to commit a file deletion you need t
 ```yaml
 - run: git rm delete_me.txt
 
-- uses: EndBug/add-and-commit@v2.3.0
+- uses: EndBug/add-and-commit@v2
   with:
     author_name: Your Name
     author_email: mail@example.com
