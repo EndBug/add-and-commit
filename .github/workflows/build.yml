@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@master
         with:
-          node-version: 12.0.0
+          node-version: 12.x
 
       - name: Install dependencies
         run: npm install
@@ -24,7 +24,7 @@ jobs:
         run: npm run build
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v2.3.0
+        uses: EndBug/add-and-commit@v2
         with:
           force: true
           message: "[auto] Update compiled version"
