@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eu
 
+cd $INPUT_CWD
+echo "Running in $PWD."
+
 # Set up .netrc file with GitHub credentials
 git_setup() {
   cat <<- EOF > $HOME/.netrc
