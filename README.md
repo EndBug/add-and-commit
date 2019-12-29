@@ -15,6 +15,7 @@ Add a step like this to your workflow:
   with: # See more info about inputs below
     author_name: Your Name
     author_email: mail@example.com
+    cwd: "."
     message: "Your commit message"
     path: "."
     pattern: "*.js"
@@ -27,6 +28,7 @@ Add a step like this to your workflow:
 
 - `author_name` : the name of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
 - `author_email` : the email of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
+- `cwd` : the working directory in which your repository is located, defaults to `.`
 - `message` : the message for the commit
 - `path` : the path(s) to stage files from
 - `pattern` : the pattern that matches file names
@@ -70,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout repo
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set up Node.js
       uses: actions/setup-node@v1
@@ -93,6 +95,38 @@ jobs:
         pattern: "*.js"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+If you need to run the action on a repository that is not located in [`$GITHUB_WORKSPACE`](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/using-environment-variables#default-environment-variables), you can use the `cwd` option: the action uses a `cd` normal command, so the path should follow bash standards.
+
+```yaml
+name: Use a different repository directory
+on: push
+
+jobs: 
+  run:
+    name: Add a text file
+    runs-on: ubuntu-latest
+
+    steps:
+      # If you need to, you can checkout your repo to a different location
+      - uses: actions/checkout@v2
+        with:
+          path: "./pathToRepo/"
+
+      # You can make whatever type of change to the repo...
+      - run: echo "123" > ./pathToRepo/file.txt
+
+      # ...and then use the action as you would normally do, but providing the path to the repo
+      - uses: EndBug/add-and-commit@v2
+        with:
+          message: "Add the very useful text file"
+          path: "."
+          pattern: "*.txt"
+          cwd: "./pathToRepo/"
+          force: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## License
