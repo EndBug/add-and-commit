@@ -51,6 +51,9 @@ then
     echo "Switching branch..."
     git checkout "${GITHUB_REF:11}"
 
+    echo "Pulling from remote..."
+    git fetch && git pull
+
     echo "Adding files..."
     add
 
