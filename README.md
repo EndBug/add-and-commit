@@ -58,9 +58,9 @@ This action only **adds** files so in order to commit a file deletion you need t
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Example:
+### Examples:
 
-You want to lint your JavaScript files, located in the `src` folder, with ESLint so that fixable changes are done without your intervention. You can use a workflow like this:
+Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
 ```yaml
 name: Lint source code
