@@ -2,7 +2,7 @@ name: Keep the versions up-to-date
 
 on:
   release:
-    types: [published]
+    types: [published, edited]
 
 jobs:
   actions-tagger:
