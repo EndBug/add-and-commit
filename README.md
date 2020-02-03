@@ -10,29 +10,39 @@ This action lets you choose the path that you want to use when adding & committi
 Add a step like this to your workflow:
 
 ```yaml
-- name: Commit changes # This is the step name that will be displayed in your runs
-  uses: EndBug/add-and-commit@v2 # You can change this to use a specific version
-  with: # See more info about inputs below
+- uses: EndBug/add-and-commit@v2 # You can change this to use a specific version
+  with:
+    # The name of the user that will be displayed as the author of the commit
+    # Default: author of the commit that triggered the run
     author_name: Your Name
+
+    # The The email of the user that will be displayed as the author of the commit
+    # Default: author of the commit that triggered the run
     author_email: mail@example.com
-    cwd: "."
-    message: "Your commit message"
-    path: "."
+
+    # The local path to the directory where your repository is located. You should use actions/checkout first to set it up
+    # Default: '.'
+    cwd: './path/to/the/repo'
+
+    # The message for the commit
+    # Default: 'Commit from GitHub Actions'
+    message: 'Your commit message'
+
+    # The path to stage files from
+    # Default: '.'
+    path: 'src'
+
+    # The pattern that mathces file names
+    # Default: '*.*'
     pattern: "*.js"
-    force: false
+
+    # Whether to use the --force option on git add, in order to bypass eventual gitignores
+    # Default: false
+    force: true
   env:
+    # This is necessary in order to push a commit to the repo
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
 ```
-
-### Inputs:
-
-- `author_name` : the name of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
-- `author_email` : the email of the user that will be displayed as the author of the commit, defaults to the author of the commit that triggered the run
-- `cwd` : the working directory in which your repository is located, defaults to `.`
-- `message` : the message for the commit
-- `path` : the path(s) to stage files from
-- `pattern` : the pattern that matches file names
-- `force` : whether to use the force option on git add, in order to bypass eventual gitignores
 
 ### Environment variables:
 
