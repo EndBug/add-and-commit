@@ -21,7 +21,6 @@ function checkInputs() {
     setDefault('author_email', 'actions@github.com')
   }
   core.info(`Using '${core.getInput('author_name')} <${core.getInput('author_email')}>' as author.`)
-  core.info(`Using '${process.env.INPUT_AUTHOR_NAME} <${process.env.INPUT_AUTHOR_EMAIL}>' as author.`)
 }
 
 function setDefault(input: string, value: string) {

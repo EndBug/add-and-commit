@@ -28,6 +28,10 @@ inputs:
     description: The pattern that mathces file names
     required: false
     default: "*.*"
+  remove:
+    description: The files to remove
+    required: false
+    default: ""
 
 runs:
   using: node12

@@ -24,6 +24,10 @@ Add a step like this to your workflow:
     # Default: '.'
     cwd: './path/to/the/repo'
 
+    # Whether to use the --force option on git add, in order to bypass eventual gitignores
+    # Default: false
+    force: true
+
     # The message for the commit
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'
@@ -36,9 +40,10 @@ Add a step like this to your workflow:
     # Default: '*.*'
     pattern: "*.js"
 
-    # Whether to use the --force option on git add, in order to bypass eventual gitignores
-    # Default: false
-    force: true
+    #  The files to remove
+    # Default: ''
+    remove: "./dir/old_file.js"
+
   env:
     # This is necessary in order to push a commit to the repo
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
@@ -51,22 +56,7 @@ With that said, you can just copy the example line and don't worry about it. If 
 
 ### Deleting files:
 
-This action only **adds** files so in order to commit a file deletion you need to stage that separately: for that, you can run `git rm` in a previous step. Here's a quick example:
-
-```yaml
-- run: git rm delete_me.txt
-
-- uses: EndBug/add-and-commit@v2
-  with:
-    author_name: Your Name
-    author_email: mail@example.com
-    message: "Remove file"
-    path: "."
-    pattern: "*.js"  # The path is not important, the file will get removed anyway: that means you can still use the action as usual
-    force: true
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+You can delete files with the `remove` option: that runs a `git remove` command that will stage the files in the given path for removal. Please keep in mind that if the path is wrong the action will stop.
 
 ### Examples:
 
