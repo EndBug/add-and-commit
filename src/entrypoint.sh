@@ -52,6 +52,9 @@ if ! git diff --cached --exit-code; then
     echo "Adding files..."
     add
 
+    echo "Removing files..."
+    git rm $INPUT_REMOVE
+
     echo "Creating commit..."
     git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
 

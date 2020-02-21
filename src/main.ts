@@ -20,6 +20,7 @@ function checkInputs() {
     setDefault('author_name', 'Add & Commit Action')
     setDefault('author_email', 'actions@github.com')
   }
+  setDefault('remove', '')
   core.info(`Using '${core.getInput('author_name')} <${core.getInput('author_email')}>' as author.`)
   core.info(`Using '${process.env.INPUT_AUTHOR_NAME} <${process.env.INPUT_AUTHOR_EMAIL}>' as author.`)
 }
