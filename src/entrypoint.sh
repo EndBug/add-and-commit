@@ -21,13 +21,18 @@ EOF
 }
 
 add() {
-    if $INPUT_FORCE; then f=-f; fi
+    if $INPUT_FORCE; then f=-f; else f=; fi
     find $INPUT_PATH -name "$INPUT_PATTERN" | while read x; do git add $f $x; done
 }
 
+remove() {
+    if [ -n "$INPUT_REMOVE" ]; then git rm $INPUT_REMOVE; fi
+}
+
 # This is needed to make the check work for untracked files
-echo "Staging files in commit path..."
+echo "Staging files..."
 add
+remove
 
 echo "Checking for uncommitted changes in the git working tree..."
 # This section only runs if there have been file changes
@@ -49,11 +54,14 @@ if ! git diff --cached --exit-code; then
     echo "Pulling from remote..."
     git fetch && git pull
 
+    echo "Resetting files..."
+    git reset
+
     echo "Adding files..."
     add
 
     echo "Removing files..."
-    git rm $INPUT_REMOVE
+    remove
 
     echo "Creating commit..."
     git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
