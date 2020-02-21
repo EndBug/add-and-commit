@@ -32,6 +32,7 @@ inputs:
     description: The files to remove
     required: false
     default: ""
+
 runs:
   using: node12
   main: lib/main.js
