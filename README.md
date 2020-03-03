@@ -10,7 +10,7 @@ This action lets you choose the path that you want to use when adding & committi
 Add a step like this to your workflow:
 
 ```yaml
-- uses: EndBug/add-and-commit@v2 # You can change this to use a specific version
+- uses: EndBug/add-and-commit@v4 # You can change this to use a specific version
   with:
     # The arguments for the git add command (see the paragraph below for more info)
     # Default: '.'
@@ -53,10 +53,12 @@ With that said, you can just copy the example line and don't worry about it. If 
 ### Adding files:
 
 The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you don't want it to use a recursive behavior: `$(find . -maxdepth 1 -name *.js)`
+The script will not stop if one the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Deleting files:
 
-You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. Please keep in mind that if the path is wrong the action will stop.
+You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. 
+The script will not stop if one the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Examples:
 

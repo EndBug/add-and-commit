@@ -2,6 +2,10 @@ name: Add & Commit
 description: Add & commit files from a path directly from GitHub Actions
 
 inputs:
+  add:
+    description: Arguments for the git add command
+    required: false
+    default: "."
   author_name:
     description: The name of the user that will be displayed as the author of the commit
     required: false
@@ -20,10 +24,6 @@ inputs:
     description: The message for the commit
     required: false
     default: Commit from GitHub Actions
-  add:
-    description: Arguments for the git add command
-    required: false
-    default: "."
   remove:
     description: Arguments for the git rm command
     required: false
