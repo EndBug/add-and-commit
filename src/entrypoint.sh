@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -u
 
 cd $INPUT_CWD
 echo "Running in $PWD."
