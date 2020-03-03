@@ -5,8 +5,8 @@ import * as path from 'path'
 try {
   checkInputs()
   shell.exec(path.join(__dirname, '../src/entrypoint.sh'))
-} catch (e) {
-  core.setFailed(e)
+} catch (err) {
+  core.setFailed(err)
 }
 
 function checkInputs() {
