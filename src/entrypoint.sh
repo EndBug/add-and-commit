@@ -22,7 +22,7 @@ EOF
 
 add() {
     if $INPUT_FORCE; then f=-f; else f=; fi
-    find $INPUT_PATH -name "$INPUT_PATTERN" | while read x; do git add $f $x; done
+    git add $INPUT_ADD $f
 }
 
 remove() {

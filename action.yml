@@ -20,16 +20,12 @@ inputs:
     description: The message for the commit
     required: false
     default: Commit from GitHub Actions
-  path:
-    description: The path to stage files from
+  add:
+    description: Arguments for the git add command
     required: false
     default: "."
-  pattern:
-    description: The pattern that mathces file names
-    required: false
-    default: "*.*"
   remove:
-    description: The files to remove
+    description: Arguments for the git rm command
     required: false
     default: ""
 

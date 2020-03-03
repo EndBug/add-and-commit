@@ -12,6 +12,10 @@ Add a step like this to your workflow:
 ```yaml
 - uses: EndBug/add-and-commit@v2 # You can change this to use a specific version
   with:
+    # The arguments for the git add command (see the paragraph below for more info)
+    # Default: '.'
+    add: 'src'
+
     # The name of the user that will be displayed as the author of the commit
     # Default: author of the commit that triggered the run
     author_name: Your Name
@@ -32,15 +36,7 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'
 
-    # The path to stage files from
-    # Default: '.'
-    path: 'src'
-
-    # The pattern that mathces file names
-    # Default: '*.*'
-    pattern: "*.js"
-
-    #  The files to remove
+    #  The arguments for the git rm command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"
 
@@ -54,9 +50,13 @@ Add a step like this to your workflow:
 The only `env` variable required is the token for the action to run: GitHub generates one automatically, but you need to pass it through `env` to make it available to actions. You can find more about `GITHUB_TOKEN` [here](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret).  
 With that said, you can just copy the example line and don't worry about it. If you do want to use a different token you can pass that in, but I wouldn't see any possible advantage in doing so.
 
+### Adding files:
+
+The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you don't want it to use a recursive behavior: `$(find . -maxdepth 1 -name *.js)`
+
 ### Deleting files:
 
-You can delete files with the `remove` option: that runs a `git remove` command that will stage the files in the given path for removal. Please keep in mind that if the path is wrong the action will stop.
+You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. Please keep in mind that if the path is wrong the action will stop.
 
 ### Examples:
 
@@ -86,13 +86,12 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v2 
+      uses: EndBug/add-and-commit@v4
       with:
         author_name: Your Name
         author_email: mail@example.com
         message: "Your commit message"
-        path: "."
-        pattern: "*.js"
+        add: "*.js"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -118,11 +117,10 @@ jobs:
       - run: echo "123" > ./pathToRepo/file.txt
 
       # ...and then use the action as you would normally do, but providing the path to the repo
-      - uses: EndBug/add-and-commit@v2
+      - uses: EndBug/add-and-commit@v4
         with:
           message: "Add the very useful text file"
-          path: "."
-          pattern: "*.txt"
+          add: "*.txt"
           cwd: "./pathToRepo/"
           force: true
         env:
