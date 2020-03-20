@@ -2,12 +2,10 @@
   "name": "add-and-commit",
   "version": "4.0.0",
   "description": "Add & commit files from a path directly from GitHub Actions",
-  "main": "lib/main.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "npm run compile && npm run minify && rm build/*.js",
-    "compile": "tsc",
-    "minify": "minify build -d lib",
-    "dist": "echo \"Preparing for distribution...\" && npm i --only=prod && git add -f node_modules && git commit -m \"Commit dist files\"",
+    "build": "npm i && ncc build src/main.ts --minify --out lib",
+    "watch": "ncc build src/main.ts --watch --out lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,15 +26,14 @@
   },
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
-    "@actions/core": "^1.1.3",
-    "shelljs": "^0.8.3"
+    "@actions/core": "^1.1.3"
   },
   "devDependencies": {
     "@types/node": "^12.7.12",
     "@types/shelljs": "^0.8.6",
     "@typescript-eslint/eslint-plugin": "^2.12.0",
     "@typescript-eslint/parser": "^2.12.0",
-    "babel-minify": "^0.5.1",
+    "@zeit/ncc": "^0.21.1",
     "eslint": "^6.8.0",
     "typescript": "^3.6.4"
   }

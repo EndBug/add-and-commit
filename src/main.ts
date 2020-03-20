@@ -1,12 +1,12 @@
-import * as core from '@actions/core'
-import * as shell from 'shelljs'
-import * as path from 'path'
+import { info, setFailed, getInput, warning } from '@actions/core'
+import { join as path } from 'path'
+import { execFileSync } from 'child_process'
 
 try {
   checkInputs()
-  shell.exec(path.join(__dirname, '../src/entrypoint.sh'))
+  execFileSync(path(__dirname, 'entrypoint.sh'))
 } catch (err) {
-  core.setFailed(err)
+  setFailed(err)
 }
 
 function checkInputs() {
@@ -16,11 +16,11 @@ function checkInputs() {
     setDefault('author_name', author.name)
     setDefault('author_email', author.email)
   } else {
-    core.warning('No event path available, unable to fetch author info.')
+    warning('No event path available, unable to fetch author info.')
     setDefault('author_name', 'Add & Commit Action')
     setDefault('author_email', 'actions@github.com')
   }
-  core.info(`Using '${core.getInput('author_name')} <${core.getInput('author_email')}>' as author.`)
+  info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
 }
 
 function setDefault(input: string, value: string) {
