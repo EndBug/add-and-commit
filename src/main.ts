@@ -17,7 +17,7 @@ function checkInputs() {
     setDefault('author_name', author.name)
     setDefault('author_email', author.email)
   } else {
-    warning(`Unable to fetch author info: couldn't find ${!eventPath ? 'event path' : !require(eventPath)?.head_commit ? 'commit' : 'commit author'}.`)
+    if (!getInput('author_name') || !getInput('author_email')) warning(`Unable to fetch author info: couldn't find ${!eventPath ? 'event path' : !require(eventPath)?.head_commit ? 'commit' : 'commit author'}.`)
     setDefault('author_name', 'Add & Commit Action')
     setDefault('author_email', 'actions@github.com')
   }
