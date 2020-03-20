@@ -11,15 +11,17 @@ try {
 
 function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH
-  if (eventPath) {
-    const { author } = require(eventPath).head_commit
+  const author = eventPath && require(eventPath)?.head_commit?.author
+
+  if (author) {
     setDefault('author_name', author.name)
     setDefault('author_email', author.email)
   } else {
-    warning('No event path available, unable to fetch author info.')
+    warning(`Unable to fetch author info: couldn't find ${!eventPath ? 'event path' : !require(eventPath)?.head_commit ? 'commit' : 'commit author'}.`)
     setDefault('author_name', 'Add & Commit Action')
     setDefault('author_email', 'actions@github.com')
   }
+
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
 }
 
