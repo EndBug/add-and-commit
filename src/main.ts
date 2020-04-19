@@ -6,7 +6,8 @@ try {
   checkInputs()
   execFileSync(path(__dirname, 'entrypoint.sh'))
 } catch (err) {
-  setFailed(err)
+  console.error(err)
+  setFailed(err instanceof Error ? err.message : err)
 }
 
 function checkInputs() {
