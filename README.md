@@ -1,9 +1,9 @@
 # Add & Commit
 
-You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds and so on...
+You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
 
 This is **heavily** inspired by [git-auto-commit-action](https://github.com/stefanzweifel/git-auto-commit-action) (by [Stefan Zweifel](https://github.com/stefanzweifel)): that action automatically detects changed files and commits them. While this is useful for most situations, this doesn't commit untracked files and can sometimes commit unintended changes (such as `package-lock.json` or similar, that may have happened during previous steps).  
-This action lets you choose the path that you want to use when adding & committing changes, so that it works as you would normally do using `git` on your machine.
+This action lets you choose the path that you want to use when adding & committing changes so that it works as you would normally do using `git` on your machine.
 
 ## Usage
 
@@ -12,7 +12,7 @@ Add a step like this to your workflow:
 ```yaml
 - uses: EndBug/add-and-commit@v4 # You can change this to use a specific version
   with:
-    # The arguments for the git add command (see the paragraph below for more info)
+    # The arguments for the `git add` command (see the paragraph below for more info)
     # Default: '.'
     add: 'src'
 
@@ -20,7 +20,7 @@ Add a step like this to your workflow:
     # Default: author of the commit that triggered the run
     author_name: Your Name
 
-    # The The email of the user that will be displayed as the author of the commit
+    # The email of the user that will be displayed as the author of the commit
     # Default: author of the commit that triggered the run
     author_email: mail@example.com
 
@@ -28,7 +28,7 @@ Add a step like this to your workflow:
     # Default: '.'
     cwd: './path/to/the/repo'
 
-    # Whether to use the --force option on git add, in order to bypass eventual gitignores
+    # Whether to use the --force option on `git add`, in order to bypass eventual gitignores
     # Default: false
     force: true
 
@@ -36,7 +36,7 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'
 
-    #  The arguments for the git rm command (see the paragraph below for more info)
+    #  The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"
 
@@ -48,17 +48,17 @@ Add a step like this to your workflow:
 ### Environment variables:
 
 The only `env` variable required is the token for the action to run: GitHub generates one automatically, but you need to pass it through `env` to make it available to actions. You can find more about `GITHUB_TOKEN` [here](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret).  
-With that said, you can just copy the example line and don't worry about it. If you do want to use a different token you can pass that in, but I wouldn't see any possible advantage in doing so.
+That said, you can just copy the example line and not worry about it. If you do want to use a different token you can pass that in, but I wouldn't see any possible advantage in doing so.
 
 ### Adding files:
 
 The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you don't want it to use a recursive behavior: `$(find . -maxdepth 1 -name *.js)`.
-The script will not stop if one the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
+The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Deleting files:
 
 You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. 
-The script will not stop if one the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
+The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Examples:
 
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # If you need to, you can checkout your repo to a different location
+      # If you need to, you can check out your repo to a different location
       - uses: actions/checkout@v2
         with:
           path: "./pathToRepo/"
