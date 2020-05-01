@@ -4,8 +4,9 @@ import { execFile } from 'child_process'
 
 try {
   checkInputs()
-  execFile(path(__dirname, 'entrypoint.sh'))
-    .stdout?.pipe(process.stdout)
+  const child = execFile(path(__dirname, 'entrypoint.sh'))
+  child.stdout?.pipe(process.stdout)
+  child.stderr?.pipe(process.stderr)
 } catch (err) {
   console.error(err)
   setFailed(err instanceof Error ? err.message : err)
