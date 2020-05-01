@@ -4,7 +4,8 @@ import { execFileSync } from 'child_process'
 
 try {
   checkInputs()
-  execFileSync(path(__dirname, 'entrypoint.sh'))
+  const output = execFileSync(path(__dirname, 'entrypoint.sh'))
+  info(output.toString())
 } catch (err) {
   console.error(err)
   setFailed(err instanceof Error ? err.message : err)
