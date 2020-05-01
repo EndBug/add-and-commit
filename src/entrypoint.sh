@@ -44,14 +44,14 @@ if ! git diff --cached --quiet --exit-code; then
     git fetch
 
     # Verify if the branch needs to be created
-    if ! git rev-parse --verify --quiet "${GITHUB_REF:11}"; then
+    if ! git rev-parse --verify --quiet "$INPUT_REF"; then
         echo "Creating branch..."
-        git branch "${GITHUB_REF:11}"
+        git branch "$INPUT_REF"
     fi
 
     # Switch to branch from current workflow run
     echo "Switching branch..."
-    git checkout "${GITHUB_REF:11}"
+    git checkout "$INPUT_REF"
 
     echo "Pulling from remote..."
     git fetch && git pull
@@ -69,7 +69,7 @@ if ! git diff --cached --quiet --exit-code; then
     git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
 
     echo "Pushing to repo..."
-    git push --set-upstream origin "${GITHUB_REF:11}"
+    git push --set-upstream origin "$INPUT_REF"
 
     echo "::endgroup::"
     echo "Task completed."

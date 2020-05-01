@@ -24,6 +24,9 @@ inputs:
     description: The message for the commit
     required: false
     default: Commit from GitHub Actions
+  ref:
+    description: Name of the branch to use, if different from the one that triggered the workflow
+    required: false
   remove:
     description: Arguments for the git rm command
     required: false

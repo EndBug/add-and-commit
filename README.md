@@ -36,7 +36,11 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'
 
-    #  The arguments for the `git rm` command (see the paragraph below for more info)
+    # Name of the branch to use, if different from the one that triggered the workflow
+    # Default: the branch that triggered the workflow (from GITHUB_REF)
+    ref: 'someOtherBranch'
+
+    # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"
 

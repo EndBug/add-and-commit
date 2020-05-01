@@ -25,6 +25,8 @@ function checkInputs() {
     setDefault('author_email', 'actions@github.com')
   }
 
+  setDefault('ref', process.env.GITHUB_REF?.substring(11) || '')
+
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
 }
 
