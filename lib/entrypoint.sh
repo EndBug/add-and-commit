@@ -1,6 +1,8 @@
 #!/bin/bash
 set -u
 
+echo "::group::Internal logs"
+
 cd $INPUT_CWD
 echo "Running in $PWD."
 
@@ -68,6 +70,10 @@ if ! git diff --cached --quiet --exit-code; then
 
     echo "Pushing to repo..."
     git push --set-upstream origin "${GITHUB_REF:11}"
+
+    echo "::endgroup::"
+    echo "Finished."
 else
+    echo "::endgroup::"
     echo "Working tree clean. Nothing to commit."
 fi
