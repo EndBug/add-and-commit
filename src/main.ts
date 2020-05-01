@@ -1,11 +1,11 @@
 import { info, setFailed, getInput, warning } from '@actions/core'
 import { join as path } from 'path'
-import { execFileSync } from 'child_process'
+import { execFile } from 'child_process'
 
 try {
   checkInputs()
-  const output = execFileSync(path(__dirname, 'entrypoint.sh'))
-  info(output.toString())
+  execFile(path(__dirname, 'entrypoint.sh'))
+    .stdout?.on('data', data => info(data.toString()))
 } catch (err) {
   console.error(err)
   setFailed(err instanceof Error ? err.message : err)
