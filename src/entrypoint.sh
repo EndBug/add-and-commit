@@ -36,7 +36,7 @@ remove
 
 echo "Checking for uncommitted changes in the git working tree..."
 # This section only runs if there have been file changes
-if ! git diff --cached --exit-code; then
+if ! git diff --cached --quiet --exit-code; then
     git_setup
 
     git fetch
