@@ -72,7 +72,7 @@ if ! git diff --cached --quiet --exit-code; then
     git push --set-upstream origin "${GITHUB_REF:11}"
 
     echo "::endgroup::"
-    echo "Finished."
+    echo "Task completed."
 else
     echo "::endgroup::"
     echo "Working tree clean. Nothing to commit."
