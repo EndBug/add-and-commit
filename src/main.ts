@@ -5,7 +5,7 @@ import { execFile } from 'child_process'
 try {
   checkInputs()
   execFile(path(__dirname, 'entrypoint.sh'))
-    .stdout?.on('data', data => info(data.toString()))
+    .stdout?.pipe(process.stdout)
 } catch (err) {
   console.error(err)
   setFailed(err instanceof Error ? err.message : err)
