@@ -44,6 +44,10 @@ Add a step like this to your workflow:
     # Default: ''
     remove: "./dir/old_file.js"
 
+    # Name of the tag to add to the new commit. Use an empty string to disable tagging.
+    # Default: ''
+    tag: "v1.0.0"
+
   env:
     # This is necessary in order to push a commit to the repo
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
