@@ -31,6 +31,10 @@ remove() {
     if [ -n "$INPUT_REMOVE" ]; then git rm $INPUT_REMOVE; fi
 }
 
+tag() {
+    if [ -n "$INPUT_TAG" ]; then git tag $INPUT_TAG; fi
+}
+
 # This is needed to make the check work for untracked files
 echo "Staging files..."
 add
@@ -68,8 +72,11 @@ if ! git diff --cached --quiet --exit-code; then
     echo "Creating commit..."
     git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>"
 
+    echo "Tagging commit..."
+    tag
+
     echo "Pushing to repo..."
-    git push --set-upstream origin "$INPUT_REF"
+    git push --set-upstream origin --tags "$INPUT_REF"
 
     echo "::endgroup::"
     echo "Task completed."
