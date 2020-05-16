@@ -76,7 +76,7 @@ if ! git diff --cached --quiet --exit-code; then
     tag
 
     echo "Pushing to repo..."
-    git push --set-upstream origin "$INPUT_REF"
+    git push --set-upstream origin --tags "$INPUT_REF"
 
     echo "::endgroup::"
     echo "Task completed."
