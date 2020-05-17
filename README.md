@@ -70,7 +70,8 @@ The script will not stop if one of the git commands fails. E.g.: if your command
 
 ### Tagging:
 
-You can tag commits with the `tag` option: when used, it will create a lightweight tag for the commit with the name you set as input. If not entered (or if an empty string is passed) teh action won't create any tag.
+You can tag commits with the `tag` option: when used, it will create a lightweight tag for the commit with the name you set as input. If not entered (or if an empty string is passed) teh action won't create any tag.  
+If there is already a tag with the name you entered it will be overwritten, and so the tag will be "updated".
 
 ### Examples:
 
