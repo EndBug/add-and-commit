@@ -44,7 +44,7 @@ Add a step like this to your workflow:
     # Default: ''
     remove: "./dir/old_file.js"
 
-    # Name of the tag to add to the new commit. Use an empty string to disable tagging.
+    # Name of the tag to add to the new commit (see the paragraph below for more info)
     # Default: ''
     tag: "v1.0.0"
 
@@ -67,6 +67,10 @@ The script will not stop if one of the git commands fails. E.g.: if your command
 
 You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. 
 The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
+
+### Tagging:
+
+You can tag commits with the `tag` option: when used, it will create a lightweight tag for the commit with the name you set as input. If not entered (or if an empty string is passed) teh action won't create any tag.
 
 ### Examples:
 
