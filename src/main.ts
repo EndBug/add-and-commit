@@ -4,7 +4,7 @@ import { resolve } from 'path'
 
 try {
   checkInputs()
-  const child = execFile(resolve(__dirname, 'entrypoint.sh'))
+  const child = execFile(resolve('entrypoint.sh'), [], { shell: true })
   child.stdout?.pipe(process.stdout)
   child.stderr?.pipe(process.stderr)
 } catch (err) {
