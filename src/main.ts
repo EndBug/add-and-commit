@@ -1,10 +1,10 @@
 import { info, setFailed, getInput, warning } from '@actions/core'
 import { execFile } from 'child_process'
-import { resolve } from 'path'
+import { join } from 'path'
 
 try {
   checkInputs()
-  const child = execFile(resolve('entrypoint.sh'), [], { shell: true })
+  const child = execFile(join(__dirname, 'entrypoint.sh'), [], { shell: true })
   child.stdout?.pipe(process.stdout)
   child.stderr?.pipe(process.stderr)
 } catch (err) {
