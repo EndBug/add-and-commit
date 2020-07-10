@@ -74,6 +74,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "onilton",
+      "name": "Onilton Maciel",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/725676?v=4",
+      "profile": "https://github.com/onilton",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
