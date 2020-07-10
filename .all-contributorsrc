@@ -48,6 +48,15 @@
       ]
     },
     {
+      "login": "brahma-dev",
+      "name": "Brahma Dev",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1793295?v=4",
+      "profile": "https://github.com/brahma-dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
       "login": "felixlapalma",
       "name": "Felix Rojo Lapalma",
       "avatar_url": "https://avatars2.githubusercontent.com/u/38389683?v=4",
@@ -55,7 +64,7 @@
       "contributions": [
         "bug"
       ]
-    }
+    },
   ],
   "contributorsPerLine": 7,
   "skipCi": true
