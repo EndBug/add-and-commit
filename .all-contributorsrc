@@ -46,6 +46,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "brahma-dev",
+      "name": "Brahma Dev",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1793295?v=4",
+      "profile": "https://github.com/brahma-dev",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
