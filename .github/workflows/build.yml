@@ -29,7 +29,7 @@ jobs:
       - name: Commit changes
         uses: EndBug/add-and-commit@v4.0.0
         with:
-          message: "[auto] Update compiled version"
+          message: "[auto] build: update compiled version"
           add: lib
           force: true
         env:
