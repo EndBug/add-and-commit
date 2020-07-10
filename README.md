@@ -1,6 +1,6 @@
 # Add & Commit
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
@@ -160,6 +160,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/jhhughes"><img src="https://avatars2.githubusercontent.com/u/13724293?v=4" width="100px;" alt=""/><br /><sub><b>jhhughes</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Ajhhughes" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/brahma-dev"><img src="https://avatars3.githubusercontent.com/u/1793295?v=4" width="100px;" alt=""/><br /><sub><b>Brahma Dev</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Abrahma-dev" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/felixlapalma"><img src="https://avatars2.githubusercontent.com/u/38389683?v=4" width="100px;" alt=""/><br /><sub><b>Felix Rojo Lapalma</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Afelixlapalma" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://robinwijnant.me"><img src="https://avatars3.githubusercontent.com/u/33033209?v=4" width="100px;" alt=""/><br /><sub><b>Robin Wijnant</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3ARobinWijnant" title="Bug reports">🐛</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=RobinWijnant" title="Code">💻</a></td>
   </tr>
 </table>
 
