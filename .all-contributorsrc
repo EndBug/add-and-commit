@@ -111,6 +111,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "JonasJacobsUserspace",
+      "name": "JonasJacobsUserspace",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/59708720?v=4",
+      "profile": "https://github.com/JonasJacobsUserspace",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
