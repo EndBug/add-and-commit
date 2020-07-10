@@ -1,6 +1,6 @@
 {
   "projectName": "add-and-commit",
-  "projectOwner": "Federico Grandi",
+  "projectOwner": "EndBug",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -19,7 +19,17 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "jactor-rises",
+      "name": "Tor Egil Jacobsen",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/14565088?v=4",
+      "profile": "https://github.com/jactor-rises",
+      "contributions": [
+        "code"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
