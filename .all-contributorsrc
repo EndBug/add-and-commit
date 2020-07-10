@@ -55,6 +55,43 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "brahma-dev",
+      "name": "Brahma Dev",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1793295?v=4",
+      "profile": "https://github.com/brahma-dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "felixlapalma",
+      "name": "Felix Rojo Lapalma",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/38389683?v=4",
+      "profile": "https://github.com/felixlapalma",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "RobinWijnant",
+      "name": "Robin Wijnant",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/33033209?v=4",
+      "profile": "http://robinwijnant.me",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "onilton",
+      "name": "Onilton Maciel",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/725676?v=4",
+      "profile": "https://github.com/onilton",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
