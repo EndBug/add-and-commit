@@ -1,6 +1,6 @@
 # Add & Commit
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
@@ -156,6 +156,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/EndBug"><img src="https://avatars1.githubusercontent.com/u/26386270?v=4" width="100px;" alt=""/><br /><sub><b>Federico Grandi</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=EndBug" title="Code">💻</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=EndBug" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/jactor-rises"><img src="https://avatars3.githubusercontent.com/u/14565088?v=4" width="100px;" alt=""/><br /><sub><b>Tor Egil Jacobsen</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=jactor-rises" title="Code">💻</a></td>
+    <td align="center"><a href="https://twitter.com/yelizariev"><img src="https://avatars0.githubusercontent.com/u/186131?v=4" width="100px;" alt=""/><br /><sub><b>Ivan Yelizariev</b></sub></a><br /><a href="#ideas-yelizariev" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
