@@ -64,6 +64,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "RobinWijnant",
+      "name": "Robin Wijnant",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/33033209?v=4",
+      "profile": "http://robinwijnant.me",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
