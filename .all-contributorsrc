@@ -46,6 +46,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "felixlapalma",
+      "name": "Felix Rojo Lapalma",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/38389683?v=4",
+      "profile": "https://github.com/felixlapalma",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
