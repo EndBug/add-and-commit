@@ -101,6 +101,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "ToMe25",
+      "name": "ToMe25",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/38815969?v=4",
+      "profile": "https://github.com/ToMe25",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
