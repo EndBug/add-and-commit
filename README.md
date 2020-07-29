@@ -35,6 +35,10 @@ Add a step like this to your workflow:
     # Default: false
     force: true
 
+    # Whether to use the --signoff option on `git commit`
+    # Default: false
+    signoff: true
+
     # The message for the commit
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'

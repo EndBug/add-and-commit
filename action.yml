@@ -20,6 +20,10 @@ inputs:
     description: Whether to use the force option on git add, in order to bypass eventual gitignores
     required: false
     default: "false"
+  signoff:
+    description: Whether to use the signoff option on git commit
+    required: false
+    default: "false"
   message:
     description: The message for the commit
     required: false
