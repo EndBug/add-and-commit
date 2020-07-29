@@ -31,6 +31,11 @@ remove() {
     if [ -n "$INPUT_REMOVE" ]; then git rm $INPUT_REMOVE; fi
 }
 
+commit() {
+    if $INPUT_SIGNOFF; then signoffcmd=--signoff; else signoffcmd=; fi
+    git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>" $signoffcmd
+}
+
 tag() {
     if [ -n "$INPUT_TAG" ]; then git tag $INPUT_TAG; fi
 }
@@ -70,11 +75,7 @@ if ! git diff --cached --quiet --exit-code; then
     remove
 
     echo "Creating commit..."
-    signoffcmd=
-    if $INPUT_SIGNOFF; then
-        signoffcmd=--signoff
-    fi
-    git commit -m "$INPUT_MESSAGE" --author="$INPUT_AUTHOR_NAME <$INPUT_AUTHOR_EMAIL>" "$signoffcmd"
+    commit
 
     echo "Tagging commit..."
     tag
