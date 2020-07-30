@@ -1,4 +1,4 @@
-import { info, setFailed, getInput, warning } from '@actions/core'
+import { info, setFailed, getInput, warning, debug } from '@actions/core'
 import { execFile } from 'child_process'
 import { join } from 'path'
 
@@ -14,7 +14,7 @@ try {
 
 function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH,
-    event = require(eventPath || ''),
+    event = eventPath && require(eventPath),
     author = event?.head_commit?.author
 
   if (author) {
@@ -33,9 +33,9 @@ function checkInputs() {
 
   const actualRef = setDefault('ref', defaultRef || '')
 
-  console.debug(process.env.GITHUB_EVENT_NAME || '')
-  console.debug(isPR + '')
-  console.debug(actualRef)
+  debug(process.env.GITHUB_EVENT_NAME || '')
+  debug(isPR + '')
+  debug(actualRef)
 
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
   if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
