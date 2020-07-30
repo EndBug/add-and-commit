@@ -13,8 +13,9 @@ try {
 }
 
 function checkInputs() {
-  const eventPath = process.env.GITHUB_EVENT_PATH
-  const author = eventPath && require(eventPath)?.head_commit?.author
+  const eventPath = process.env.GITHUB_EVENT_PATH,
+    event = require(eventPath || ''),
+    author = event?.head_commit?.author
 
   if (author) {
     setDefault('author_name', author.name)
@@ -25,12 +26,19 @@ function checkInputs() {
     setDefault('author_email', 'actions@github.com')
   }
 
-  setDefault('ref', process.env.GITHUB_REF?.substring(11) || '')
+  const isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
+    defaultRef = isPR
+      ? event?.pull_request?.head?.ref as string
+      : process.env.GITHUB_REF?.substring(11)
+
+  const actualRef = setDefault('ref', defaultRef || '')
 
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
+  if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
 }
 
 function setDefault(input: string, value: string) {
   const key = 'INPUT_' + input.toUpperCase()
   if (!process.env[key]) process.env[key] = value
+  return process.env[key] as string
 }
