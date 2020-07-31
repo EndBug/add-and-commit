@@ -16,7 +16,7 @@ async function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
-    sha = event?.pull_request?.head?.sha as string,
+    sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
     defaultRef = isPR
       ? event?.pull_request?.head?.ref as string
       : process.env.GITHUB_REF?.substring(11)
@@ -24,7 +24,9 @@ async function checkInputs() {
   const actualRef = setDefault('ref', defaultRef || '')
 
   let author = event?.head_commit?.author
-  if (isPR && sha && !author) {
+  if (sha && !author) {
+    info('Unable to get commit from workflow event: trying with the GitHub API...')
+
     // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
     const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
       headers = process.env.GITHUB_TOKEN ? {
