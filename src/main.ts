@@ -1,37 +1,59 @@
-import { info, setFailed, getInput, warning, debug } from '@actions/core'
+import { info, setFailed, getInput, warning } from '@actions/core'
 import { execFile } from 'child_process'
-import { join } from 'path'
+import path from 'path'
+import axios from 'axios'
 
-try {
-  checkInputs()
-  const child = execFile(join(__dirname, 'entrypoint.sh'), [], { shell: true })
+checkInputs().then(() => {
+  const child = execFile(path.join(__dirname, 'entrypoint.sh'), [], { shell: true })
   child.stdout?.pipe(process.stdout)
   child.stderr?.pipe(process.stderr)
-} catch (err) {
+}).catch(err => {
   console.error(err)
   setFailed(err instanceof Error ? err.message : err)
-}
+})
 
-function checkInputs() {
+async function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
-    author = event?.head_commit?.author
-
-  if (author) {
-    setDefault('author_name', author.name)
-    setDefault('author_email', author.email)
-  } else {
-    if (!getInput('author_name') || !getInput('author_email')) warning(`Unable to fetch author info: couldn't find ${!eventPath ? 'event path' : !require(eventPath)?.head_commit ? 'commit' : 'commit author'}.`)
-    setDefault('author_name', 'Add & Commit Action')
-    setDefault('author_email', 'actions@github.com')
-  }
-
-  const isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
+    isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
+    sha = event?.pull_request?.head?.sha as string,
     defaultRef = isPR
       ? event?.pull_request?.head?.ref as string
       : process.env.GITHUB_REF?.substring(11)
 
   const actualRef = setDefault('ref', defaultRef || '')
+
+  let author = event?.head_commit?.author
+  if (isPR && sha && !author) {
+    // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
+    const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
+      headers = process.env.GITHUB_TOKEN ? {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+      } : undefined,
+      commit = (await axios.get(url, { headers })).data
+
+    author = commit?.commit?.author
+  }
+
+  if (author) {
+    setDefault('author_name', author.name)
+    setDefault('author_email', author.email)
+  }
+
+  if (!getInput('author_name') || !getInput('author_email')) {
+    const reason = !eventPath
+      ? 'event path'
+      : isPR
+        ? sha
+          ? 'fetch commit'
+          : 'find commit sha'
+        : !event?.head_commit
+          ? 'find commit'
+          : 'find commit author'
+    warning(`Unable to fetch author info: couldn't ${reason}.`)
+    setDefault('author_name', 'Add & Commit Action')
+    setDefault('author_email', 'actions@github.com')
+  }
 
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
   if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
