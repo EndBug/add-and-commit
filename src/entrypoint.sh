@@ -52,15 +52,9 @@ if ! git diff --cached --quiet --exit-code; then
 
     git fetch
 
-    # Verify if the branch needs to be created
-    if ! git rev-parse --verify --quiet "$INPUT_REF"; then
-        echo "Creating branch..."
-        git branch "$INPUT_REF"
-    fi
-
-    # Switch to branch from current workflow run
-    echo "Switching branch..."
-    git checkout "$INPUT_REF"
+    # Switch branch (create a new one if it doesn't exist)
+    echo "Switching/creating branch..."
+    git checkout "$INPUT_REF" 2>/dev/null || git checkout -b "$INPUT_REF"
 
     echo "Pulling from remote..."
     git fetch && git pull
