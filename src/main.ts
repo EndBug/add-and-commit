@@ -33,10 +33,6 @@ function checkInputs() {
 
   const actualRef = setDefault('ref', defaultRef || '')
 
-  debug(process.env.GITHUB_EVENT_NAME || '')
-  debug(isPR + '')
-  debug(actualRef)
-
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
   if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
 }
