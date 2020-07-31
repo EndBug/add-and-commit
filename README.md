@@ -1,6 +1,6 @@
 # Add & Commit
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
@@ -173,6 +173,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/ToMe25"><img src="https://avatars1.githubusercontent.com/u/38815969?v=4" width="100px;" alt=""/><br /><sub><b>ToMe25</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=ToMe25" title="Code">💻</a> <a href="#ideas-ToMe25" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/JonasJacobsUserspace"><img src="https://avatars0.githubusercontent.com/u/59708720?v=4" width="100px;" alt=""/><br /><sub><b>JonasJacobsUserspace</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AJonasJacobsUserspace" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/pvogt09"><img src="https://avatars3.githubusercontent.com/u/50047961?v=4" width="100px;" alt=""/><br /><sub><b>pvogt09</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=pvogt09" title="Code">💻</a></td>
+    <td align="center"><a href="http://hoten.cc"><img src="https://avatars1.githubusercontent.com/u/4071474?v=4" width="100px;" alt=""/><br /><sub><b>Connor Clark</b></sub></a><br /><a href="#ideas-connorjclark" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
