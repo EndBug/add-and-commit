@@ -1,11 +1,10 @@
 name: Build
 on:
   push:
-    branches-ignore:
-      - dist
     paths:
       - src/**
       - .github/workflows/build.yml
+  workflow_dispatch:
 
 jobs:
   build:
