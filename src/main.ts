@@ -32,7 +32,13 @@ async function checkInputs() {
       headers = process.env.GITHUB_TOKEN ? {
         Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
       } : undefined,
-      commit = (await axios.get(url, { headers })).data
+      commit = (await axios.get(url, { headers }).catch(err => {
+        info('::group::Request error:')
+        info(`Request URL: ${url}`)
+        info(err)
+        info('::endgroup::')
+        return undefined
+      }))?.data
 
     author = commit?.commit?.author
   }
