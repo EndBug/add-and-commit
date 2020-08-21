@@ -1,4 +1,4 @@
-name: 'Close stale issues and PRs'
+name: 'Handle stale issues and PRs'
 on:
   schedule:
     - cron: '0 0 * * *'
