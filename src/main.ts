@@ -15,11 +15,14 @@ checkInputs().then(() => {
 async function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
+    token = process.env.GITHUB_TOKEN,
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
     sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
     defaultRef = isPR
       ? event?.pull_request?.head?.ref as string
       : process.env.GITHUB_REF?.substring(11)
+
+  if (!token) warning('The GITHUB_TOKEN env variable is missing: the action may not work as expected.')
 
   const actualRef = setDefault('ref', defaultRef || '')
 
@@ -29,8 +32,8 @@ async function checkInputs() {
 
     // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
     const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
-      headers = process.env.GITHUB_TOKEN ? {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+      headers = token ? {
+        Authorization: `Bearer ${token}`
       } : undefined,
       commit = (await axios.get(url, { headers }).catch(err => {
         info('::group::Request error:')
