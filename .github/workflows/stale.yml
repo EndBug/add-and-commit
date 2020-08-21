@@ -1,0 +1,21 @@
+name: 'Close stale issues and PRs'
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'This issue is being marked as "stale" because it has been open 30 days with no activity. Remove the "stale" label or comment, otherwise this will be closed in 5 days.'
+          stale-issue-label: stale
+          exempt-issue-labels: pinned
+          stale-pr-message: 'This PR is being marked as "stale" because it has been open 30 days with no activity. Remove the "stale" label or comment, otherwise this will be closed in 5 days.'
+          stale-pr-label: stale
+          exempt-pr-labels: pinned
+          days-before-stale: 30
+          days-before-close: 5
