@@ -5,7 +5,7 @@ inputs:
   add:
     description: Arguments for the git add command
     required: false
-    default: "."
+    default: '.'
   author_name:
     description: The name of the user that will be displayed as the author of the commit
     required: false
@@ -15,15 +15,15 @@ inputs:
   cwd:
     description: The directory where your repository is located. You should use actions/checkout first to set it up
     required: false
-    default: "."
+    default: '.'
   force:
     description: Whether to use the force option on git add, in order to bypass eventual gitignores
     required: false
-    default: "false"
+    default: 'false'
   signoff:
     description: Whether to use the signoff option on git commit
     required: false
-    default: "false"
+    default: 'false'
   message:
     description: The message for the commit
     required: false
@@ -34,11 +34,9 @@ inputs:
   remove:
     description: Arguments for the git rm command
     required: false
-    default: ""
   tag:
     description: The name of the tag to add to the new commit
     required: false
-    default: ""
 
 runs:
   using: node12

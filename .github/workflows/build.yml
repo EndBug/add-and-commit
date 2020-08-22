@@ -11,25 +11,27 @@ jobs:
     name: Build compiled JS version
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: 12.x
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Compile TypeScript into compressed JavaScript
-        run: npm run build
+      - run: npm run build
 
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v4
+      - uses: EndBug/add-and-commit@v4
         with:
-          message: "[auto] build: update compiled version"
+          message: '[auto] build: update compiled version'
           add: lib
           force: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: EndBug/add-and-commit@v4
+        with:
+          message: '[auto] build: update input typings'
+          add: src/inputs.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
