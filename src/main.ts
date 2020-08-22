@@ -1,18 +1,56 @@
-import { info, setFailed, getInput, warning } from '@actions/core'
-import { execFile } from 'child_process'
-import path from 'path'
+import { info, setFailed, getInput as getInputCore, warning, debug, startGroup } from '@actions/core'
+import fs from 'fs'
 import axios from 'axios'
+import simpleGit from 'simple-git'
 
-checkInputs().then(() => {
-  const child = execFile(path.join(__dirname, 'entrypoint.sh'), [], { shell: true })
-  child.stdout?.pipe(process.stdout)
-  child.stderr?.pipe(process.stderr)
-}).catch(err => {
-  console.error(err)
-  setFailed(err instanceof Error ? err.message : err)
-})
+import { Input, inputs } from './inputs'
+type InputRecord = Record<Input, string | boolean | undefined>
+
+const git = simpleGit({
+  baseDir: getInput('cwd'),
+
+});
+
+// let inputValues: InputRecord
+
+(async () => {
+  await checkInputs()
+  // inputValues = inputs.reduce((obj, input) => ({ ...obj, [input]: getInput(input) }), {}) as InputRecord
+
+  startGroup('Internal logs')
+  await setLoginInfo()
+
+  await git.fetch()
+
+  info('Switching/creating branch...')
+  await git
+    .checkout(getInput('ref'))
+    .catch(() => git.checkoutLocalBranch(getInput('ref')))
+
+  info('Pulling from remote...')
+  await git
+    .fetch()
+    .pull()
+
+  info('Resetting files...')
+  await git.reset()
+
+  if (getInput('add')) {
+    info('Adding files...')
+
+    if (git.checkIgnore())
+      await git.add('')
+  }
+
+})().catch(setFailed)
 
 async function checkInputs() {
+  function setDefault(input: string, value: string) {
+    const key = 'INPUT_' + input.toUpperCase()
+    if (!process.env[key]) process.env[key] = value
+    return process.env[key] as string
+  }
+
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
     token = process.env.GITHUB_TOKEN,
@@ -70,8 +108,35 @@ async function checkInputs() {
   if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
 }
 
-function setDefault(input: string, value: string) {
-  const key = 'INPUT_' + input.toUpperCase()
-  if (!process.env[key]) process.env[key] = value
-  return process.env[key] as string
+function getInput(name: Input) {
+  return getInputCore(name)
+}
+
+async function setLoginInfo() {
+  const myConfig = `
+  machine github.com
+  login $GITHUB_ACTOR
+  password $GITHUB_TOKEN
+
+  machine api.github.com
+  login $GITHUB_ACTOR
+  password $GITHUB_TOKEN
+  `.trim(),
+    configFilePath = `${process.env.HOME}/.netrc`
+
+  let nextConfig = ''
+  try {
+    nextConfig = fs.readFileSync(configFilePath, { encoding: 'utf8' })
+    nextConfig += '\n' + myConfig
+  } catch {
+    nextConfig = myConfig
+  }
+
+  fs.writeFileSync(configFilePath, nextConfig)
+  debug(`> Current .netrc\n${nextConfig}`)
+
+  await git
+    .addConfig('user.email', getInput('author_email'))
+    .addConfig('user.name', getInput('author_name'))
+  debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 }
