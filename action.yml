@@ -12,27 +12,22 @@ inputs:
   author_email:
     description: The email of the user that will be displayed as the author of the commit
     required: false
+  branch:
+    description: Name of the branch to use, if different from the one that triggered the workflow
+    required: false
   cwd:
     description: The directory where your repository is located. You should use actions/checkout first to set it up
     required: false
     default: '.'
-  force:
-    description: Whether to use the force option on git add, in order to bypass eventual gitignores
-    required: false
-    default: 'false'
-  signoff:
-    description: Whether to use the signoff option on git commit
-    required: false
-    default: 'false'
   message:
     description: The message for the commit
     required: false
     default: Commit from GitHub Actions
-  ref:
-    description: Name of the branch to use, if different from the one that triggered the workflow
-    required: false
   remove:
     description: Arguments for the git rm command
+    required: false
+  signoff:
+    description: Whether to use the signoff option on git commit
     required: false
   tag:
     description: The name of the tag to add to the new commit
