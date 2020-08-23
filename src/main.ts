@@ -202,18 +202,20 @@ async function setLoginInfo() {
   debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 }
 
-function add(logWarning = true): Promise<void | Response<void>> {
-  return git.add(getInput('add').split(' ')).catch((e: Error) => {
-    if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
-      logWarning && warning('Add command did not match any file.')
-    else throw e
-  })
+function add(logWarning = true): Promise<void | Response<void>> | void {
+  if (getInput('add'))
+    return git.add(getInput('add').split(' ')).catch((e: Error) => {
+      if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
+        logWarning && warning('Add command did not match any file.')
+      else throw e
+    })
 }
 
-function remove(logWarning = true) {
-  return git.rm(getInput('remove').split(' ')).catch((e: Error) => {
-    if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
-      logWarning && warning('Remove command did not match any file.')
-    else throw e
-  })
+function remove(logWarning = true): Promise<void | Response<void>> | void {
+  if (getInput('remove'))
+    return git.rm(getInput('remove').split(' ')).catch((e: Error) => {
+      if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
+        logWarning && warning('Remove command did not match any file.')
+      else throw e
+    })
 }
