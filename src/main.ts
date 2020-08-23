@@ -14,8 +14,16 @@ const git = simpleGit({
 
   startGroup('Internal logs')
   info('> Staging files...')
-  await add(false)
-  await remove(false)
+
+  if (getInput('add')) {
+    info('> Adding files...')
+    await add()
+  } else info('> No files to add.')
+
+  if (getInput('remove')) {
+    info('> Removing files...')
+    await remove()
+  } else info('> No files to remove.')
 
   info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
@@ -36,15 +44,9 @@ const git = simpleGit({
       .fetch(undefined, log)
       .pull(undefined, undefined, undefined, log)
 
-    if (getInput('add')) {
-      info('> Adding files...')
-      await add()
-    } else info('> No files to add.')
-
-    if (getInput('remove')) {
-      info('> Removing files...')
-      await remove()
-    } else info('> No files to remove.')
+    info('> Re-staging files...')
+    if (getInput('add')) await add({ ignoreErrors: true })
+    if (getInput('remove')) await remove({ ignoreErrors: true })
 
     info('> Creating commit...')
     await git.commit(getInput('message'), undefined, {
@@ -201,18 +203,20 @@ async function setLoginInfo() {
   debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 }
 
-function add(logWarning = true): Promise<void | Response<void>> | void {
+function add({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
   if (getInput('add'))
     return git.add(getInput('add').split(' '), log).catch((e: Error) => {
+      if (ignoreErrors) return
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Add command did not match any file.')
       else throw e
     })
 }
 
-function remove(logWarning = true): Promise<void | Response<void>> | void {
+function remove({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
   if (getInput('remove'))
     return git.rm(getInput('remove').split(' '), log).catch((e: Error) => {
+      if (ignoreErrors) return
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Remove command did not match any file.')
       else throw e
