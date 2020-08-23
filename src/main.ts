@@ -36,9 +36,6 @@ const git = simpleGit({
       .fetch(undefined, log)
       .pull(undefined, undefined, undefined, log)
 
-    info('> Resetting files...')
-    await git.reset(undefined, log)
-
     if (getInput('add')) {
       info('> Adding files...')
       await add()
