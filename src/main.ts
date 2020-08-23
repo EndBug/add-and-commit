@@ -83,10 +83,12 @@ const git = simpleGit({
 })().catch(setFailed)
 
 async function checkInputs() {
-  function setDefault(input: string, value: string) {
-    const key = 'INPUT_' + input.toUpperCase()
-    if (!process.env[key]) process.env[key] = value
-    return process.env[key] as string
+  function setInput(input: Input, value: string | undefined) {
+    return process.env[`INPUT_${input.toUpperCase()}`] = value
+  }
+  function setDefault(input: Input, value: string) {
+    if (!getInput(input)) setInput(input, value)
+    return getInput(input)
   }
 
   const eventPath = process.env.GITHUB_EVENT_PATH,
@@ -94,14 +96,20 @@ async function checkInputs() {
     token = process.env.GITHUB_TOKEN,
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
     sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
-    defaultRef = isPR
+    defaultBranch = isPR
       ? event?.pull_request?.head?.ref as string
       : process.env.GITHUB_REF?.substring(11)
 
+  // #region GITHUB_TOKEN
   if (!token) warning('The GITHUB_TOKEN env variable is missing: the action may not work as expected.')
+  // #endregion
 
-  const actualRef = setDefault('ref', defaultRef || '')
+  // #region add, remove
+  if (!getInput('add') && !getInput('remove'))
+    throw new Error('Both \'add\' and \'remove\' are empty, the action has nothing to do.')
+  // #endregion
 
+  // #region author_name, author_email
   let author = event?.head_commit?.author
   if (sha && !author) {
     info('Unable to get commit from workflow event: trying with the GitHub API...')
@@ -143,7 +151,22 @@ async function checkInputs() {
   }
 
   info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
-  if (isPR) info(`Running for a PR, the action will use '${actualRef}' as ref.`)
+  // #endregion
+
+  // #region branch
+  const branch = setDefault('branch', defaultBranch || '')
+  if (isPR) info(`Running for a PR, the action will use '${branch}' as ref.`)
+  // #endregion
+
+  // #region signoff
+  if (getInput('signoff')) try {
+    const parsed = JSON.parse(getInput('signoff'))
+    if (typeof parsed == 'boolean' && !parsed)
+      setInput('signoff', undefined)
+  } catch {
+    throw new Error(`"${getInput('signoff')}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`)
+  }
+  // #endregion
 }
 
 function getInput(name: Input) {
