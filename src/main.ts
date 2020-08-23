@@ -210,7 +210,7 @@ async function setLoginInfo() {
 
 function add({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
   if (getInput('add'))
-    return git.add(getInput('add').split(' '), log).catch((e: Error) => {
+    return git.add(getInput('add').split(' '), (e: any, d?: any) => log(ignoreErrors ? null : e, d)).catch((e: Error) => {
       if (ignoreErrors) return
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Add command did not match any file.')
@@ -220,7 +220,7 @@ function add({ logWarning = true, ignoreErrors = false } = {}): Promise<void | R
 
 function remove({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
   if (getInput('remove'))
-    return git.rm(getInput('remove').split(' '), log).catch((e: Error) => {
+    return git.rm(getInput('remove').split(' '), (e: any, d?: any) => log(ignoreErrors ? null : e, d)).catch((e: Error) => {
       if (ignoreErrors) return
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Remove command did not match any file.')
