@@ -82,7 +82,8 @@ const git = simpleGit({
 
 async function checkInputs() {
   function setInput(input: Input, value: string | undefined) {
-    return process.env[`INPUT_${input.toUpperCase()}`] = value
+    if (value) return process.env[`INPUT_${input.toUpperCase()}`] = value
+    else return delete process.env[`INPUT_${input.toUpperCase()}`]
   }
   function setDefault(input: Input, value: string) {
     if (!getInput(input)) setInput(input, value)
@@ -160,6 +161,7 @@ async function checkInputs() {
     const parsed = JSON.parse(getInput('signoff'))
     if (typeof parsed == 'boolean' && !parsed)
       setInput('signoff', undefined)
+    debug(`Current signoff option: ${getInput('signoff')} (${typeof getInput('signoff')})`)
   } catch {
     throw new Error(`"${getInput('signoff')}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`)
   }
