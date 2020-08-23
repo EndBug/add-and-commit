@@ -10,7 +10,7 @@ const git = simpleGit({
 });
 
 (async () => {
-  await checkInputs()
+  await checkInputs().catch(setFailed)
 
   startGroup('Internal logs')
   info('> Staging files...')
@@ -76,8 +76,10 @@ const git = simpleGit({
     endGroup()
     info('> Working tree clean. Nothing to commit.')
   }
-
-})().catch(setFailed)
+})().catch(e => {
+  endGroup()
+  setFailed(e)
+})
 
 async function checkInputs() {
   function setInput(input: Input, value: string | undefined) {
