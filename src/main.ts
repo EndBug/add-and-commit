@@ -7,50 +7,49 @@ import { Input } from './inputs'
 
 const git = simpleGit({
   baseDir: getInput('cwd')
-}),
-  { log } = console;
+});
 
 (async () => {
   await checkInputs()
 
   startGroup('Internal logs')
-  info('Staging files...')
+  info('> Staging files...')
   await add(false)
   await remove(false)
 
-  info('Checking for uncommitted changes in the git working tree...')
+  info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
   if (changedFiles > 0) {
-    info(`Found ${changedFiles} changed files.`)
+    info(`> Found ${changedFiles} changed files.`)
 
     await setLoginInfo()
 
     await git.fetch(undefined, log)
 
-    info('Switching/creating branch...')
+    info('> Switching/creating branch...')
     await git
       .checkout(getInput('branch'), undefined, log)
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log),)
 
-    info('Pulling from remote...')
+    info('> Pulling from remote...')
     await git
       .fetch(undefined, log)
       .pull(undefined, undefined, undefined, log)
 
-    info('Resetting files...')
+    info('> Resetting files...')
     await git.reset(undefined, log)
 
     if (getInput('add')) {
-      info('Adding files...')
+      info('> Adding files...')
       await add()
-    } else info('No files to add.')
+    } else info('> No files to add.')
 
     if (getInput('remove')) {
-      info('Removing files...')
+      info('> Removing files...')
       await remove()
-    } else info('No files to remove.')
+    } else info('> No files to remove.')
 
-    info('Creating commit...')
+    info('> Creating commit...')
     await git.commit(getInput('message'), undefined, {
       '--author': `"${getInput('author_name')} <${getInput('author_email')}>"`,
       ...(getInput('signoff') ? {
@@ -59,25 +58,25 @@ const git = simpleGit({
     }, log)
 
     if (getInput('tag')) {
-      info('Tagging commit...')
+      info('> Tagging commit...')
       await git.tag(getInput('tag').split(' '))
-    } else info('No tag info provided.')
+    } else info('> No tag info provided.')
 
-    info('Pushing commit to repo...')
+    info('> Pushing commit to repo...')
     // @ts-expect-error
     await git.push(`--set-upstream origin "${getInput('branch')}"`.split(' '), undefined, undefined, log)
 
     if (getInput('tag')) {
-      info('Pushing tags to repo...')
+      info('> Pushing tags to repo...')
       // @ts-expect-error
       await git.push(`--set-upstream origin "${getInput('branch')}" --force --tags`.split(' '), undefined, undefined, log)
-    } else info('No tags to push.')
+    } else info('> No tags to push.')
 
     endGroup()
-    info('Task completed.')
+    info('> Task completed.')
   } else {
     endGroup()
-    info('Working tree clean. Nothing to commit.')
+    info('> Working tree clean. Nothing to commit.')
   }
 
 })().catch(setFailed)
@@ -112,7 +111,7 @@ async function checkInputs() {
   // #region author_name, author_email
   let author = event?.head_commit?.author
   if (sha && !author) {
-    info('Unable to get commit from workflow event: trying with the GitHub API...')
+    info('> Unable to get commit from workflow event: trying with the GitHub API...')
 
     // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
     const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
@@ -120,10 +119,9 @@ async function checkInputs() {
         Authorization: `Bearer ${token}`
       } : undefined,
       commit = (await axios.get(url, { headers }).catch(err => {
-        info('::group::Request error:')
-        info(`Request URL: ${url}`)
-        info(err)
-        info('::endgroup::')
+        startGroup('Request error:')
+        info(`> Request URL: ${url}\b${err}`)
+        endGroup()
         return undefined
       }))?.data
 
@@ -150,12 +148,12 @@ async function checkInputs() {
     setDefault('author_email', 'actions@github.com')
   }
 
-  info(`Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
+  info(`> Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
   // #endregion
 
   // #region branch
   const branch = setDefault('branch', defaultBranch || '')
-  if (isPR) info(`Running for a PR, the action will use '${branch}' as ref.`)
+  if (isPR) info(`> Running for a PR, the action will use '${branch}' as ref.`)
   // #endregion
 
   // #region signoff
@@ -171,6 +169,10 @@ async function checkInputs() {
 
 function getInput(name: Input) {
   return getInputCore(name)
+}
+
+function log(err: null | Error, data?: any) {
+  if (data) console.log(data)
 }
 
 async function setLoginInfo() {
