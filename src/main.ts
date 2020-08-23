@@ -6,9 +6,9 @@ import simpleGit, { Response } from 'simple-git'
 import { Input } from './inputs'
 
 const git = simpleGit({
-  baseDir: getInput('cwd'),
-
-});
+  baseDir: getInput('cwd')
+}),
+  { log } = console;
 
 (async () => {
   await checkInputs()
@@ -25,20 +25,20 @@ const git = simpleGit({
 
     await setLoginInfo()
 
-    await git.fetch()
+    await git.fetch(undefined, log)
 
     info('Switching/creating branch...')
     await git
-      .checkout(getInput('branch'))
-      .catch(() => git.checkoutLocalBranch(getInput('branch')))
+      .checkout(getInput('branch'), undefined, log)
+      .catch(() => git.checkoutLocalBranch(getInput('branch'), log),)
 
     info('Pulling from remote...')
     await git
-      .fetch()
-      .pull()
+      .fetch(undefined, log)
+      .pull(undefined, undefined, undefined, log)
 
     info('Resetting files...')
-    await git.reset()
+    await git.reset(undefined, log)
 
     if (getInput('add')) {
       info('Adding files...')
@@ -56,7 +56,7 @@ const git = simpleGit({
       ...(getInput('signoff') ? {
         '--signoff': null
       } : {})
-    })
+    }, log)
 
     if (getInput('tag')) {
       info('Tagging commit...')
@@ -65,12 +65,12 @@ const git = simpleGit({
 
     info('Pushing commit to repo...')
     // @ts-expect-error
-    await git.push(`--set-upstream origin "${getInput('branch')}"`.split(' '))
+    await git.push(`--set-upstream origin "${getInput('branch')}"`.split(' '), undefined, undefined, log)
 
     if (getInput('tag')) {
       info('Pushing tags to repo...')
       // @ts-expect-error
-      await git.push(`--set-upstream origin "${getInput('branch')}" --force --tags`.split(' '))
+      await git.push(`--set-upstream origin "${getInput('branch')}" --force --tags`.split(' '), undefined, undefined, log)
     } else info('No tags to push.')
 
     endGroup()
@@ -197,14 +197,14 @@ async function setLoginInfo() {
   debug(`> Current .netrc\n${nextConfig}`)
 
   await git
-    .addConfig('user.email', getInput('author_email'))
-    .addConfig('user.name', getInput('author_name'))
+    .addConfig('user.email', getInput('author_email'), undefined, log)
+    .addConfig('user.name', getInput('author_name'), undefined, log)
   debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 }
 
 function add(logWarning = true): Promise<void | Response<void>> | void {
   if (getInput('add'))
-    return git.add(getInput('add').split(' ')).catch((e: Error) => {
+    return git.add(getInput('add').split(' '), log).catch((e: Error) => {
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Add command did not match any file.')
       else throw e
@@ -213,7 +213,7 @@ function add(logWarning = true): Promise<void | Response<void>> | void {
 
 function remove(logWarning = true): Promise<void | Response<void>> | void {
   if (getInput('remove'))
-    return git.rm(getInput('remove').split(' ')).catch((e: Error) => {
+    return git.rm(getInput('remove').split(' '), log).catch((e: Error) => {
       if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
         logWarning && warning('Remove command did not match any file.')
       else throw e
