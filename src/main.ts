@@ -58,7 +58,7 @@ const git = simpleGit({
 
     if (getInput('tag')) {
       info('> Tagging commit...')
-      await git.tag(getInput('tag').split(' '), log)
+      await git.addTag(getInput('tag'), log)
     } else info('> No tag info provided.')
 
     info('> Pushing commit to repo...')
