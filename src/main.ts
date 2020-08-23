@@ -1,4 +1,4 @@
-import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup } from '@actions/core'
+import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup, error } from '@actions/core'
 import fs from 'fs'
 import axios from 'axios'
 import simpleGit, { Response } from 'simple-git'
@@ -174,8 +174,9 @@ function getInput(name: Input) {
   return getInputCore(name)
 }
 
-function log(err: null | Error, data?: any) {
+function log(err: any | Error, data?: any) {
   if (data) console.log(data)
+  if (err) error(err)
 }
 
 async function setLoginInfo() {
