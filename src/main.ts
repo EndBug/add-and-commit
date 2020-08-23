@@ -204,7 +204,7 @@ async function setLoginInfo() {
 
 function add(logWarning = true): Promise<void | Response<void>> {
   return git.add(getInput('add').split(' ')).catch((e: Error) => {
-    if (e.message.startsWith('fatal: pathspec') && e.message.endsWith('did not match any files'))
+    if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
       logWarning && warning('Add command did not match any file.')
     else throw e
   })
@@ -212,7 +212,7 @@ function add(logWarning = true): Promise<void | Response<void>> {
 
 function remove(logWarning = true) {
   return git.rm(getInput('remove').split(' ')).catch((e: Error) => {
-    if (e.message.startsWith('fatal: pathspec') && e.message.endsWith('did not match any files'))
+    if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
       logWarning && warning('Remove command did not match any file.')
     else throw e
   })
