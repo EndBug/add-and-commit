@@ -66,9 +66,9 @@ const git = simpleGit({
 
     if (getInput('tag')) {
       info('> Pushing tags to repo...')
-      await git.pushTags('origin', log).catch(() => {
+      await git.pushTags('origin', (e, d?) => log(undefined, e || d)).catch(() => {
         info('> Tag push failed: deleting remote tag and re-pushing...')
-        return git.push(undefined, undefined, { '--delete': null, 'origin': null, [getInput('tag')]: null })
+        return git.push(undefined, undefined, { '--delete': null, 'origin': null, [getInput('tag').split(' ').filter(w => !w.startsWith('-'))[0]]: null })
           .pushTags('origin', log)
       })
     } else info('> No tags to push.')
