@@ -188,12 +188,12 @@ function log(err: any | Error, data?: any) {
 async function setLoginInfo() {
   const myConfig = `
   machine github.com
-  login $GITHUB_ACTOR
-  password $GITHUB_TOKEN
+  login ${process.env.GITHUB_ACTOR}
+  password ${process.env.GITHUB_TOKEN}
 
   machine api.github.com
-  login $GITHUB_ACTOR
-  password $GITHUB_TOKEN
+  login ${process.env.GITHUB_ACTOR}
+  password ${process.env.GITHUB_TOKEN}
   `.trim(),
     configFilePath = `${process.env.HOME}/.netrc`
 
