@@ -187,27 +187,27 @@ function log(err: any | Error, data?: any) {
 }
 
 async function setLoginInfo() {
-  const myConfig = `
-  machine github.com
-  login ${process.env.GITHUB_ACTOR}
-  password ${process.env.GITHUB_TOKEN}
+  // const myConfig = `
+  // machine github.com
+  // login ${process.env.GITHUB_ACTOR}
+  // password ${process.env.GITHUB_TOKEN}
 
-  machine api.github.com
-  login ${process.env.GITHUB_ACTOR}
-  password ${process.env.GITHUB_TOKEN}
-  `.trim(),
-    configFilePath = path.join(process.env.HOME || '', '.netrc')
+  // machine api.github.com
+  // login ${process.env.GITHUB_ACTOR}
+  // password ${process.env.GITHUB_TOKEN}
+  // `.trim(),
+  //   configFilePath = path.join(process.env.HOME || '', '.netrc')
 
-  let nextConfig = ''
-  try {
-    nextConfig = fs.readFileSync(configFilePath, { encoding: 'utf8' })
-    nextConfig += '\n' + myConfig
-  } catch {
-    nextConfig = myConfig
-  }
+  // let nextConfig = ''
+  // try {
+  //   nextConfig = fs.readFileSync(configFilePath, { encoding: 'utf8' })
+  //   nextConfig += '\n' + myConfig
+  // } catch {
+  //   nextConfig = myConfig
+  // }
 
-  fs.writeFileSync(configFilePath, nextConfig)
-  debug(`> Current .netrc\n${nextConfig}`)
+  // fs.writeFileSync(configFilePath, nextConfig)
+  // debug(`> Current .netrc\n${nextConfig}`)
 
   await git
     .addConfig('user.email', getInput('author_email'), undefined, log)
