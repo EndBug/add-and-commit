@@ -32,7 +32,7 @@ const git = simpleGit({
 
     await setLoginInfo()
 
-    await git.fetch(['--tags'], log)
+    await git.fetch(['--tags', '--force'], log)
 
     info('> Switching/creating branch...')
     await git
