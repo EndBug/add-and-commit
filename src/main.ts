@@ -1,5 +1,6 @@
 import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup, error } from '@actions/core'
 import fs from 'fs'
+import path from 'path'
 import axios from 'axios'
 import simpleGit, { Response } from 'simple-git'
 
@@ -195,7 +196,7 @@ async function setLoginInfo() {
   login ${process.env.GITHUB_ACTOR}
   password ${process.env.GITHUB_TOKEN}
   `.trim(),
-    configFilePath = `${process.env.HOME}/.netrc`
+    configFilePath = path.join(process.env.HOME || '', '.netrc')
 
   let nextConfig = ''
   try {
