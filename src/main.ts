@@ -66,7 +66,8 @@ const git = simpleGit({
 
     if (getInput('tag')) {
       info('> Pushing tags to repo...')
-      await git.push('origin', getInput('branch'), { '--force': null, '--tags': null }, log)
+      // @ts-expect-error
+      await git.pushTags('origin', log, '--force --tags')
     } else info('> No tags to push.')
 
     endGroup()
