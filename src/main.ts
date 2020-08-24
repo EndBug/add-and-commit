@@ -37,7 +37,7 @@ const git = simpleGit({
     info('> Switching/creating branch...')
     await git
       .checkout(getInput('branch'), undefined, log)
-      .catch(() => git.checkoutLocalBranch(getInput('branch'), log),)
+      .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
     info('> Pulling from remote...')
     await git
@@ -66,8 +66,11 @@ const git = simpleGit({
 
     if (getInput('tag')) {
       info('> Pushing tags to repo...')
-      // @ts-expect-error
-      await git.pushTags('origin', log, '--force --tags')
+      await git.pushTags('origin', log).catch(() => {
+        info('> Tag push failed: deleting remote tag and re-pushing...')
+        return git.push(undefined, undefined, { '--delete': null, 'origin': null, [getInput('tag')]: null })
+          .pushTags('origin', log)
+      })
     } else info('> No tags to push.')
 
     endGroup()
