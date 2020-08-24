@@ -1,6 +1,4 @@
 import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup, error } from '@actions/core'
-import fs from 'fs'
-import path from 'path'
 import axios from 'axios'
 import simpleGit, { Response } from 'simple-git'
 
@@ -31,7 +29,10 @@ const git = simpleGit({
   if (changedFiles > 0) {
     info(`> Found ${changedFiles} changed files.`)
 
-    await setLoginInfo()
+    await git
+      .addConfig('user.email', getInput('author_email'), undefined, log)
+      .addConfig('user.name', getInput('author_name'), undefined, log)
+    debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 
     await git.fetch(['--tags', '--force'], log)
 
@@ -184,35 +185,6 @@ function getInput(name: Input) {
 function log(err: any | Error, data?: any) {
   if (data) console.log(data)
   if (err) error(err)
-}
-
-async function setLoginInfo() {
-  // const myConfig = `
-  // machine github.com
-  // login ${process.env.GITHUB_ACTOR}
-  // password ${process.env.GITHUB_TOKEN}
-
-  // machine api.github.com
-  // login ${process.env.GITHUB_ACTOR}
-  // password ${process.env.GITHUB_TOKEN}
-  // `.trim(),
-  //   configFilePath = path.join(process.env.HOME || '', '.netrc')
-
-  // let nextConfig = ''
-  // try {
-  //   nextConfig = fs.readFileSync(configFilePath, { encoding: 'utf8' })
-  //   nextConfig += '\n' + myConfig
-  // } catch {
-  //   nextConfig = myConfig
-  // }
-
-  // fs.writeFileSync(configFilePath, nextConfig)
-  // debug(`> Current .netrc\n${nextConfig}`)
-
-  await git
-    .addConfig('user.email', getInput('author_email'), undefined, log)
-    .addConfig('user.name', getInput('author_name'), undefined, log)
-  debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
 }
 
 function add({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
