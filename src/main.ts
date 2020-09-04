@@ -1,12 +1,13 @@
 import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup, error } from '@actions/core'
 import axios from 'axios'
+import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 
 import { Input } from './inputs'
 
-const git = simpleGit({
-  baseDir: getInput('cwd')
-});
+const baseDir = path.join(process.cwd(), getInput('cwd') || '')
+const git = simpleGit({ baseDir })
+console.log(`Running in ${baseDir}`);
 
 (async () => {
   await checkInputs().catch(setFailed)
