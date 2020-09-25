@@ -4,10 +4,11 @@
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/index.js",
   "scripts": {
-    "build": "npm i && ncc build src/main.ts --minify --out lib",
+    "build": "npm run inputs && ncc build src/main.ts --minify --out lib",
     "watch": "ncc build src/main.ts --watch --out lib",
     "all-contributors-badge": "ts-node scripts/all-contributors-badge",
     "changelog": "ts-node scripts/changelog.ts",
+    "inputs": "ts-node scripts/inputs.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,18 +29,20 @@
   },
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
-    "@actions/core": "^1.1.3",
-    "axios": "^0.19.2"
+    "@actions/core": "^1.2.4",
+    "axios": "^0.19.2",
+    "simple-git": "^2.19.0"
   },
   "devDependencies": {
-    "@types/node": "^12.7.12",
-    "@types/shelljs": "^0.8.6",
-    "@typescript-eslint/eslint-plugin": "^2.12.0",
-    "@typescript-eslint/parser": "^2.12.0",
-    "@zeit/ncc": "^0.21.1",
-    "all-contributors-cli": "^6.16.1",
+    "@types/node": "^12.12.54",
+    "@types/yamljs": "^0.2.31",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "@vercel/ncc": "^0.23.0",
+    "all-contributors-cli": "^6.17.2",
     "eslint": "^6.8.0",
     "ts-node": "^8.10.2",
-    "typescript": "^3.6.4"
+    "typescript": "^4.0.2",
+    "yamljs": "^0.3.0"
   }
 }

@@ -12,7 +12,7 @@ This action lets you choose the path that you want to use when adding & committi
 Add a step like this to your workflow:
 
 ```yaml
-- uses: EndBug/add-and-commit@v4 # You can change this to use a specific version
+- uses: EndBug/add-and-commit@v5 # You can change this to use a specific version
   with:
     # The arguments for the `git add` command (see the paragraph below for more info)
     # Default: '.'
@@ -26,33 +26,29 @@ Add a step like this to your workflow:
     # Default: author of the commit that triggered the run
     author_email: mail@example.com
 
+    # Name of the branch to use, if different from the one that triggered the workflow
+    # Default: the branch that triggered the run
+    branch: some-branch
+
     # The local path to the directory where your repository is located. You should use actions/checkout first to set it up
     # Default: '.'
     cwd: './path/to/the/repo'
-
-    # Whether to use the --force option on `git add`, in order to bypass eventual gitignores
-    # Default: false
-    force: true
-
-    # Whether to use the --signoff option on `git commit`
-    # Default: false
-    signoff: true
 
     # The message for the commit
     # Default: 'Commit from GitHub Actions'
     message: 'Your commit message'
 
-    # Name of the branch to use, if different from the one that triggered the workflow
-    # Default: the branch that triggered the workflow (from GITHUB_REF)
-    ref: 'someOtherBranch'
-
     # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"
 
-    # Name of the tag to add to the new commit (see the paragraph below for more info)
+    # Whether to use the --signoff option on `git commit` (only `true` and `false` are accepted)
+    # Default: false
+    signoff: true
+
+    # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
-    tag: "v1.0.0"
+    tag: "v1.0.0 --force"
 
   env:
     # This is necessary in order to push a commit to the repo
@@ -66,18 +62,17 @@ That said, you can just copy the example line and not worry about it. If you do 
 
 ### Adding files:
 
-The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you don't want it to use a recursive behavior: `$(find . -maxdepth 1 -name *.js)`.
+The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you want to force-add a file: `./path/to/file.txt --force`.  
 The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Deleting files:
 
-You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. 
+You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. As with the `add` argument, you can use every option `git rm` allows (e.g. add `--force` to ignore `.gitignore` rules).  
 The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.
 
 ### Tagging:
 
-You can tag commits with the `tag` option: when used, it will create a lightweight tag for the commit with the name you set as input. If not entered (or if an empty string is passed) teh action won't create any tag.  
-If there is already a tag with the name you entered it will be overwritten, and so the tag will be "updated".
+You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
 
 ### Examples:
 
@@ -107,7 +102,7 @@ jobs:
       run: eslint "src/**" --fix
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v4
+      uses: EndBug/add-and-commit@v5
       with:
         author_name: Your Name
         author_email: mail@example.com
@@ -138,12 +133,11 @@ jobs:
       - run: echo "123" > ./pathToRepo/file.txt
 
       # ...and then use the action as you would normally do, but providing the path to the repo
-      - uses: EndBug/add-and-commit@v4
+      - uses: EndBug/add-and-commit@v5
         with:
           message: "Add the very useful text file"
-          add: "*.txt"
+          add: "*.txt --force"
           cwd: "./pathToRepo/"
-          force: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
