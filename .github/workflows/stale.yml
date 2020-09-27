@@ -12,10 +12,10 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: 'This issue is being marked as "stale" because it has been open 20 days with no activity. Remove the "stale" label or comment, otherwise this will be closed in 5 days.'
-          stale-issue-label: stale
-          exempt-issue-labels: pinned
+          stale-issue-label: 'status: stale'
+          exempt-issue-labels: 'status: pinned'
           stale-pr-message: 'This PR is being marked as "stale" because it has been open 20 days with no activity. Remove the "stale" label or comment, otherwise this will be closed in 5 days.'
-          stale-pr-label: stale
-          exempt-pr-labels: pinned
+          stale-pr-label: 'status: stale'
+          exempt-pr-labels: 'status: pinned'
           days-before-stale: 20
           days-before-close: 5
