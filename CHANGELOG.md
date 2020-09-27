@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.0] - 2020-09-27
 ### Changed:
-- **[BREAKING]** Action parameters: multiple action parameters have been changed, refer to the docs for better info.
-- The code is now entirely in TypeScript.
+- **[BREAKING]** Action parameters: multiple action parameters have been changed, refer to the docs for better info
+- The code is now entirely in TypeScript (PR #57)
 
 ### Fixed:
-- Improved input checks.
-- Logs are now displayed on Windows too.
-- Remove unnecessary steps.
+- Improved input checks
+- Logs are now displayed on Windows too
+- Remove unnecessary steps
 - Remove unused dependencies
 
 ## [4.4.0] - 2020-07-31
