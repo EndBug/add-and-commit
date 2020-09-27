@@ -8,6 +8,17 @@ You can see the docs for every version at [here](https://dbots.js.org/#/docs).
 
 ## [Unreleased]
 
+## [5.0.0] - 2020-09-27
+### Changed:
+- **[BREAKING]** Action parameters: multiple action parameters have been changed, refer to the docs for better info.
+- The code is now entirely in TypeScript.
+
+### Fixed:
+- Improved input checks.
+- Logs are now displayed on Windows too.
+- Remove unnecessary steps.
+- Remove unused dependencies
+
 ## [4.4.0] - 2020-07-31
 ### Added:
 - Pull requests: the action can now work in runs triggered by pull request events (issue #48)
@@ -99,7 +110,7 @@ You can see the docs for every version at [here](https://dbots.js.org/#/docs).
 First release
 
 #
-[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v4.4.0...HEAD
+[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.0.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -119,3 +130,4 @@ First release
 [4.2.1]: https://github.com/EndBug/add-and-commit/compare/v4.2.0...v4.2.1
 [4.3.0]: https://github.com/EndBug/add-and-commit/compare/v4.2.1...v4.3.0
 [4.4.0]: https://github.com/EndBug/add-and-commit/compare/v4.3.0...v4.4.0
+[5.0.0]: https://github.com/EndBug/add-and-commit/compare/v4.4.0...v5.0.0
