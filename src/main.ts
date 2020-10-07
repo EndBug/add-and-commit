@@ -162,6 +162,11 @@ async function checkInputs() {
   info(`> Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
   // #endregion
 
+  // #region message
+  setDefault('message', `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`)
+  info(`> Using "${getInput('message')}" as commit message.`)
+  // #endregion
+
   // #region branch
   const branch = setDefault('branch', defaultBranch || '')
   if (isPR) info(`> Running for a PR, the action will use '${branch}' as ref.`)

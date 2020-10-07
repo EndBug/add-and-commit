@@ -22,7 +22,6 @@ inputs:
   message:
     description: The message for the commit
     required: false
-    default: Commit from GitHub Actions
   remove:
     description: Arguments for the git rm command
     required: false

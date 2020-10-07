@@ -35,7 +35,7 @@ Add a step like this to your workflow:
     cwd: './path/to/the/repo'
 
     # The message for the commit
-    # Default: 'Commit from GitHub Actions'
+    # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
     # The arguments for the `git rm` command (see the paragraph below for more info)
