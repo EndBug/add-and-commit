@@ -25,7 +25,6 @@ jobs:
         with:
           message: '[auto] build: update compiled version'
           add: lib
-          force: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
