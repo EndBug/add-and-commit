@@ -22,6 +22,10 @@ inputs:
   message:
     description: The message for the commit
     required: false
+  pull_stategy:
+    description: The flag used on the pull strategy
+    required: false
+    default: '--no-rebase'
   remove:
     description: Arguments for the git rm command
     required: false

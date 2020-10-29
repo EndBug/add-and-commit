@@ -38,6 +38,10 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
+    # The flag used on the pull strategy
+    # Default: '--no-rebase'
+    pull_strategy: '--no-rebase or --no-ff or --rebase'
+
     # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"
