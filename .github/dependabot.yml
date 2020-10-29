@@ -11,6 +11,6 @@ updates:
       interval: 'weekly'
     commit-message:
       prefix: 'chore'
-      include_scope: true
-    default_labels:
+      include: 'scope'
+    labels:
       - 'type: dependencies'
