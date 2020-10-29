@@ -30,7 +30,7 @@
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "axios": "^0.19.2",
+    "axios": "^0.21.0",
     "simple-git": "^2.19.0"
   },
   "devDependencies": {
