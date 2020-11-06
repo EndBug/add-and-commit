@@ -46,7 +46,7 @@ console.log(`Running in ${baseDir}`);
     await git
       .fetch(undefined, log)
       .pull(undefined, undefined, {
-        [getInput('pull_stategy')]: null
+        [getInput('pull_strategy')]: null
       }, log)
 
     info('> Re-staging files...')
