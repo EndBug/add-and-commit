@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.1] - 2020-11-07
+### Fixed:
+- Fixed typo in parameter name: `pull_strategy` was written as `pull_stategy` (PR #83)
+
 ## [5.1.0] - 2020-10-07
 ### Added:
 - The default commit message now displays the name of the workflow too (issue #64) 
@@ -112,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 First release
 
 #
-[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.1.0...HEAD
+[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.1.1...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -134,3 +138,4 @@ First release
 [4.4.0]: https://github.com/EndBug/add-and-commit/compare/v4.3.0...v4.4.0
 [5.0.0]: https://github.com/EndBug/add-and-commit/compare/v4.4.0...v5.0.0
 [5.1.0]: https://github.com/EndBug/add-and-commit/compare/v5.0.0...v5.1.0
+[5.1.1]: https://github.com/EndBug/add-and-commit/compare/v5.1.0...v5.1.1
