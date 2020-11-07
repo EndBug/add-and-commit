@@ -147,6 +147,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "coffeegoddd",
+      "name": "Dustin Brown",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/43383835?v=4",
+      "profile": "https://github.com/coffeegoddd",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
