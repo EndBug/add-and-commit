@@ -156,6 +156,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Chocrates",
+      "name": "Chris McIntosh",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1758164?v=4",
+      "profile": "https://github.com/Chocrates",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
