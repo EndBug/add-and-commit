@@ -42,6 +42,10 @@ Add a step like this to your workflow:
     # Default: '--no-rebase'
     pull_strategy: '--no-rebase or --no-ff or --rebase'
 
+    # Whether to push the commit and, if any, its tags to the repo (only `true` and `false` are accepted)
+    # Default: true
+    push: false
+
     # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: "./dir/old_file.js"

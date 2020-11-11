@@ -27,7 +27,7 @@ inputs:
     required: false
     default: '--no-rebase'
   push:
-    description: Whether to push the commit to the repo
+    description: Whether to push the commit and, if any, its tags to the repo
     required: false
   remove:
     description: Arguments for the git rm command
