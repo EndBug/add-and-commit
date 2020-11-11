@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2020-11-11
+### Added:
+-  New `push` option: this lets you tell the action whether to push commit and tags to the repo. The default value is `true`, so that the default behavior is not changed. (issue #86)
+
 ## [5.1.2] - 2020-11-10
 ### Fixed:
 - Fixed an issue with the build (issue #88)
@@ -120,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 First release
 
 #
-[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.1.2...HEAD
+[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -144,3 +148,4 @@ First release
 [5.1.0]: https://github.com/EndBug/add-and-commit/compare/v5.0.0...v5.1.0
 [5.1.1]: https://github.com/EndBug/add-and-commit/compare/v5.1.0...v5.1.1
 [5.1.2]: https://github.com/EndBug/add-and-commit/compare/v5.1.1...v5.1.2
+[5.2.0]: https://github.com/EndBug/add-and-commit/compare/v5.1.2...v5.2.0
