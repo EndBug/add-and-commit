@@ -1,6 +1,8 @@
 name: Docs
 on:
   push:
+    branches:
+      - master
     paths:
       - .all-contributorsrc
       - .github/workflows/docs.yml
@@ -23,7 +25,7 @@ jobs:
 
       - uses: EndBug/add-and-commit@v4.0.0
         with:
-          message: "[auto] docs: update contributors badge"
+          message: '[auto] docs: update contributors badge'
           add: README.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
