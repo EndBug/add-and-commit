@@ -66,21 +66,23 @@ console.log(`Running in ${baseDir}`);
       await git.tag(getInput('tag').split(' '), log)
     } else info('> No tag info provided.')
 
-    info('> Pushing commit to repo...')
-    await git.push('origin', getInput('branch'), { '--set-upstream': null }, log)
+    if (getInput('push')) {
+      info('> Pushing commit to repo...')
+      await git.push('origin', getInput('branch'), { '--set-upstream': null }, log)
 
-    if (getInput('tag')) {
-      info('> Pushing tags to repo...')
-      await git.pushTags('origin', (e, d?) => log(undefined, e || d)).catch(() => {
-        info('> Tag push failed: deleting remote tag and re-pushing...')
-        return git.push(undefined, undefined, {
-          '--delete': null,
-          'origin': null,
-          [getInput('tag').split(' ').filter(w => !w.startsWith('-'))[0]]: null
-        }, log)
-          .pushTags('origin', log)
-      })
-    } else info('> No tags to push.')
+      if (getInput('tag')) {
+        info('> Pushing tags to repo...')
+        await git.pushTags('origin', (e, d?) => log(undefined, e || d)).catch(() => {
+          info('> Tag push failed: deleting remote tag and re-pushing...')
+          return git.push(undefined, undefined, {
+            '--delete': null,
+            'origin': null,
+            [getInput('tag').split(' ').filter(w => !w.startsWith('-'))[0]]: null
+          }, log)
+            .pushTags('origin', log)
+        })
+      } else info('> No tags to push.')
+    } else info('> Not pushing anything.')
 
     endGroup()
     info('> Task completed.')
@@ -175,19 +177,46 @@ async function checkInputs() {
   // #endregion
 
   // #region signoff
-  if (getInput('signoff')) try {
-    const parsed = JSON.parse(getInput('signoff'))
-    if (typeof parsed == 'boolean' && !parsed)
+  if (getInput('signoff')) {
+    const parsed = parseBool(getInput('signoff'))
+
+    if (parsed === undefined)
+      throw new Error(`"${getInput('signoff')}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`)
+
+    if (!parsed)
       setInput('signoff', undefined)
+
     debug(`Current signoff option: ${getInput('signoff')} (${typeof getInput('signoff')})`)
-  } catch {
-    throw new Error(`"${getInput('signoff')}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`)
+  }
+
+  // #endregion  
+
+  // #region push
+  setDefault('push', 'true')
+  if (getInput('push')) { // It's just to scope the parsed constant
+    const parsed = parseBool(getInput('push'))
+
+    if (parsed === undefined)
+      throw new Error(`"${getInput('push')}" is not a valid value for the 'push' input: only "true" and "false" are allowed.`)
+
+    if (!parsed)
+      setInput('push', undefined)
+
+    debug(`Current push option: ${getInput('push')} (${typeof getInput('push')})`)
   }
   // #endregion
 }
 
 function getInput(name: Input) {
   return getInputCore(name)
+}
+
+function parseBool(value: any) {
+  try {
+    const parsed = JSON.parse(value)
+    if (typeof parsed == 'boolean')
+      return parsed
+  } catch { }
 }
 
 function log(err: any | Error, data?: any) {

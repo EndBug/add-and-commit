@@ -26,6 +26,9 @@ inputs:
     description: The flag used on the pull strategy
     required: false
     default: '--no-rebase'
+  push:
+    description: Whether to push the commit to the repo
+    required: false
   remove:
     description: Arguments for the git rm command
     required: false
