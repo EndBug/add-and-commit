@@ -36,7 +36,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "axios": "^0.21.0",
-    "simple-git": "^2.21.0"
+    "simple-git": "^2.22.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.54",
