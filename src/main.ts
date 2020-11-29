@@ -3,7 +3,7 @@ import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 
-import { Input } from './inputs'
+type Input = 'add' | 'author_name' | 'author_email' | 'branch' | 'cwd' | 'message' | 'pull_strategy' | 'push' | 'remove' | 'signoff' | 'tag'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
