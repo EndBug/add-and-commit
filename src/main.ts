@@ -1,15 +1,34 @@
-import { info, setFailed, getInput as getInputCore, warning, debug, startGroup, endGroup, error } from '@actions/core'
+import {
+  info,
+  setFailed,
+  getInput as getInputCore,
+  warning,
+  debug,
+  startGroup,
+  endGroup,
+  error
+} from '@actions/core'
 import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 
-type Input = 'add' | 'author_name' | 'author_email' | 'branch' | 'cwd' | 'message' | 'pull_strategy' | 'push' | 'remove' | 'signoff' | 'tag'
+type Input =
+  | 'add'
+  | 'author_name'
+  | 'author_email'
+  | 'branch'
+  | 'cwd'
+  | 'message'
+  | 'pull_strategy'
+  | 'push'
+  | 'remove'
+  | 'signoff'
+  | 'tag'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
-console.log(`Running in ${baseDir}`);
-
-(async () => {
+console.log(`Running in ${baseDir}`)
+;(async () => {
   await checkInputs().catch(setFailed)
 
   startGroup('Internal logs')
@@ -33,7 +52,10 @@ console.log(`Running in ${baseDir}`);
     await git
       .addConfig('user.email', getInput('author_email'), undefined, log)
       .addConfig('user.name', getInput('author_name'), undefined, log)
-    debug('> Current git config\n' + JSON.stringify((await git.listConfig()).all, null, 2))
+    debug(
+      '> Current git config\n' +
+        JSON.stringify((await git.listConfig()).all, null, 2)
+    )
 
     await git.fetch(['--tags', '--force'], log)
 
@@ -43,23 +65,35 @@ console.log(`Running in ${baseDir}`);
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
     info('> Pulling from remote...')
-    await git
-      .fetch(undefined, log)
-      .pull(undefined, undefined, {
+    await git.fetch(undefined, log).pull(
+      undefined,
+      undefined,
+      {
         [getInput('pull_strategy')]: null
-      }, log)
+      },
+      log
+    )
 
     info('> Re-staging files...')
     if (getInput('add')) await add({ ignoreErrors: true })
     if (getInput('remove')) await remove({ ignoreErrors: true })
 
     info('> Creating commit...')
-    await git.commit(getInput('message'), undefined, {
-      '--author': `"${getInput('author_name')} <${getInput('author_email')}>"`,
-      ...(getInput('signoff') ? {
-        '--signoff': null
-      } : {})
-    }, log)
+    await git.commit(
+      getInput('message'),
+      undefined,
+      {
+        '--author': `"${getInput('author_name')} <${getInput(
+          'author_email'
+        )}>"`,
+        ...(getInput('signoff')
+          ? {
+              '--signoff': null
+            }
+          : {})
+      },
+      log
+    )
 
     if (getInput('tag')) {
       info('> Tagging commit...')
@@ -68,19 +102,34 @@ console.log(`Running in ${baseDir}`);
 
     if (getInput('push')) {
       info('> Pushing commit to repo...')
-      await git.push('origin', getInput('branch'), { '--set-upstream': null }, log)
+      await git.push(
+        'origin',
+        getInput('branch'),
+        { '--set-upstream': null },
+        log
+      )
 
       if (getInput('tag')) {
         info('> Pushing tags to repo...')
-        await git.pushTags('origin', (e, d?) => log(undefined, e || d)).catch(() => {
-          info('> Tag push failed: deleting remote tag and re-pushing...')
-          return git.push(undefined, undefined, {
-            '--delete': null,
-            'origin': null,
-            [getInput('tag').split(' ').filter(w => !w.startsWith('-'))[0]]: null
-          }, log)
-            .pushTags('origin', log)
-        })
+        await git
+          .pushTags('origin', (e, d?) => log(undefined, e || d))
+          .catch(() => {
+            info('> Tag push failed: deleting remote tag and re-pushing...')
+            return git
+              .push(
+                undefined,
+                undefined,
+                {
+                  '--delete': null,
+                  origin: null,
+                  [getInput('tag')
+                    .split(' ')
+                    .filter((w) => !w.startsWith('-'))[0]]: null
+                },
+                log
+              )
+              .pushTags('origin', log)
+          })
       } else info('> No tags to push.')
     } else info('> Not pushing anything.')
 
@@ -90,14 +139,14 @@ console.log(`Running in ${baseDir}`);
     endGroup()
     info('> Working tree clean. Nothing to commit.')
   }
-})().catch(e => {
+})().catch((e) => {
   endGroup()
   setFailed(e)
 })
 
 async function checkInputs() {
   function setInput(input: Input, value: string | undefined) {
-    if (value) return process.env[`INPUT_${input.toUpperCase()}`] = value
+    if (value) return (process.env[`INPUT_${input.toUpperCase()}`] = value)
     else return delete process.env[`INPUT_${input.toUpperCase()}`]
   }
   function setDefault(input: Input, value: string) {
@@ -111,34 +160,45 @@ async function checkInputs() {
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
     sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
     defaultBranch = isPR
-      ? event?.pull_request?.head?.ref as string
+      ? (event?.pull_request?.head?.ref as string)
       : process.env.GITHUB_REF?.substring(11)
 
   // #region GITHUB_TOKEN
-  if (!token) warning('The GITHUB_TOKEN env variable is missing: the action may not work as expected.')
+  if (!token)
+    warning(
+      'The GITHUB_TOKEN env variable is missing: the action may not work as expected.'
+    )
   // #endregion
 
   // #region add, remove
   if (!getInput('add') && !getInput('remove'))
-    throw new Error('Both \'add\' and \'remove\' are empty, the action has nothing to do.')
+    throw new Error(
+      "Both 'add' and 'remove' are empty, the action has nothing to do."
+    )
   // #endregion
 
   // #region author_name, author_email
   let author = event?.head_commit?.author
   if (sha && !author) {
-    info('> Unable to get commit from workflow event: trying with the GitHub API...')
+    info(
+      '> Unable to get commit from workflow event: trying with the GitHub API...'
+    )
 
     // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
     const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
-      headers = token ? {
-        Authorization: `Bearer ${token}`
-      } : undefined,
-      commit = (await axios.get(url, { headers }).catch(err => {
-        startGroup('Request error:')
-        info(`> Request URL: ${url}\b${err}`)
-        endGroup()
-        return undefined
-      }))?.data
+      headers = token
+        ? {
+            Authorization: `Bearer ${token}`
+          }
+        : undefined,
+      commit = (
+        await axios.get(url, { headers }).catch((err) => {
+          startGroup('Request error:')
+          info(`> Request URL: ${url}\b${err}`)
+          endGroup()
+          return undefined
+        })
+      )?.data
 
     author = commit?.commit?.author
   }
@@ -152,22 +212,29 @@ async function checkInputs() {
     const reason = !eventPath
       ? 'event path'
       : isPR
-        ? sha
-          ? 'fetch commit'
-          : 'find commit sha'
-        : !event?.head_commit
-          ? 'find commit'
-          : 'find commit author'
+      ? sha
+        ? 'fetch commit'
+        : 'find commit sha'
+      : !event?.head_commit
+      ? 'find commit'
+      : 'find commit author'
     warning(`Unable to fetch author info: couldn't ${reason}.`)
     setDefault('author_name', 'Add & Commit Action')
     setDefault('author_email', 'actions@github.com')
   }
 
-  info(`> Using '${getInput('author_name')} <${getInput('author_email')}>' as author.`)
+  info(
+    `> Using '${getInput('author_name')} <${getInput(
+      'author_email'
+    )}>' as author.`
+  )
   // #endregion
 
   // #region message
-  setDefault('message', `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`)
+  setDefault(
+    'message',
+    `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
+  )
   info(`> Using "${getInput('message')}" as commit message.`)
   // #endregion
 
@@ -181,28 +248,41 @@ async function checkInputs() {
     const parsed = parseBool(getInput('signoff'))
 
     if (parsed === undefined)
-      throw new Error(`"${getInput('signoff')}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`)
+      throw new Error(
+        `"${getInput(
+          'signoff'
+        )}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`
+      )
 
-    if (!parsed)
-      setInput('signoff', undefined)
+    if (!parsed) setInput('signoff', undefined)
 
-    debug(`Current signoff option: ${getInput('signoff')} (${typeof getInput('signoff')})`)
+    debug(
+      `Current signoff option: ${getInput('signoff')} (${typeof getInput(
+        'signoff'
+      )})`
+    )
   }
 
-  // #endregion  
+  // #endregion
 
   // #region push
   setDefault('push', 'true')
-  if (getInput('push')) { // It's just to scope the parsed constant
+  if (getInput('push')) {
+    // It's just to scope the parsed constant
     const parsed = parseBool(getInput('push'))
 
     if (parsed === undefined)
-      throw new Error(`"${getInput('push')}" is not a valid value for the 'push' input: only "true" and "false" are allowed.`)
+      throw new Error(
+        `"${getInput(
+          'push'
+        )}" is not a valid value for the 'push' input: only "true" and "false" are allowed.`
+      )
 
-    if (!parsed)
-      setInput('push', undefined)
+    if (!parsed) setInput('push', undefined)
 
-    debug(`Current push option: ${getInput('push')} (${typeof getInput('push')})`)
+    debug(
+      `Current push option: ${getInput('push')} (${typeof getInput('push')})`
+    )
   }
   // #endregion
 }
@@ -214,9 +294,8 @@ function getInput(name: Input) {
 function parseBool(value: any) {
   try {
     const parsed = JSON.parse(value)
-    if (typeof parsed == 'boolean')
-      return parsed
-  } catch { }
+    if (typeof parsed == 'boolean') return parsed
+  } catch {}
 }
 
 function log(err: any | Error, data?: any) {
@@ -224,22 +303,42 @@ function log(err: any | Error, data?: any) {
   if (err) error(err)
 }
 
-function add({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
+function add({
+  logWarning = true,
+  ignoreErrors = false
+} = {}): Promise<void | Response<void>> | void {
   if (getInput('add'))
-    return git.add(getInput('add').split(' '), (e: any, d?: any) => log(ignoreErrors ? null : e, d)).catch((e: Error) => {
-      if (ignoreErrors) return
-      if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
-        logWarning && warning('Add command did not match any file.')
-      else throw e
-    })
+    return git
+      .add(getInput('add').split(' '), (e: any, d?: any) =>
+        log(ignoreErrors ? null : e, d)
+      )
+      .catch((e: Error) => {
+        if (ignoreErrors) return
+        if (
+          e.message.includes('fatal: pathspec') &&
+          e.message.includes('did not match any files')
+        )
+          logWarning && warning('Add command did not match any file.')
+        else throw e
+      })
 }
 
-function remove({ logWarning = true, ignoreErrors = false } = {}): Promise<void | Response<void>> | void {
+function remove({
+  logWarning = true,
+  ignoreErrors = false
+} = {}): Promise<void | Response<void>> | void {
   if (getInput('remove'))
-    return git.rm(getInput('remove').split(' '), (e: any, d?: any) => log(ignoreErrors ? null : e, d)).catch((e: Error) => {
-      if (ignoreErrors) return
-      if (e.message.includes('fatal: pathspec') && e.message.includes('did not match any files'))
-        logWarning && warning('Remove command did not match any file.')
-      else throw e
-    })
+    return git
+      .rm(getInput('remove').split(' '), (e: any, d?: any) =>
+        log(ignoreErrors ? null : e, d)
+      )
+      .catch((e: Error) => {
+        if (ignoreErrors) return
+        if (
+          e.message.includes('fatal: pathspec') &&
+          e.message.includes('did not match any files')
+        )
+          logWarning && warning('Remove command did not match any file.')
+        else throw e
+      })
 }

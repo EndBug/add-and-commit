@@ -6,6 +6,7 @@
   "scripts": {
     "build": "ncc build src/main.ts --minify --out lib",
     "watch": "ncc build src/main.ts --watch --out lib",
+    "lint:fix": "eslint --ext .ts --fix src",
     "all-contributors-badge": "ts-node scripts/all-contributors-badge",
     "changelog": "ts-node scripts/changelog.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -45,7 +46,10 @@
     "@vercel/ncc": "^0.25.1",
     "all-contributors-cli": "^6.19.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.3.0",
+    "prettier": "^2.2.1",
     "ts-node": "^9.0.0",
     "typescript": "^4.1.2",
     "yamljs": "^0.3.0"
