@@ -11,6 +11,7 @@ import {
 import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
+import YAML from 'js-yaml'
 
 type Input =
   | 'add'
@@ -175,6 +176,27 @@ async function checkInputs() {
     throw new Error(
       "Both 'add' and 'remove' are empty, the action has nothing to do."
     )
+
+  if (getInput('add')) {
+    const parsed = parseInputArray(getInput('add'))
+    if (parsed.length == 1)
+      info('Add input parsed as single string, running 1 git add command.')
+    else if (parsed.length > 1)
+      info(
+        `Add input parsed as string array, running ${parsed.length} git add commands.`
+      )
+    else setFailed('Add input: array length < 1')
+  }
+  if (getInput('remove')) {
+    const parsed = parseInputArray(getInput('remove'))
+    if (parsed.length == 1)
+      info('Remove input parsed as single string, running 1 git rm command.')
+    else if (parsed.length > 1)
+      info(
+        `Remove input parsed as string array, running ${parsed.length} git rm commands.`
+      )
+    else setFailed('Remove input: array length < 1')
+  }
   // #endregion
 
   // #region author_name, author_email
@@ -303,42 +325,91 @@ function log(err: any | Error, data?: any) {
   if (err) error(err)
 }
 
-function add({
-  logWarning = true,
-  ignoreErrors = false
-} = {}): Promise<void | Response<void>> | void {
-  if (getInput('add'))
-    return git
-      .add(getInput('add').split(' '), (e: any, d?: any) =>
-        log(ignoreErrors ? null : e, d)
-      )
-      .catch((e: Error) => {
-        if (ignoreErrors) return
-        if (
-          e.message.includes('fatal: pathspec') &&
-          e.message.includes('did not match any files')
+async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
+  (void | Response<void>)[]
+> {
+  const input = getInput('add')
+  if (!input) return []
+
+  const parsed = parseInputArray(input)
+  const res: (void | Response<void>)[] = []
+
+  for (const args of parsed) {
+    res.push(
+      // Push the result of every git command (which are executed in order) to the array
+      // If any of them fails, the whole function will return a Promise rejection
+      await git
+        .add(args.split(' '), (err: any, data?: any) =>
+          log(ignoreErrors ? null : err, data)
         )
-          logWarning && warning('Add command did not match any file.')
-        else throw e
-      })
+        .catch((e: Error) => {
+          if (ignoreErrors) return
+          if (
+            e.message.includes('fatal: pathspec') &&
+            e.message.includes('did not match any files') &&
+            logWarning
+          )
+            warning(`Add command did not match any file:\n  git add ${args}`)
+          else throw e
+        })
+    )
+  }
+
+  return res
 }
 
-function remove({
+async function remove({
   logWarning = true,
   ignoreErrors = false
-} = {}): Promise<void | Response<void>> | void {
-  if (getInput('remove'))
-    return git
-      .rm(getInput('remove').split(' '), (e: any, d?: any) =>
-        log(ignoreErrors ? null : e, d)
-      )
-      .catch((e: Error) => {
-        if (ignoreErrors) return
-        if (
-          e.message.includes('fatal: pathspec') &&
-          e.message.includes('did not match any files')
+} = {}): Promise<(void | Response<void>)[]> {
+  const input = getInput('remove')
+  if (!input) return []
+
+  const parsed = parseInputArray(input)
+  const res: (void | Response<void>)[] = []
+
+  for (const args of parsed) {
+    res.push(
+      // Push the result of every git command (which are executed in order) to the array
+      // If any of them fails, the whole function will return a Promise rejection
+      await git
+        .rm(args.split(' '), (e: any, d?: any) =>
+          log(ignoreErrors ? null : e, d)
         )
-          logWarning && warning('Remove command did not match any file.')
-        else throw e
-      })
+        .catch((e: Error) => {
+          if (ignoreErrors) return
+          if (
+            e.message.includes('fatal: pathspec') &&
+            e.message.includes('did not match any files')
+          )
+            logWarning &&
+              warning(
+                `Remove command did not match any file:\n  git rm ${args}`
+              )
+          else throw e
+        })
+    )
+  }
+
+  return res
+}
+
+/**
+ * Tries to parse a JSON array, then a YAML array.
+ * If both fail, it returns an array containing the input value as its only element
+ */
+function parseInputArray(input: string): string[] {
+  try {
+    const json = JSON.parse(input)
+    if (json && Array.isArray(json) && json.every((e) => typeof e == 'string'))
+      return json
+  } catch {}
+
+  try {
+    const yaml = YAML.safeLoad(input)
+    if (yaml && Array.isArray(yaml) && yaml.every((e) => typeof e == 'string'))
+      return yaml
+  } catch {}
+
+  return [input]
 }
