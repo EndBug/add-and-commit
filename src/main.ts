@@ -1,29 +1,15 @@
 import {
   info,
   setFailed,
-  getInput as getInputCore,
   warning,
   debug,
   startGroup,
-  endGroup,
-  error
+  endGroup
 } from '@actions/core'
 import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
-
-type Input =
-  | 'add'
-  | 'author_name'
-  | 'author_email'
-  | 'branch'
-  | 'cwd'
-  | 'message'
-  | 'pull_strategy'
-  | 'push'
-  | 'remove'
-  | 'signoff'
-  | 'tag'
+import { getInput, Input, log, outputs, parseBool, setOutput } from './util'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
@@ -92,12 +78,18 @@ console.log(`Running in ${baseDir}`)
             }
           : {})
       },
-      log
+      (err, data?) => {
+        if (data) setOutput('committed', 'true')
+        return log(err, data)
+      }
     )
 
     if (getInput('tag')) {
       info('> Tagging commit...')
-      await git.tag(getInput('tag').split(' '), log)
+      await git.tag(getInput('tag').split(' '), (err, data?) => {
+        if (data) setOutput('tagged', 'true')
+        return log(err, data)
+      })
     } else info('> No tag info provided.')
 
     if (getInput('push')) {
@@ -106,7 +98,10 @@ console.log(`Running in ${baseDir}`)
         'origin',
         getInput('branch'),
         { '--set-upstream': null },
-        log
+        (err, data?) => {
+          if (data) setOutput('pushed', 'true')
+          return log(err, data)
+        }
       )
 
       if (getInput('tag')) {
@@ -139,10 +134,13 @@ console.log(`Running in ${baseDir}`)
     endGroup()
     info('> Working tree clean. Nothing to commit.')
   }
-})().catch((e) => {
-  endGroup()
-  setFailed(e)
-})
+})()
+  .then(logOutputs)
+  .catch((e) => {
+    endGroup()
+    logOutputs()
+    setFailed(e)
+  })
 
 async function checkInputs() {
   function setInput(input: Input, value: string | undefined) {
@@ -286,23 +284,6 @@ async function checkInputs() {
   }
   // #endregion
 }
-
-function getInput(name: Input) {
-  return getInputCore(name)
-}
-
-function parseBool(value: any) {
-  try {
-    const parsed = JSON.parse(value)
-    if (typeof parsed == 'boolean') return parsed
-  } catch {}
-}
-
-function log(err: any | Error, data?: any) {
-  if (data) console.log(data)
-  if (err) error(err)
-}
-
 function add({
   logWarning = true,
   ignoreErrors = false
@@ -341,4 +322,10 @@ function remove({
           logWarning && warning('Remove command did not match any file.')
         else throw e
       })
+}
+
+function logOutputs() {
+  startGroup('Outputs:')
+  info(JSON.stringify(outputs))
+  endGroup()
 }
