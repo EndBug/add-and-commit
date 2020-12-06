@@ -4,7 +4,7 @@
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/index.js",
   "scripts": {
-    "build": "ncc build src/main.ts --minify --out lib",
+    "build": "ncc build src/main.ts --out lib",
     "watch": "ncc build src/main.ts --watch --out lib",
     "lint:fix": "eslint --ext .ts --fix src",
     "all-contributors-badge": "ts-node scripts/all-contributors-badge",
