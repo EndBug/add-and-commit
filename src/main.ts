@@ -86,10 +86,16 @@ console.log(`Running in ${baseDir}`)
 
     if (getInput('tag')) {
       info('> Tagging commit...')
-      await git.tag(getInput('tag').split(' '), (err, data?) => {
-        if (data) setOutput('tagged', 'true')
-        return log(err, data)
-      })
+      await git
+        .tag(getInput('tag').split(' '), (err, data?) => {
+          if (data) setOutput('tagged', 'true')
+          return log(err, data)
+        })
+        .then((data) => {
+          setOutput('tagged', 'true')
+          return log(null, data)
+        })
+        .catch((err) => log(err))
     } else info('> No tag info provided.')
 
     if (getInput('push')) {
