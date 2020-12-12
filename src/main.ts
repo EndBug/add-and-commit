@@ -325,7 +325,9 @@ function remove({
 }
 
 function logOutputs() {
-  startGroup('Outputs:')
-  info(JSON.stringify(outputs))
+  startGroup('Outputs')
+  for (const key in outputs) {
+    info(`${key}: ${outputs[key]}`)
+  }
   endGroup()
 }
