@@ -95,7 +95,7 @@ console.log(`Running in ${baseDir}`)
           setOutput('tagged', 'true')
           return log(null, data)
         })
-        .catch((err) => log(err))
+        .catch((err) => setFailed(err))
     } else info('> No tag info provided.')
 
     if (getInput('push')) {
