@@ -38,6 +38,7 @@ export function parseBool(value: any) {
 
 export function setOutput(name: Output, value: 'true' | 'false') {
   core.debug(`Setting output: ${name}=${value}`)
+  outputs[name] = value
   return core.setOutput(name, value)
 }
 for (const key in outputs) setOutput(key as Output, outputs[key])
