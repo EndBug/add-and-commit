@@ -12,19 +12,6 @@ import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
 import { getInput, Input, log, outputs, parseBool, setOutput } from './util'
 
-type Input =
-  | 'add'
-  | 'author_name'
-  | 'author_email'
-  | 'branch'
-  | 'cwd'
-  | 'message'
-  | 'pull_strategy'
-  | 'push'
-  | 'remove'
-  | 'signoff'
-  | 'tag'
-
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
 console.log(`Running in ${baseDir}`)
@@ -324,22 +311,6 @@ async function checkInputs() {
     )
   }
   // #endregion
-}
-
-function getInput(name: Input) {
-  return getInputCore(name)
-}
-
-function parseBool(value: any) {
-  try {
-    const parsed = JSON.parse(value)
-    if (typeof parsed == 'boolean') return parsed
-  } catch {}
-}
-
-function log(err: any | Error, data?: any) {
-  if (data) console.log(data)
-  if (err) error(err)
 }
 
 async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
