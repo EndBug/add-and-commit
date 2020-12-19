@@ -113,7 +113,7 @@ console.log(`Running in ${baseDir}`)
       if (getInput('tag')) {
         info('> Pushing tags to repo...')
         await git
-          .pushTags('origin', (e, d?) => log(undefined, e || d))
+          .pushTags('origin', undefined, (e, d?) => log(undefined, e || d))
           .catch(() => {
             info('> Tag push failed: deleting remote tag and re-pushing...')
             return git
@@ -129,7 +129,7 @@ console.log(`Running in ${baseDir}`)
                 },
                 log
               )
-              .pushTags('origin', log)
+              .pushTags('origin', undefined, log)
           })
       } else info('> No tags to push.')
     } else info('> Not pushing anything.')
