@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -6,125 +7,183 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.2.0] - 2020-11-11
+## [5.3.0] - 2020-12-12
+
 ### Added:
--  New `push` option: this lets you tell the action whether to push commit and tags to the repo. The default value is `true`, so that the default behavior is not changed. (issue #86)
+
+- Outputs: the action now has 3 outputs (`committed`, `pushed`, and `tagged`) that will be set to either `true` or `false` to tell you what the action has done. The outputs are also shown in the action logs.
+
+## [5.2.0] - 2020-11-11
+
+### Added:
+
+- New `push` option: this lets you tell the action whether to push commit and tags to the repo. The default value is `true`, so that the default behavior is not changed. (issue #86)
 
 ## [5.1.2] - 2020-11-10
+
 ### Fixed:
+
 - Fixed an issue with the build (issue #88)
 
 ## [5.1.1] - 2020-11-07
+
 ### Fixed:
+
 - Fixed typo in parameter name: `pull_strategy` was written as `pull_stategy` (PR #83)
 
 ## [5.1.0] - 2020-10-07
+
 ### Added:
-- The default commit message now displays the name of the workflow too (issue #64) 
+
+- The default commit message now displays the name of the workflow too (issue #64)
 
 ## [5.0.0] - 2020-09-27
+
 ### Changed:
+
 - **[BREAKING]** Action parameters: multiple action parameters have been changed, refer to the docs for better info
 - The code is now entirely in TypeScript (PR #57)
 
 ### Fixed:
+
 - Improved input checks
 - Logs are now displayed on Windows too
 - Remove unnecessary steps
 - Remove unused dependencies
 
 ## [4.4.0] - 2020-07-31
+
 ### Added:
+
 - Pull requests: the action can now work in runs triggered by pull request events (issue #48)
 
 ## [4.3.0] - 2020-07-29
+
 ### Addded:
+
 - `signoff` parameter: lets you use the `--signoff` argument for the `git commit` command (PR #46)
 
 ## [4.2.1] - 2020-07-10
+
 ### Fixed:
+
 - OS-support: the action now properly works on Windows instances (issue #33)
 
 ## [4.2.0] - 2020-05-17
+
 ### Added:
+
 - Tagging: you can now create and update lightweight tags (PR #30)
 
 ## [4.1.0] - 2020-05-01
-### Added: 
+
+### Added:
+
 - `ref` parameter: lets you choose the branch to run the action on, the default is the one that triggered the workflow (issue #29)
 
 ## [4.0.3] - 2020-05-01
+
 ### Fixed:
+
 - Logs: `git diff` won't display logs anymore, to avoid buffer problems (issue #27)
 - Logs: additional info will be logged along with the command outputs
 - Logs: added groups to improve readability
 
 ## [4.0.2] - 2020-04-19
+
 ### Fixed:
+
 - Error handling: failures are now easier to read (issue #25)
 
 ## [4.0.1] - 2020-03-20
+
 ### Fixed:
+
 - Scheduled events: the action can be used in action runs triggered by a scheduled events
 - Warnings: there won't be warnings when both `author_name` and `author_email` are set
 
 ## [4.0.0] - 2020-03-03
+
 ### Removed:
+
 - **[BREAKING]** `path` parameter: see 'Changed' section for more info
 - **[BREAKING]** `pattern` parameter: see 'Changed' section for more info
 
 ### Changed:
+
 - The action now uses `git add` and `git rm` commands, you can choose their arguemnts directly by using the `add` and `remove` parameters
 - **[BREAKING]** Error handling: the action won't stop if one of your git commands fails (e.g. if one of your pathspecs doesn't match any file)
 
 ## [3.1.0] - 2020-02-21
+
 ### Added:
+
 - `remove` parameter: lets you delete files directly from the action
 
 ## [3.0.0] - 2020-01-24
+
 ### Added:
+
 - The action can now run in multiple subsequent jobs in the same workflow
 
 ### Removed:
+
 - **[BREAKING]** [`actions/checkout@v1`](https://github.com/actions/checkout/tree/v1) support is being dropped in favor of [`actions/checkout@v2`](https://github.com/actions/checkout/releases/tag/v2)
 
 ## [2.3.2] - 2019-12-29
+
 ### Added:
+
 - `cwd` parameter: lets you set the Current Working Directory
 
 ## [2.3.1] - 2019-12-20
-### Added: 
+
+### Added:
+
 - Short tags: from now on, there will be short major tags available (`v2`, `v3`, ...)
 
 ## [2.3.0] - 2019-12-14
+
 ### Changed:
+
 - TypeScript rewrite: the action will run faster because, unlike with Docker, no build process is needed
 
 ### Added:
+
 - OS support: the action can now run in non-Linux environments too
 
 ## [2.2.0] - 2019-12-14
+
 ### Added:
+
 - The action can automatically fetch the commit author to use
 - You can manually provide the author using the `author_name` and `author_email` parameters
 
 ## [2.1.1] - 2019-12-07
+
 ### Fixed:
+
 - The action can now be used multiple times in the same workflow
 
 ## [2.1.0] - 2019-09-19
+
 ### Added:
+
 - `force` parameter: uses `--force` when running `git add`
 
 ## [2.0.0] - 2019-09-18
+
 ### Changed:
+
 - **[BREAKING]** The action now uses a `find` command
 
 ## [1.0.0] - 2019-09-17
+
 First release
 
 #
-[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...HEAD
+
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.3.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -149,3 +208,4 @@ First release
 [5.1.1]: https://github.com/EndBug/add-and-commit/compare/v5.1.0...v5.1.1
 [5.1.2]: https://github.com/EndBug/add-and-commit/compare/v5.1.1...v5.1.2
 [5.2.0]: https://github.com/EndBug/add-and-commit/compare/v5.1.2...v5.2.0
+[5.3.0]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...v5.3.0

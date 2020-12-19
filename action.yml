@@ -39,6 +39,14 @@ inputs:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
 
+outputs:
+  committed:
+    description: Whether the action has created a commit.
+  pushed:
+    description: Whether the action has pushed to the remote.
+  tagged:
+    description: Whether the action has created a tag.
+
 runs:
   using: node12
   main: lib/index.js

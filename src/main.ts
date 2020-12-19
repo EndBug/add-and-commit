@@ -1,17 +1,16 @@
 import {
   info,
   setFailed,
-  getInput as getInputCore,
   warning,
   debug,
   startGroup,
-  endGroup,
-  error
+  endGroup
 } from '@actions/core'
 import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
+import { getInput, Input, log, outputs, parseBool, setOutput } from './util'
 
 type Input =
   | 'add'
@@ -93,12 +92,24 @@ console.log(`Running in ${baseDir}`)
             }
           : {})
       },
-      log
+      (err, data?) => {
+        if (data) setOutput('committed', 'true')
+        return log(err, data)
+      }
     )
 
     if (getInput('tag')) {
       info('> Tagging commit...')
-      await git.tag(getInput('tag').split(' '), log)
+      await git
+        .tag(getInput('tag').split(' '), (err, data?) => {
+          if (data) setOutput('tagged', 'true')
+          return log(err, data)
+        })
+        .then((data) => {
+          setOutput('tagged', 'true')
+          return log(null, data)
+        })
+        .catch((err) => setFailed(err))
     } else info('> No tag info provided.')
 
     if (getInput('push')) {
@@ -107,13 +118,16 @@ console.log(`Running in ${baseDir}`)
         'origin',
         getInput('branch'),
         { '--set-upstream': null },
-        log
+        (err, data?) => {
+          if (data) setOutput('pushed', 'true')
+          return log(err, data)
+        }
       )
 
       if (getInput('tag')) {
         info('> Pushing tags to repo...')
         await git
-          .pushTags('origin', (e, d?) => log(undefined, e || d))
+          .pushTags('origin', undefined, (e, d?) => log(undefined, e || d))
           .catch(() => {
             info('> Tag push failed: deleting remote tag and re-pushing...')
             return git
@@ -129,7 +143,7 @@ console.log(`Running in ${baseDir}`)
                 },
                 log
               )
-              .pushTags('origin', log)
+              .pushTags('origin', undefined, log)
           })
       } else info('> No tags to push.')
     } else info('> Not pushing anything.')
@@ -140,10 +154,13 @@ console.log(`Running in ${baseDir}`)
     endGroup()
     info('> Working tree clean. Nothing to commit.')
   }
-})().catch((e) => {
-  endGroup()
-  setFailed(e)
-})
+})()
+  .then(logOutputs)
+  .catch((e) => {
+    endGroup()
+    logOutputs()
+    setFailed(e)
+  })
 
 async function checkInputs() {
   function setInput(input: Input, value: string | undefined) {
@@ -425,4 +442,12 @@ function parseInputArray(input: string): string[] {
 
   debug('Input parsed as single string')
   return [input]
+}
+
+function logOutputs() {
+  startGroup('Outputs')
+  for (const key in outputs) {
+    info(`${key}: ${outputs[key]}`)
+  }
+  endGroup()
 }

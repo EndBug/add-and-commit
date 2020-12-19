@@ -1,4 +1,5 @@
 # Add & Commit
+
 <a href="https://github.com/search?o=desc&q=EndBug%2Fadd-and-commit+path%3A.github%2Fworkflows+language%3AYAML&s=&type=Code" target="_blank" title="Public workflows that use this action."><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fapi-git-master.endbug.vercel.app%2Fapi%2Fgithub-actions%2Fused-by%3Faction%3DEndBug%2Fadd-and-commit%26badge%3Dtrue" alt="Public workflows that use this action."></a>
 [![All Contributors](https://img.shields.io/badge/all_contributors-18-orange.svg?style=flat)](#contributors-)
 
@@ -48,7 +49,7 @@ Add a step like this to your workflow:
 
     # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
-    remove: "./dir/old_file.js"
+    remove: './dir/old_file.js'
 
     # Whether to use the --signoff option on `git commit` (only `true` and `false` are accepted)
     # Default: false
@@ -56,7 +57,7 @@ Add a step like this to your workflow:
 
     # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
-    tag: "v1.0.0 --force"
+    tag: 'v1.0.0 --force'
 
   env:
     # This is necessary in order to push a commit to the repo
@@ -82,6 +83,16 @@ The script will not stop if one of the git commands fails. E.g.: if your command
 
 You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
 
+### Outputs:
+
+The action provides these outputs:
+
+- `committed`: whether the action has created a commit (`'true'` or `'false'`)
+- `pushed`: whether the action has pushed to teh remote(`'true'` or `'false'`)
+- `tagged`: whether the action has created a tag (`'true'` or `'false'`)
+
+For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
+
 ### Examples:
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
@@ -90,34 +101,34 @@ Do you want to lint your JavaScript files, located in the `src` folder, with ESL
 name: Lint source code
 on: push
 
-jobs: 
+jobs:
   run:
     name: Lint with ESLint
     runs-on: ubuntu-latest
-    steps: 
-    - name: Checkout repo
-      uses: actions/checkout@v2
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    
-    - name: Install dependencies
-      run: npm install
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
 
-    - name: Update source code
-      run: eslint "src/**" --fix
+      - name: Install dependencies
+        run: npm install
 
-    - name: Commit changes
-      uses: EndBug/add-and-commit@v5
-      with:
-        author_name: Your Name
-        author_email: mail@example.com
-        message: "Your commit message"
-        add: "*.js"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update source code
+        run: eslint "src/**" --fix
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v5
+        with:
+          author_name: Your Name
+          author_email: mail@example.com
+          message: 'Your commit message'
+          add: '*.js'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 If you need to run the action on a repository that is not located in [`$GITHUB_WORKSPACE`](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/using-environment-variables#default-environment-variables), you can use the `cwd` option: the action uses a `cd` normal command, so the path should follow bash standards.
@@ -126,7 +137,7 @@ If you need to run the action on a repository that is not located in [`$GITHUB_W
 name: Use a different repository directory
 on: push
 
-jobs: 
+jobs:
   run:
     name: Add a text file
     runs-on: ubuntu-latest
@@ -135,7 +146,7 @@ jobs:
       # If you need to, you can check out your repo to a different location
       - uses: actions/checkout@v2
         with:
-          path: "./pathToRepo/"
+          path: './pathToRepo/'
 
       # You can make whatever type of change to the repo...
       - run: echo "123" > ./pathToRepo/file.txt
@@ -143,9 +154,9 @@ jobs:
       # ...and then use the action as you would normally do, but providing the path to the repo
       - uses: EndBug/add-and-commit@v5
         with:
-          message: "Add the very useful text file"
-          add: "*.txt --force"
-          cwd: "./pathToRepo/"
+          message: 'Add the very useful text file'
+          add: '*.txt --force'
+          cwd: './pathToRepo/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -181,6 +192,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/coffeegoddd"><img src="https://avatars3.githubusercontent.com/u/43383835?v=4" width="100px;" alt=""/><br /><sub><b>Dustin Brown</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Acoffeegoddd" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/Chocrates"><img src="https://avatars1.githubusercontent.com/u/1758164?v=4" width="100px;" alt=""/><br /><sub><b>Chris McIntosh</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AChocrates" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/kbsali"><img src="https://avatars0.githubusercontent.com/u/53676?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Saliou</b></sub></a><br /><a href="#ideas-kbsali" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/ewjoachim"><img src="https://avatars0.githubusercontent.com/u/1457576?v=4" width="100px;" alt=""/><br /><sub><b>Joachim Jablon</b></sub></a><br /><a href="#ideas-ewjoachim" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
