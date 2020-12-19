@@ -401,15 +401,28 @@ async function remove({
 function parseInputArray(input: string): string[] {
   try {
     const json = JSON.parse(input)
-    if (json && Array.isArray(json) && json.every((e) => typeof e == 'string'))
+    if (
+      json &&
+      Array.isArray(json) &&
+      json.every((e) => typeof e == 'string')
+    ) {
+      debug(`Input parsed as JSON array of length ${json.length}`)
       return json
+    }
   } catch {}
 
   try {
     const yaml = YAML.safeLoad(input)
-    if (yaml && Array.isArray(yaml) && yaml.every((e) => typeof e == 'string'))
+    if (
+      yaml &&
+      Array.isArray(yaml) &&
+      yaml.every((e) => typeof e == 'string')
+    ) {
+      debug(`Input parsed as YAML array of length ${yaml.length}`)
       return yaml
+    }
   } catch {}
 
+  debug('Input parsed as single string')
   return [input]
 }
