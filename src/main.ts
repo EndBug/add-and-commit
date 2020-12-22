@@ -170,11 +170,13 @@ async function checkInputs() {
   // #region GITHUB_TOKEN
   let token = process.env.GITHUB_TOKEN
   if (token) {
+    debug('Using token from GITHUB_TOKEN env variable.')
     warning(
       "The GITHUB_TOKEN env variable is deprecated and will not be supported in the next major release. Use the 'token' input, " +
         "which defaults to 'secrets.GITHUB_TOKEN'."
     )
   } else {
+    debug('Using token from token input.')
     token = getInput('token')
   }
   // #endregion
