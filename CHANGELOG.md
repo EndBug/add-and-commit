@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2020-12-22
+
+### Added:
+
+- `token` input: you can now use this instead of setting the `GITHUB_TOKEN` env variable, which has been deprecated. This input is optional, its default value is the default `secrets.GITHUB_TOKEN`. You only need to use this if you want the action to run with a PAT. (issue #110)
+
+### Deprecated:
+
+- `GITHUB_TOKEN`: the use of this env variable is now deprecated in favor of the `token` input, you'll start receiving warnings if you keep using it. (issue #110)
+
 ## [6.0.0] - 2020-12-22
 
 ### Added:
@@ -216,3 +226,4 @@ First release
 [5.2.0]: https://github.com/EndBug/add-and-commit/compare/v5.1.2...v5.2.0
 [5.3.0]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...v5.3.0
 [6.0.0]: https://github.com/EndBug/add-and-commit/compare/v5.3.0...v6.0.0
+[6.1.0]: https://github.com/EndBug/add-and-commit/compare/v6.0.0...v6.1.0
