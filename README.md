@@ -193,6 +193,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Chocrates"><img src="https://avatars1.githubusercontent.com/u/1758164?v=4" width="100px;" alt=""/><br /><sub><b>Chris McIntosh</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AChocrates" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/kbsali"><img src="https://avatars0.githubusercontent.com/u/53676?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Saliou</b></sub></a><br /><a href="#ideas-kbsali" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/ewjoachim"><img src="https://avatars0.githubusercontent.com/u/1457576?v=4" width="100px;" alt=""/><br /><sub><b>Joachim Jablon</b></sub></a><br /><a href="#ideas-ewjoachim" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/trallnag"><img src="https://avatars3.githubusercontent.com/u/24834206?v=4" width="100px;" alt=""/><br /><sub><b>Tim Schwenke</b></sub></a><br /><a href="#ideas-trallnag" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
