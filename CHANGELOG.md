@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2020-12-22
+
+### Added:
+
+- (BREAKING?) Multiple git commands: support JSON/YAML arrays for the `add` and `remove` parameters (you still need pass a string as input, but that can be parsed to an array by the action). Using them will run multiple commands in succession. I don't think this will be really breaking anything, but I've used a major version change just to be sure. There's more info about this stuff on the README.
+
 ## [5.3.0] - 2020-12-12
 
 ### Added:
@@ -209,3 +215,4 @@ First release
 [5.1.2]: https://github.com/EndBug/add-and-commit/compare/v5.1.1...v5.1.2
 [5.2.0]: https://github.com/EndBug/add-and-commit/compare/v5.1.2...v5.2.0
 [5.3.0]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...v5.3.0
+[6.0.0]: https://github.com/EndBug/add-and-commit/compare/v5.3.0...v6.0.0
