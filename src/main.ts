@@ -161,7 +161,6 @@ async function checkInputs() {
 
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
-    token = process.env.GITHUB_TOKEN,
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
     sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
     defaultBranch = isPR
@@ -169,10 +168,15 @@ async function checkInputs() {
       : process.env.GITHUB_REF?.substring(11)
 
   // #region GITHUB_TOKEN
-  if (!token)
+  let token = process.env.GITHUB_TOKEN
+  if (token) {
     warning(
-      'The GITHUB_TOKEN env variable is missing: the action may not work as expected.'
+      "The GITHUB_TOKEN env variable is deprecated and will not be supported in the next major release. Use the 'token' input, " +
+        "which defaults to 'secrets.GITHUB_TOKEN'."
     )
+  } else {
+    token = getInput('token')
+  }
   // #endregion
 
   // #region add, remove

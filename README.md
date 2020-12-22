@@ -59,15 +59,10 @@ Add a step like this to your workflow:
     # Default: ''
     tag: 'v1.0.0 --force'
 
-  env:
-    # This is necessary in order to push a commit to the repo
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
+    # Token to use for pushing the commit. The default value won't trigger any workflows, you need to use a Personal Access Token for that.
+    # Default: secrets.GITHUB_TOKEN
+    token: ${{ secrets.GITHUB_TOKEN }}
 ```
-
-### Environment variables:
-
-The only `env` variable required is the token for the action to run: GitHub generates one automatically, but you need to pass it through `env` to make it available to actions. You can find more about `GITHUB_TOKEN` [here](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret).  
-That said, you can just copy the example line and not worry about it. If you do want to use a different token you can pass that in, but I wouldn't see any possible advantage in doing so.
 
 ### Adding files:
 
@@ -129,8 +124,6 @@ jobs:
           author_email: mail@example.com
           message: 'Your commit message'
           add: '*.js'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 If you need to run the action on a repository that is not located in [`$GITHUB_WORKSPACE`](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/using-environment-variables#default-environment-variables), you can use the `cwd` option: the action uses a `cd` normal command, so the path should follow bash standards.
@@ -159,8 +152,6 @@ jobs:
           message: 'Add the very useful text file'
           add: '*.txt --force'
           cwd: './pathToRepo/'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Contributors ✨
