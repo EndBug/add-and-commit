@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added:
 
-- (BREAKING?) Multiple git commands: support JSON/YAML arrays for the `add` and `remove` parameters (you still need pass a string as input, but that can be parsed to an array by the action). Using them will run multiple commands in succession. I don't think this will be really breaking anything, but I've used a major version change just to be sure. There's more info about this stuff on the README.
+- (BREAKING?) Multiple git commands: support JSON/YAML arrays for the `add` and `remove` parameters (you still need pass a string as input, but that can be parsed to an array by the action). Using them will run multiple commands in succession. I don't think this will be really breaking anything, but I've used a major version change just to be sure. There's more info about this stuff on the README. (issue #95)
 
 ## [5.3.0] - 2020-12-12
 
