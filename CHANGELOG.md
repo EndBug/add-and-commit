@@ -199,7 +199,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v5.3.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v6.1.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0

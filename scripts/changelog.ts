@@ -27,13 +27,11 @@ arr[1] =
 futureChangelog = arr.join('## [Unreleased]')
 
 // Update footer
-arr = futureChangelog
-  .split('\n')
-  .map((line) =>
-    line.startsWith('[Unreleased]')
-      ? `[Unreleased]: https://github.com/EndBug/add-and-commit/compare/v${currentVersion}...HEAD`
-      : line
-  )
+arr = futureChangelog.split('\n').map((line) =>
+  line.startsWith('[unreleased]') // The link ref is lowercase because of prettier
+    ? `[unreleased]: https://github.com/EndBug/add-and-commit/compare/v${currentVersion}...HEAD`
+    : line
+)
 
 const lastVersion = ([...arr].reverse()[1]?.match(/\[([^\][]*)]/) ||
   [])[0].replace(/[\[\]']+/g, '') // eslint-disable-line no-useless-escape
