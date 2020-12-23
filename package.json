@@ -8,7 +8,6 @@
     "watch": "ncc build src/main.ts --watch --out lib",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts --fix src",
-    "all-contributors-badge": "ts-node scripts/all-contributors-badge",
     "changelog": "ts-node scripts/changelog.ts && npm i",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

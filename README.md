@@ -1,7 +1,7 @@
 # Add & Commit
 
 [![Public workflows that use this action.](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi-git-master.endbug.vercel.app%2Fapi%2Fgithub-actions%2Fused-by%3Faction%3DEndBug%2Fadd-and-commit%26badge%3Dtrue)](https://github.com/search?o=desc&q=EndBug+add-and-commit+path%3A.github%2Fworkflows+language%3AYAML&s=&type=Code)
-[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat)](#contributors-)
+[![All Contributors](https://img.shields.io/github/all-contributors/EndBug/add-and-commit)](#contributors-)
 
 You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
 
