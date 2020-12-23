@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.0] - 2020-12-23
+
+### Added:
+
+- `push` input: allow for custom `git push` arguments to be used, more info in the README. (issue #100)
+
 ## [6.1.0] - 2020-12-22
 
 ### Added:
@@ -199,7 +205,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v6.1.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v6.2.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -227,3 +233,4 @@ First release
 [5.3.0]: https://github.com/EndBug/add-and-commit/compare/v5.2.0...v5.3.0
 [6.0.0]: https://github.com/EndBug/add-and-commit/compare/v5.3.0...v6.0.0
 [6.1.0]: https://github.com/EndBug/add-and-commit/compare/v6.0.0...v6.1.0
+[6.2.0]: https://github.com/EndBug/add-and-commit/compare/v6.1.0...v6.2.0
