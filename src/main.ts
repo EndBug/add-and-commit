@@ -99,17 +99,34 @@ console.log(`Running in ${baseDir}`)
         .catch((err) => setFailed(err))
     } else info('> No tag info provided.')
 
-    if (getInput('push')) {
+    const pushOption = parseBool(getInput('push')) ?? getInput('push')
+    if (pushOption) {
+      // If the options is `true | string`...
       info('> Pushing commit to repo...')
-      await git.push(
-        'origin',
-        getInput('branch'),
-        { '--set-upstream': null },
-        (err, data?) => {
-          if (data) setOutput('pushed', 'true')
-          return log(err, data)
-        }
-      )
+
+      if (pushOption === true) {
+        debug(`Running: git push origin ${getInput('branch')} --set-upstream`)
+        await git.push(
+          'origin',
+          getInput('branch'),
+          { '--set-upstream': null },
+          (err, data?) => {
+            if (data) setOutput('pushed', 'true')
+            return log(err, data)
+          }
+        )
+      } else {
+        debug(`Running: git push ${pushOption}`)
+        await git.push(
+          undefined,
+          undefined,
+          pushOption.split(' '),
+          (err, data?) => {
+            if (data) setOutput('pushed', 'true')
+            return log(err, data)
+          }
+        )
+      }
 
       if (getInput('tag')) {
         info('> Pushing tags to repo...')
@@ -294,26 +311,15 @@ async function checkInputs() {
       )})`
     )
   }
-
   // #endregion
 
   // #region push
-  setDefault('push', 'true')
   if (getInput('push')) {
-    // It's just to scope the parsed constant
+    // It has to be either 'true', 'false', or any other string (use as arguments)
     const parsed = parseBool(getInput('push'))
 
-    if (parsed === undefined)
-      throw new Error(
-        `"${getInput(
-          'push'
-        )}" is not a valid value for the 'push' input: only "true" and "false" are allowed.`
-      )
-
-    if (!parsed) setInput('push', undefined)
-
     debug(
-      `Current push option: ${getInput('push')} (${typeof getInput('push')})`
+      `Current push option: '${getInput('push')}' (parsed as ${typeof parsed})`
     )
   }
   // #endregion

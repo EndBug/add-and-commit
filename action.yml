@@ -27,8 +27,9 @@ inputs:
     required: false
     default: '--no-rebase'
   push:
-    description: Whether to push the commit and, if any, its tags to the repo
+    description: Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (more info in the README)
     required: false
+    default: 'true'
   remove:
     description: Arguments for the git rm command
     required: false

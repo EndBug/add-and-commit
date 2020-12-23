@@ -43,7 +43,7 @@ Add a step like this to your workflow:
     # Default: '--no-rebase'
     pull_strategy: '--no-rebase or --no-ff or --rebase'
 
-    # Whether to push the commit and, if any, its tags to the repo (only `true` and `false` are accepted)
+    # Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (see the paragraph below for more info)
     # Default: true
     push: false
 
@@ -75,6 +75,17 @@ You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 
 You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. As with the `add` argument, you can use every option `git rm` allows (e.g. add `--force` to ignore `.gitignore` rules).  
 The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git rm` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
+
+### Pushing:
+
+By default the action runs the following command: `git push origin ${branch input} --set-upstream`. You can use the `push` input to modify this behavior, here's what you can set it to:
+
+- `true`: this is the default value, it will behave as usual.
+- `false`: this prevents the action from pushing at all, no `git push` command is run.
+- any other string:  
+  The action will use your string as the arguments for the `git push` command. Please note that nothing is used other than your arguments, and the command will result in `git push ${push input}` (no remote, no branch, no `--set-upstream`, you have to include them yourself).
+
+One way to use this is if you want to force push to a branch of your repo: you'll need to set the `push` input to, for example, `origin yourBranch --force`.
 
 ### Tagging:
 
@@ -192,6 +203,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
