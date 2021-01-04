@@ -227,49 +227,55 @@ async function checkInputs() {
   // #endregion
 
   // #region author_name, author_email
-  let author = event?.head_commit?.author
-  if (sha && !author) {
-    info(
-      '> Unable to get commit from workflow event: trying with the GitHub API...'
-    )
+  if (getInput('author_name') && getInput('author_email')) {
+    info('> Using author info from inputs...')
+  } else {
+    info('> Some author info is missing, filling from workflow event...')
+    let author = event?.head_commit?.author
 
-    // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
-    const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
-      headers = token
-        ? {
-            Authorization: `Bearer ${token}`
-          }
-        : undefined,
-      commit = (
-        await axios.get(url, { headers }).catch((err) => {
-          startGroup('Request error:')
-          info(`> Request URL: ${url}\b${err}`)
-          endGroup()
-          return undefined
-        })
-      )?.data
+    if (sha && !author) {
+      info(
+        '> Unable to get commit from workflow event: trying with the GitHub API...'
+      )
 
-    author = commit?.commit?.author
-  }
+      // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
+      const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
+        headers = token
+          ? {
+              Authorization: `Bearer ${token}`
+            }
+          : undefined,
+        commit = (
+          await axios.get(url, { headers }).catch((err) => {
+            startGroup('Request error:')
+            info(`> Request URL: ${url}\b${err}`)
+            endGroup()
+            return undefined
+          })
+        )?.data
 
-  if (author) {
-    setDefault('author_name', author.name)
-    setDefault('author_email', author.email)
-  }
+      author = commit?.commit?.author
+    }
 
-  if (!getInput('author_name') || !getInput('author_email')) {
-    const reason = !eventPath
-      ? 'event path'
-      : isPR
-      ? sha
-        ? 'fetch commit'
-        : 'find commit sha'
-      : !event?.head_commit
-      ? 'find commit'
-      : 'find commit author'
-    warning(`Unable to fetch author info: couldn't ${reason}.`)
-    setDefault('author_name', 'Add & Commit Action')
-    setDefault('author_email', 'actions@github.com')
+    if (typeof author == 'object') {
+      setDefault('author_name', author.name)
+      setDefault('author_email', author.email)
+    }
+
+    if (!getInput('author_name') || !getInput('author_email')) {
+      const reason = !eventPath
+        ? 'event path'
+        : isPR
+        ? sha
+          ? 'fetch commit'
+          : 'find commit sha'
+        : !event?.head_commit
+        ? 'find commit'
+        : 'find commit author'
+      warning(`Unable to fetch author info: couldn't ${reason}.`)
+      setDefault('author_name', 'Add & Commit Action')
+      setDefault('author_email', 'actions@github.com')
+    }
   }
 
   info(
