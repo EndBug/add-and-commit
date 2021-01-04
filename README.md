@@ -59,7 +59,7 @@ Add a step like this to your workflow:
     # Default: ''
     tag: 'v1.0.0 --force'
 
-    # Token to use for pushing the commit. The default value won't trigger any workflows, you need to use a Personal Access Token for that.
+    # The default GitHub token won't trigger any workflows. You need to use a Personal Access Token for that which needs to be added to the `actions/checkout` action and here.
     # Default: secrets.GITHUB_TOKEN
     token: ${{ secrets.GITHUB_TOKEN }}
 ```
