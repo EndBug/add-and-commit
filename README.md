@@ -59,7 +59,7 @@ Add a step like this to your workflow:
     # Default: ''
     tag: 'v1.0.0 --force'
 
-    # The default GitHub token won't trigger any workflows. You need to use a Personal Access Token for that which needs to be added to the `actions/checkout` action and here.
+    # The token to use to access the GitHub API when getting the author info (see the paragraph below for more info about the tokens used by the action)
     # Default: secrets.GITHUB_TOKEN
     token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -90,6 +90,11 @@ One way to use this is if you want to force push to a branch of your repo: you'l
 ### Tagging:
 
 You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
+
+### Tokens:
+The token from the `token` input is only used when getting the author info from the GitHub API: usually the default GitHub token is enough but if fore some reason you want to change it, you can use that input.  
+When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to change the token there.  
+Changing the token with which the repo is configured can be useful if you want to run CI checks no the commit pushed by this action; anyway, it has to be set up outside of this action.
 
 ### Outputs:
 
