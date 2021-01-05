@@ -58,10 +58,6 @@ Add a step like this to your workflow:
     # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
     tag: 'v1.0.0 --force'
-
-    # Token to use for pushing the commit. The default value won't trigger any workflows, you need to use a Personal Access Token for that.
-    # Default: secrets.GITHUB_TOKEN
-    token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Adding files:
