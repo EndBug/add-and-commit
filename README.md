@@ -87,6 +87,11 @@ One way to use this is if you want to force push to a branch of your repo: you'l
 
 You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
 
+### Tokens:
+
+When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
+Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
+
 ### Outputs:
 
 The action provides these outputs:
@@ -197,7 +202,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.somethingcatchy.net"><img src="https://avatars1.githubusercontent.com/u/12880806?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Possible Triangle</b></sub></a><br /><a href="#ideas-PssbleTrngle" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://dominikschilling.de"><img src="https://avatars2.githubusercontent.com/u/617637?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Schilling</b></sub></a><br /><a href="#ideas-ocean90" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://dominikschilling.de"><img src="https://avatars2.githubusercontent.com/u/617637?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Schilling</b></sub></a><br /><a href="#ideas-ocean90" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=ocean90" title="Documentation">📖</a></td>
   </tr>
 </table>
 
