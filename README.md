@@ -207,7 +207,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.somethingcatchy.net"><img src="https://avatars1.githubusercontent.com/u/12880806?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Possible Triangle</b></sub></a><br /><a href="#ideas-PssbleTrngle" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://dominikschilling.de"><img src="https://avatars2.githubusercontent.com/u/617637?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Schilling</b></sub></a><br /><a href="#ideas-ocean90" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://dominikschilling.de"><img src="https://avatars2.githubusercontent.com/u/617637?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Schilling</b></sub></a><br /><a href="#ideas-ocean90" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=ocean90" title="Documentation">📖</a></td>
   </tr>
 </table>
 
