@@ -356,7 +356,7 @@ function parseInputArray(input: string): string[] {
   } catch {}
 
   try {
-    const yaml = YAML.safeLoad(input)
+    const yaml = YAML.load(input)
     if (
       yaml &&
       Array.isArray(yaml) &&
