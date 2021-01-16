@@ -58,10 +58,6 @@ Add a step like this to your workflow:
     # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
     tag: 'v1.0.0 --force'
-
-    # The token to use to access the GitHub API when getting the author info (see the paragraph below for more info about the tokens used by the action)
-    # Default: secrets.GITHUB_TOKEN
-    token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Adding files:
@@ -93,8 +89,7 @@ You can use the `tag` option to enter the arguments for a `git add` command. In 
 
 ### Tokens:
 
-The token from the `token` input is only used when getting the author info from the GitHub API: usually the default GitHub token is enough but if for some reason you want to change it, you can use that input.  
-When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to change the token there.  
+When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
 
 ### Outputs:

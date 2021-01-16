@@ -6,7 +6,6 @@ import {
   startGroup,
   endGroup
 } from '@actions/core'
-import axios from 'axios'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
@@ -179,24 +178,9 @@ async function checkInputs() {
   const eventPath = process.env.GITHUB_EVENT_PATH,
     event = eventPath && require(eventPath),
     isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
-    sha = (event?.pull_request?.head?.sha || process.env.GITHUB_SHA) as string,
     defaultBranch = isPR
       ? (event?.pull_request?.head?.ref as string)
       : process.env.GITHUB_REF?.substring(11)
-
-  // #region GITHUB_TOKEN
-  let token = process.env.GITHUB_TOKEN
-  if (token) {
-    debug('Using token from GITHUB_TOKEN env variable.')
-    warning(
-      "The GITHUB_TOKEN env variable is deprecated and will not be supported in the next major release. Use the 'token' input, " +
-        "which defaults to 'secrets.GITHUB_TOKEN'."
-    )
-  } else {
-    debug('Using token from token input.')
-    token = getInput('token')
-  }
-  // #endregion
 
   // #region add, remove
   if (!getInput('add') && !getInput('remove'))
@@ -227,57 +211,11 @@ async function checkInputs() {
   // #endregion
 
   // #region author_name, author_email
-  if (getInput('author_name') && getInput('author_email')) {
-    info('> Using author info from inputs...')
-  } else {
-    info('> Some author info is missing, filling from workflow event...')
-    let author = event?.head_commit?.author
-
-    if (sha && !author) {
-      info(
-        '> Unable to get commit from workflow event: trying with the GitHub API...'
-      )
-
-      // https://docs.github.com/en/rest/reference/repos#get-a-commit--code-samples
-      const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`,
-        headers = token
-          ? {
-              Authorization: `Bearer ${token}`
-            }
-          : undefined,
-        commit = (
-          await axios.get(url, { headers }).catch((err) => {
-            startGroup('Request error:')
-            info(`> Request URL: ${url}\b${err}`)
-            endGroup()
-            return undefined
-          })
-        )?.data
-
-      author = commit?.commit?.author
-    }
-
-    if (typeof author == 'object') {
-      setDefault('author_name', author.name)
-      setDefault('author_email', author.email)
-    }
-
-    if (!getInput('author_name') || !getInput('author_email')) {
-      const reason = !eventPath
-        ? 'event path'
-        : isPR
-        ? sha
-          ? 'fetch commit'
-          : 'find commit sha'
-        : !event?.head_commit
-        ? 'find commit'
-        : 'find commit author'
-      warning(`Unable to fetch author info: couldn't ${reason}.`)
-      setDefault('author_name', 'Add & Commit Action')
-      setDefault('author_email', 'actions@github.com')
-    }
-  }
-
+  setDefault('author_name', `${process.env.GITHUB_ACTOR}`)
+  setDefault(
+    'author_email',
+    `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
+  )
   info(
     `> Using '${getInput('author_name')} <${getInput(
       'author_email'

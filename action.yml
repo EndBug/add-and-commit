@@ -9,9 +9,11 @@ inputs:
   author_name:
     description: The name of the user that will be displayed as the author of the commit
     required: false
+    default: ${{ github.actor }}
   author_email:
     description: The email of the user that will be displayed as the author of the commit
     required: false
+    default: ${{ github.actor }}@users.noreply.github.com
   branch:
     description: Name of the branch to use, if different from the one that triggered the workflow
     required: false
@@ -39,10 +41,6 @@ inputs:
   tag:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
-  token:
-    description: 'GITHUB_TOKEN or a `repo` scoped Personal Access Token (PAT)'
-    required: false
-    default: ${{ github.token }}
 
 outputs:
   committed:
