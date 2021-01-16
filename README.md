@@ -13,7 +13,7 @@ This action lets you choose the path that you want to use when adding & committi
 Add a step like this to your workflow:
 
 ```yaml
-- uses: EndBug/add-and-commit@v6 # You can change this to use a specific version
+- uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
   with:
     # The arguments for the `git add` command (see the paragraph below for more info)
     # Default: '.'
@@ -130,7 +130,7 @@ jobs:
         run: eslint "src/**" --fix
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v6
+        uses: EndBug/add-and-commit@v7
         with:
           author_name: Your Name
           author_email: mail@example.com
@@ -159,7 +159,7 @@ jobs:
       - run: echo "123" > ./pathToRepo/file.txt
 
       # ...and then use the action as you would normally do, but providing the path to the repo
-      - uses: EndBug/add-and-commit@v6
+      - uses: EndBug/add-and-commit@v7
         with:
           message: 'Add the very useful text file'
           add: '*.txt --force'
