@@ -12,7 +12,6 @@ export type Input =
   | 'remove'
   | 'signoff'
   | 'tag'
-  | 'token'
 
 export const outputs = {
   committed: 'false',
