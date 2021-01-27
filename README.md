@@ -39,9 +39,9 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
-    # The flag used on the pull strategy
+    # The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
     # Default: '--no-rebase'
-    pull_strategy: '--no-rebase or --no-ff or --rebase'
+    pull_strategy: 'NO-PULL or --no-rebase or --no-ff or --rebase'
 
     # Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (see the paragraph below for more info)
     # Default: true

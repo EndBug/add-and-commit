@@ -50,15 +50,18 @@ console.log(`Running in ${baseDir}`)
       .checkout(getInput('branch'), undefined, log)
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
-    info('> Pulling from remote...')
-    await git.fetch(undefined, log).pull(
-      undefined,
-      undefined,
-      {
-        [getInput('pull_strategy')]: null
-      },
-      log
-    )
+    if (getInput('pull_strategy') == 'NO-PULL') info('> Not pulling from repo.')
+    else {
+      info('> Pulling from remote...')
+      await git.fetch(undefined, log).pull(
+        undefined,
+        undefined,
+        {
+          [getInput('pull_strategy')]: null
+        },
+        log
+      )
+    }
 
     info('> Re-staging files...')
     if (getInput('add')) await add({ ignoreErrors: true })
