@@ -97,7 +97,7 @@ Changing the token with which the repo is configured can be useful if you want t
 The action provides these outputs:
 
 - `committed`: whether the action has created a commit (`'true'` or `'false'`)
-- `pushed`: whether the action has pushed to teh remote(`'true'` or `'false'`)
+- `pushed`: whether the action has pushed to the remote (`'true'` or `'false'`)
 - `tagged`: whether the action has created a tag (`'true'` or `'false'`)
 
 For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
