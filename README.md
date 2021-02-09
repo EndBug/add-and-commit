@@ -104,7 +104,7 @@ For more info on how to use outputs, see ["Context and expression syntax"](https
 
 ### Examples:
 
-If you don't want to use your users GitHub username for the CI commits, you can [also use the user provided by GitHub for this task](https://github.com/actions/checkout/#push-a-commit-using-the-built-in-token):
+If you don't want to use your GitHub username for the CI commits, you can [also use the user provided by GitHub for this task](https://github.com/actions/checkout/#push-a-commit-using-the-built-in-token):
 ```yaml
 on: push
 jobs:
