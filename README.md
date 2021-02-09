@@ -104,6 +104,19 @@ For more info on how to use outputs, see ["Context and expression syntax"](https
 
 ### Examples:
 
+If you don't want to use your users GitHub username for the CI commits, you can [also use the user provided by GitHub for this task](https://github.com/actions/checkout/#push-a-commit-using-the-built-in-token):
+```yaml
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: EndBug/add-and-commit@v7.0.0
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+```
+
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
 ```yaml
