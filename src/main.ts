@@ -260,6 +260,11 @@ async function checkInputs() {
   }
   // #endregion
 
+  // #region pull_strategy
+  if (getInput('pull_strategy') == 'NO-PULL')
+    debug("NO-PULL found: won't pull from remote.")
+  // #endregion
+
   // #region push
   if (getInput('push')) {
     // It has to be either 'true', 'false', or any other string (use as arguments)
