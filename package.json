@@ -1,6 +1,7 @@
 {
   "name": "add-and-commit",
   "version": "7.0.0",
+  "private": true,
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/index.js",
   "scripts": {
@@ -9,12 +10,8 @@
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts --fix src",
     "changelog": "ts-node scripts/changelog.ts && npm i",
+    "postinstall": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run build && git add lib"
-    }
   },
   "repository": {
     "type": "git",
@@ -48,7 +45,7 @@
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "husky": "^4.3.8",
+    "husky": "^5.0.9",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5",
