@@ -114,10 +114,10 @@ jobs:
       - uses: EndBug/add-and-commit@v7.0.0
         with:
           author_name: github-actions
-          author_email: 41898282+github-actions[bot]@users.noreply.github.co
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
 
-The mail [`41898282+github-actions[bot]@users.noreply.github.co` is the mail] of the original GitHub Actions bot. If you use that, [the GitHub avatar is shown for the commits](https://github.community/t/github-actions-bot-email-address/17204). 
+`41898282+github-actions[bot]@users.noreply.github.com` is the mail of the original GitHub Actions bot. If you use that, [the GitHub avatar is shown for the commits](https://github.community/t/github-actions-bot-email-address/17204). 
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
