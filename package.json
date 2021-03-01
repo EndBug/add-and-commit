@@ -10,7 +10,7 @@
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts --fix src",
     "changelog": "ts-node scripts/changelog.ts && npm i",
-    "postinstall": "husky install",
+    "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
