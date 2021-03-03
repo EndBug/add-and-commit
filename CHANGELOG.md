@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.1.0] - 2021-03-03
+
+### Added:
+
+- `pull_strategy`: you can use 'NO-PULL' to prevent the action from pulling from the remote at all.
+
 ## [7.0.0] - 2021-01-16
 
 ### Changed:
@@ -213,7 +219,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.0.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.1.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -243,3 +249,4 @@ First release
 [6.1.0]: https://github.com/EndBug/add-and-commit/compare/v6.0.0...v6.1.0
 [6.2.0]: https://github.com/EndBug/add-and-commit/compare/v6.1.0...v6.2.0
 [7.0.0]: https://github.com/EndBug/add-and-commit/compare/v6.2.0...v7.0.0
+[7.1.0]: https://github.com/EndBug/add-and-commit/compare/v7.0.0...v7.1.0
