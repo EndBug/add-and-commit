@@ -25,7 +25,7 @@ inputs:
     description: The message for the commit
     required: false
   pull_strategy:
-    description: The flag used on the pull strategy
+    description: The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
     required: false
     default: '--no-rebase'
   push:
