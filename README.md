@@ -92,6 +92,16 @@ You can use the `tag` option to enter the arguments for a `git add` command. In 
 When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
 
+### About `actions/checkout`
+The token you use when setting up the repo with this action will determine what token `add-and-commit` will use.  
+Some users reported that they were getting an error:
+
+```
+> fatal: could not read Username for 'https://github.com': No such device or address
+```
+
+If you're getting this error and you're using `actions/checkout@v1`, try upgrading to `actions/checkout@v2`. If you're still having problems after upgrading, feel free to open an issue. Issue ref: [#146](https://github.com/EndBug/add-and-commit/issues/146)
+
 ### Outputs:
 
 The action provides these outputs:
