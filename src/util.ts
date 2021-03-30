@@ -29,6 +29,19 @@ export function log(err: any | Error, data?: any) {
   if (err) core.error(err)
 }
 
+/**
+ * Matches the different pathspecs and arguments by removing spaces that are not inside quotes
+ * @example
+ * ```js
+ * matchGitArgs('  first     second    "third"    \'fourth\'') => [ 'first', 'second', '"third"', "'fourth'" ]
+ * matchGitArgs('      ') => [ ]
+ * ```
+ * @returns An array, if there's no match it'll be empty
+ */
+export function matchGitArgs(string: string) {
+  return string.match(/(?:[^\s"]+|"[^"]*")+/g) || []
+}
+
 export function parseBool(value: any) {
   try {
     const parsed = JSON.parse(value)

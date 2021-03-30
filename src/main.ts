@@ -9,7 +9,15 @@ import {
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
-import { getInput, Input, log, outputs, parseBool, setOutput } from './util'
+import {
+  getInput,
+  Input,
+  log,
+  matchGitArgs,
+  outputs,
+  parseBool,
+  setOutput
+} from './util'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
@@ -90,7 +98,7 @@ console.log(`Running in ${baseDir}`)
     if (getInput('tag')) {
       info('> Tagging commit...')
       await git
-        .tag(getInput('tag').split(' '), (err, data?) => {
+        .tag(matchGitArgs(getInput('tag')), (err, data?) => {
           if (data) setOutput('tagged', 'true')
           return log(err, data)
         })
@@ -122,7 +130,7 @@ console.log(`Running in ${baseDir}`)
         await git.push(
           undefined,
           undefined,
-          pushOption.split(' '),
+          matchGitArgs(pushOption),
           (err, data?) => {
             if (data) setOutput('pushed', 'true')
             return log(err, data)
@@ -143,9 +151,9 @@ console.log(`Running in ${baseDir}`)
                 {
                   '--delete': null,
                   origin: null,
-                  [getInput('tag')
-                    .split(' ')
-                    .filter((w) => !w.startsWith('-'))[0]]: null
+                  [matchGitArgs(getInput('tag')).filter(
+                    (w) => !w.startsWith('-')
+                  )[0]]: null
                 },
                 log
               )
@@ -291,7 +299,7 @@ async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
       // Push the result of every git command (which are executed in order) to the array
       // If any of them fails, the whole function will return a Promise rejection
       await git
-        .add(args.split(' '), (err: any, data?: any) =>
+        .add(matchGitArgs(args), (err: any, data?: any) =>
           log(ignoreErrors ? null : err, data)
         )
         .catch((e: Error) => {
@@ -325,7 +333,7 @@ async function remove({
       // Push the result of every git command (which are executed in order) to the array
       // If any of them fails, the whole function will return a Promise rejection
       await git
-        .rm(args.split(' '), (e: any, d?: any) =>
+        .rm(matchGitArgs(args), (e: any, d?: any) =>
           log(ignoreErrors ? null : e, d)
         )
         .catch((e: Error) => {
