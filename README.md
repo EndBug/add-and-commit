@@ -63,13 +63,13 @@ Add a step like this to your workflow:
 ### Adding files:
 
 The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you want to force-add a file: `./path/to/file.txt --force`.  
-The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
+The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git add` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
 
 ### Deleting files:
 
 You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. As with the `add` argument, you can use every option `git rm` allows (e.g. add `--force` to ignore `.gitignore` rules).  
-The script will not stop if one of the git commands fails. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
+The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git rm` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
 
 ### Pushing:
@@ -93,6 +93,7 @@ When pushing, the action uses the token that the local git repository has been c
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
 
 ### About `actions/checkout`
+
 The token you use when setting up the repo with this action will determine what token `add-and-commit` will use.  
 Some users reported that they were getting an error:
 
@@ -115,6 +116,7 @@ For more info on how to use outputs, see ["Context and expression syntax"](https
 ### Examples:
 
 If you don't want to use your GitHub username for the CI commits, you can [also use the user provided by GitHub for this task](https://github.com/actions/checkout/#push-a-commit-using-the-built-in-token):
+
 ```yaml
 on: push
 jobs:
@@ -127,7 +129,7 @@ jobs:
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
 
-`41898282+github-actions[bot]@users.noreply.github.com` is the mail of the original GitHub Actions bot. If you use that, [the GitHub avatar is shown for the commits](https://github.community/t/github-actions-bot-email-address/17204). 
+`41898282+github-actions[bot]@users.noreply.github.com` is the mail of the original GitHub Actions bot. If you use that, [the GitHub avatar is shown for the commits](https://github.community/t/github-actions-bot-email-address/17204).
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
