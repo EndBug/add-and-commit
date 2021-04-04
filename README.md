@@ -231,6 +231,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://dominikschilling.de"><img src="https://avatars2.githubusercontent.com/u/617637?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Schilling</b></sub></a><br /><a href="#ideas-ocean90" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=ocean90" title="Documentation">📖</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=ocean90" title="Code">💻</a></td>
     <td align="center"><a href="https://chaos.social/@rugk"><img src="https://avatars.githubusercontent.com/u/11966684?v=4?s=100" width="100px;" alt=""/><br /><sub><b>rugk</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=rugk" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://xenoterracide.com"><img src="https://avatars.githubusercontent.com/u/5517?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Caleb Cushing</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Axenoterracide" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
