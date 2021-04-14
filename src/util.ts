@@ -33,13 +33,16 @@ export function log(err: any | Error, data?: any) {
  * Matches the different pathspecs and arguments by removing spaces that are not inside quotes
  * @example
  * ```js
- * matchGitArgs('  first     second    "third"    \'fourth\'') => [ 'first', 'second', '"third"', "'fourth'" ]
+ * matchGitArgs('  first     second    "third 3"    \'fourth\'') => [ 'first', 'second', 'third 3', "'fourth'" ]
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
  */
 export function matchGitArgs(string: string) {
-  return string.match(/(?:[^\s"]+|"[^"]*")+/g) || []
+  return (string.match(/(?:[^\s"]+|"[^"]*")+/g) || []).map((s) =>
+    // Removes double quotes, to avoid problems with simple-git
+    s.replace(/^"(.*)"$/, '$1')
+  )
 }
 
 export function parseBool(value: any) {
