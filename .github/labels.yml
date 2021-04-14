@@ -49,7 +49,7 @@
   aliases: ['duplicate']
 
 - name: 'type: feature'
-  color: 5ebeff
+  color: 0E8A16
   description: 'New feature or feature request'
   aliases: ['enhancement', 'type: enhancement']
 
