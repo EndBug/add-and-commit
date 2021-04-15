@@ -32,6 +32,7 @@ export function log(err: any | Error, data?: any) {
 
 /**
  * Matches the different pathspecs and arguments by removing spaces that are not inside quotes
+ * {@link https://stackoverflow.com/a/67103621/7133466}
  * @example
  * ```js
  * matchGitArgs(`--message "This is a 'quoted' message" --other 'This uses the "other" quotes' --foo 1234`) => ["--message", "This is a 'quoted' message", "--other", "This uses the \"other\" quotes", "--foo", "1234"]
