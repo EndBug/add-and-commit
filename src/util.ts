@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import matchAll from 'string.prototype.matchall'
 
 export type Input =
   | 'add'
@@ -33,16 +34,28 @@ export function log(err: any | Error, data?: any) {
  * Matches the different pathspecs and arguments by removing spaces that are not inside quotes
  * @example
  * ```js
- * matchGitArgs('  first     second    "third 3"    \'fourth\'') => [ 'first', 'second', 'third 3', "'fourth'" ]
+ * matchGitArgs(`--message "This is a 'quoted' message" --other 'This uses the "other" quotes' --foo 1234`) => ["--message", "This is a 'quoted' message", "--other", "This uses the \"other\" quotes", "--foo", "1234"]
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
  */
 export function matchGitArgs(string: string) {
-  return (string.match(/(?:[^\s"]+|"[^"]*")+/g) || []).map((s) =>
-    // Removes double quotes, to avoid problems with simple-git
-    s.replace(/^"(.*)"$/, '$1')
-  )
+  const tokens = String.raw`
+    (?<option> --\w+)
+    | (' (?<sq> (\\. | [^'])* ) ')
+    | (" (?<dq> (\\. | [^"])* ) ")
+    | (?<raw> \S+)
+`
+
+  const re = tokens.replace(/\s+/g, '')
+
+  const result: string[] = []
+
+  for (const m of matchAll(string, re)) {
+    result.push(...Object.values(m.groups || {}).filter(Boolean))
+  }
+
+  return result
 }
 
 export function parseBool(value: any) {
