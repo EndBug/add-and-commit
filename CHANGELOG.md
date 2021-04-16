@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.1.2] - 2021-04-16
+
+### Fixed:
+
+- Git args parsing now correctly handles quotes, that can be used for multi-word arguments (issue #166)
+
 ## [7.1.1] - 2021-04-04
 
 ### Fixed:
@@ -225,7 +231,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.1.1...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.1.2...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -257,3 +263,4 @@ First release
 [7.0.0]: https://github.com/EndBug/add-and-commit/compare/v6.2.0...v7.0.0
 [7.1.0]: https://github.com/EndBug/add-and-commit/compare/v7.0.0...v7.1.0
 [7.1.1]: https://github.com/EndBug/add-and-commit/compare/v7.1.0...v7.1.1
+[7.1.2]: https://github.com/EndBug/add-and-commit/compare/v7.1.1...v7.1.2
