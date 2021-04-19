@@ -32,7 +32,7 @@
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
-    "js-yaml": "^4.0.0",
+    "js-yaml": "^4.1.0",
     "simple-git": "^2.27.0",
     "string.prototype.matchall": "^4.0.4"
   },
