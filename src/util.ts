@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import matchAll from 'string.prototype.matchall'
+import { parseArgsStringToArgv } from 'string-argv'
 
 export type Input =
   | 'add'
@@ -31,32 +31,36 @@ export function log(err: any | Error, data?: any) {
 }
 
 /**
- * Matches the different pathspecs and arguments by removing spaces that are not inside quotes
- * {@link https://stackoverflow.com/a/67103621/7133466}
+ * Matches the given string to an array of arguments.  
+ * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
+ * {@link https://www.npm.im/string-argv}
  * @example
  * ```js
- * matchGitArgs(`--message "This is a 'quoted' message" --other 'This uses the "other" quotes' --foo 1234`) => ["--message", "This is a 'quoted' message", "--other", "This uses the \"other\" quotes", "--foo", "1234"]
+ * matchGitArgs(`
+    -s
+    --longOption 'This uses the "other" quotes'
+    --foo 1234
+    --file=message.txt
+    --file2="Application 'Support'/\"message\".txt"
+  `) => [
+    '-s',
+    '--longOption',
+    'This uses the "other" quotes',
+    '--foo',
+    '1234',
+    '--file=message.txt',
+    `--file2="Application 'Support'/\\"message\\".txt"`
+  ]
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
  */
 export function matchGitArgs(string: string) {
-  const tokens = String.raw`
-    (?<option> --\w+)
-    | (' (?<sq> (\\. | [^'])* ) ')
-    | (" (?<dq> (\\. | [^"])* ) ")
-    | (?<raw> \S+)
-`
-
-  const re = tokens.replace(/\s+/g, '')
-
-  const result: string[] = []
-
-  for (const m of matchAll(string, re)) {
-    result.push(...Object.values(m.groups || {}).filter(Boolean))
-  }
-
-  return result
+  const parsed = parseArgsStringToArgv(string)
+  core.debug(`Git args parsed:
+  - Original: ${string}
+  - Parsed: ${JSON.stringify(parsed)}`)
+  return parsed
 }
 
 export function parseBool(value: any) {
