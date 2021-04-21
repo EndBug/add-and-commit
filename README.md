@@ -60,6 +60,11 @@ Add a step like this to your workflow:
     tag: 'v1.0.0 --force'
 ```
 
+### Git arguments
+
+Multiple options let you provide the git arguments that you want the action to use. It's important to note that these arguments **are not actually used with a CLI command**, but they are parsed by a package called [`string-argv`](https://npm.im/string-argv), and then used with [`simple-git`](https://npm.im/simple-git).  
+What does this mean for you? It means that string that contain a lot of nested quotes may be parsed incorrectly, and that specific ways of declaring arguments may not be supported by this libraries. If you're having issues with your argument strings you can check whether they're being parsed correctly either by [enabling debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) for your workflow runs or by testing it directly with `string-argv` ([RunKit demo](https://npm.runkit.com/string-argv)): if each argument and option is aprsed correctly you'll see an array where every string is an option or value.
+
 ### Adding files:
 
 The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you want to force-add a file: `./path/to/file.txt --force`.  

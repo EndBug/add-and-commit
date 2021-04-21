@@ -33,7 +33,7 @@ export function log(err: any | Error, data?: any) {
 /**
  * Matches the given string to an array of arguments.  
  * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
- * {@link https://www.npmjs.com/package/string-argv}
+ * {@link https://www.npm.im/string-argv}
  * @example
  * ```js
  * matchGitArgs(`
