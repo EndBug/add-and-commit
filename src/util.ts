@@ -58,9 +58,8 @@ export function log(err: any | Error, data?: any) {
 export function matchGitArgs(string: string) {
   const parsed = parseArgsStringToArgv(string)
   core.debug(`Git args parsed:
-    - Original: ${string}
-    - Parsed: ${parsed}
-  `)
+  - Original: ${string}
+  - Parsed: ${JSON.stringify(parsed)}`)
   return parsed
 }
 
