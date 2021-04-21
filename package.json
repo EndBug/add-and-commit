@@ -34,12 +34,11 @@
     "@actions/core": "^1.2.7",
     "js-yaml": "^4.1.0",
     "simple-git": "^2.27.0",
-    "string.prototype.matchall": "^4.0.4"
+    "string-argv": "^0.3.1"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.0",
     "@types/node": "^12.12.54",
-    "@types/string.prototype.matchall": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "@vercel/ncc": "^0.27.0",
