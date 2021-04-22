@@ -20,7 +20,7 @@ inputs:
     required: false
     default: '.'
   default_author:
-    description: TODO
+    description: How the action should fill missing author name or email.
     required: false
     default: 'github_actor'
   message:
@@ -44,8 +44,9 @@ inputs:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
     
+  # Input not required from the user
   github_token:
-    description: TODO
+    description: The token used to make requests to the GitHub API. It's NOT used to make commits and should not be changed.
     required: false
     default: ${{ github.token }}
 

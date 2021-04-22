@@ -20,11 +20,11 @@ Add a step like this to your workflow:
     add: 'src'
 
     # The name of the user that will be displayed as the author of the commit
-    # Default: author of the commit that triggered the run
+    # Default: depends on the default_author input
     author_name: Your Name
 
     # The email of the user that will be displayed as the author of the commit
-    # Default: author of the commit that triggered the run
+    # Default: depends on the default_author input
     author_email: mail@example.com
 
     # Name of the branch to use, if different from the one that triggered the workflow
@@ -34,6 +34,13 @@ Add a step like this to your workflow:
     # The local path to the directory where your repository is located. You should use actions/checkout first to set it up
     # Default: '.'
     cwd: './path/to/the/repo'
+
+    # Determines the way the action fills missing author name and email. Three options are available:
+    # - github_actor -> UserName <UserName@users.noreply.github.com>
+    # - user_info -> Your Display Name <your-actual@email.com>
+    # - github_actions -> github-actions <email associated with the github logo>
+    # Default:
+    default_author: github_actor
 
     # The message for the commit
     # Default: 'Commit from GitHub Actions (name of the workflow)'
@@ -96,6 +103,8 @@ You can use the `tag` option to enter the arguments for a `git add` command. In 
 
 When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
+
+The action automatically gets the GitHub token from a `github_token` input: this input should not be modified by the user, since it doesn't affect the commits as it's only used to access the GitHub API to get user info, in case they selected that option for the commit author.
 
 ### About `actions/checkout`
 
