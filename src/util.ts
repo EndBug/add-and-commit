@@ -1,5 +1,5 @@
-import * as core from '@actions/core'
 import { parseArgsStringToArgv } from 'string-argv'
+import { Toolkit } from 'actions-toolkit'
 
 export type Input =
   | 'add'
@@ -7,6 +7,7 @@ export type Input =
   | 'author_email'
   | 'branch'
   | 'cwd'
+  | 'default_author'
   | 'message'
   | 'pull_strategy'
   | 'push'
@@ -14,20 +15,31 @@ export type Input =
   | 'signoff'
   | 'tag'
 
-export const outputs = {
+export type Output = 'committed' | 'pushed' | 'tagged'
+
+type RecordOf<T extends string> = Record<T, string | undefined>
+export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>()
+tools.outputs = {
   committed: 'false',
   pushed: 'false',
   tagged: 'false'
 }
-export type Output = keyof typeof outputs
 
 export function getInput(name: Input) {
-  return core.getInput(name)
+  return tools.inputs[name] || ''
+}
+
+export async function getUserDisplayName(username?: string) {
+  if (!username) return undefined
+
+  const res = await tools.github.users.getByUsername({ username })
+
+  return res?.data?.name
 }
 
 export function log(err: any | Error, data?: any) {
   if (data) console.log(data)
-  if (err) core.error(err)
+  if (err) tools.log.error(err)
 }
 
 /**
@@ -57,7 +69,7 @@ export function log(err: any | Error, data?: any) {
  */
 export function matchGitArgs(string: string) {
   const parsed = parseArgsStringToArgv(string)
-  core.debug(`Git args parsed:
+  tools.log.debug(`Git args parsed:
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`)
   return parsed
@@ -71,8 +83,6 @@ export function parseBool(value: any) {
 }
 
 export function setOutput(name: Output, value: 'true' | 'false') {
-  core.debug(`Setting output: ${name}=${value}`)
-  outputs[name] = value
-  return core.setOutput(name, value)
+  tools.log.debug(`Setting output: ${name}=${value}`)
+  tools.outputs[name] = value
 }
-for (const key in outputs) setOutput(key as Output, outputs[key])
