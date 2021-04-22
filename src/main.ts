@@ -333,6 +333,12 @@ async function checkInputs() {
     )
   }
   // #endregion
+
+  // #region github_token
+  if (!getInput('github_token'))
+    core.warning(
+      'No github_token has been detected, the action may fail if it needs to use the API'
+    )
 }
 
 async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<

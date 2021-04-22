@@ -15,6 +15,7 @@ export type Input =
   | 'remove'
   | 'signoff'
   | 'tag'
+  | 'github_token'
 
 export type Output = 'committed' | 'pushed' | 'tagged'
 

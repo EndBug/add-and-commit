@@ -43,6 +43,11 @@ inputs:
   tag:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
+    
+  github_token:
+    description: TODO
+    required: false
+    default: ${{ github.token }}
 
 outputs:
   committed:
