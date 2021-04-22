@@ -223,11 +223,7 @@ async function checkInputs() {
   // #endregion
 
   // #region default_author
-  const default_author_valid = [
-    'author_username',
-    'author_displayname',
-    'github_actions'
-  ]
+  const default_author_valid = ['github_actor', 'user_info', 'github_actions']
   if (!default_author_valid.includes(getInput('default_author')))
     throw new Error(
       `'${getInput(
@@ -240,22 +236,20 @@ async function checkInputs() {
   // #region author_name, author_email
   let name, email
   switch (getInput('default_author')) {
-    case 'author_username': {
+    case 'github_actor': {
       name = process.env.GITHUB_ACTOR
       email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
       break
     }
 
-    case 'author_displayname': {
+    case 'user_info': {
       if (!getInput('author_name') || !getInput('author_email')) {
         const res = await getUserInfo(process.env.GITHUB_ACTOR)
         if (!res?.name)
-          core.warning(
-            "Couldn't fetch author name, filling with author_username."
-          )
+          core.warning("Couldn't fetch author name, filling with github_actor.")
         if (!res?.email)
           core.warning(
-            "Couldn't fetch author email, filling with author_username."
+            "Couldn't fetch author email, filling with github_actor."
           )
 
         res?.name && (name = res?.name)

@@ -22,7 +22,7 @@ inputs:
   default_author:
     description: TODO
     required: false
-    default: 'author_username'
+    default: 'github_actor'
   message:
     description: The message for the commit
     required: false
