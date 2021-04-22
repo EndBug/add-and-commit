@@ -250,8 +250,8 @@ async function checkInputs() {
 
     case 'author_displayname': {
       const displayname = getInput('author_name')
-        ? await getUserDisplayName(process.env.GITHUB_ACTOR)
-        : undefined
+        ? undefined
+        : await getUserDisplayName(process.env.GITHUB_ACTOR)
 
       displayname && setDefault('author_name', displayname)
       setDefault(
