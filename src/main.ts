@@ -17,7 +17,7 @@ const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
 core.info(`Running in ${baseDir}`)
 ;(async () => {
-  await checkInputs().catch(tools.exit.failure)
+  await checkInputs().catch(core.setFailed)
 
   core.startGroup('Internal logs')
   core.info('> Staging files...')
@@ -101,7 +101,7 @@ core.info(`Running in ${baseDir}`)
           setOutput('tagged', 'true')
           return log(null, data)
         })
-        .catch((err) => tools.exit.failure(err))
+        .catch((err) => core.setFailed(err))
     } else core.info('> No tag info provided.')
 
     const pushOption = parseBool(getInput('push')) ?? getInput('push')
@@ -172,7 +172,7 @@ core.info(`Running in ${baseDir}`)
   .catch((e) => {
     core.endGroup()
     logOutputs()
-    tools.exit.failure(e)
+    core.setFailed(e)
   })
 
 async function checkInputs() {
@@ -206,7 +206,7 @@ async function checkInputs() {
       core.info(
         `Add input parsed as string array, running ${parsed.length} git add commands.`
       )
-    else tools.exit.failure('Add input: array length < 1')
+    else core.setFailed('Add input: array length < 1')
   }
   if (getInput('remove')) {
     const parsed = parseInputArray(getInput('remove'))
@@ -218,7 +218,7 @@ async function checkInputs() {
       core.info(
         `Remove input parsed as string array, running ${parsed.length} git rm commands.`
       )
-    else tools.exit.failure('Remove input: array length < 1')
+    else core.setFailed('Remove input: array length < 1')
   }
   // #endregion
 
