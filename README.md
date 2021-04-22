@@ -129,7 +129,9 @@ For more info on how to use outputs, see ["Context and expression syntax"](https
 
 ### Examples:
 
-If you don't want to use your GitHub username for the CI commits, you can [also use the user provided by GitHub for this task](https://github.com/actions/checkout/#push-a-commit-using-the-built-in-token):
+If you don't want to use your GitHub username for the CI commits, you can use the `default_author` option to make it appear as if it was made by "github-actions"
+
+<img src="https://user-images.githubusercontent.com/26386270/115738624-80b51780-a38d-11eb-9bbe-77461654274c.png" height=40/>
 
 ```yaml
 on: push
@@ -139,11 +141,9 @@ jobs:
     steps:
       - uses: EndBug/add-and-commit@v7.0.0
         with:
-          author_name: github-actions
-          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          default_author: github_actions
 ```
 
-`41898282+github-actions[bot]@users.noreply.github.com` is the mail of the original GitHub Actions bot. If you use that, [the GitHub avatar is shown for the commits](https://github.community/t/github-actions-bot-email-address/17204).
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
