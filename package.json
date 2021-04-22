@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/EndBug/add-and-commit#readme",
   "dependencies": {
+    "@actions/core": "^1.2.7",
     "actions-toolkit": "github:EndBug/actions-toolkit#core-actions",
     "js-yaml": "^4.1.0",
     "simple-git": "^2.27.0",

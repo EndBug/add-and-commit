@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
@@ -14,47 +15,47 @@ import {
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
-tools.log(`Running in ${baseDir}`)
+core.info(`Running in ${baseDir}`)
 ;(async () => {
   await checkInputs().catch(tools.exit.failure)
 
-  tools.log.startGroup('Internal logs')
-  tools.log('> Staging files...')
+  core.startGroup('Internal logs')
+  core.info('> Staging files...')
 
   if (getInput('add')) {
-    tools.log('> Adding files...')
+    core.info('> Adding files...')
     await add()
-  } else tools.log('> No files to add.')
+  } else core.info('> No files to add.')
 
   if (getInput('remove')) {
-    tools.log('> Removing files...')
+    core.info('> Removing files...')
     await remove()
-  } else tools.log('> No files to remove.')
+  } else core.info('> No files to remove.')
 
-  tools.log('> Checking for uncommitted changes in the git working tree...')
+  core.info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
   if (changedFiles > 0) {
-    tools.log(`> Found ${changedFiles} changed files.`)
+    core.info(`> Found ${changedFiles} changed files.`)
 
     await git
       .addConfig('user.email', getInput('author_email'), undefined, log)
       .addConfig('user.name', getInput('author_name'), undefined, log)
-    tools.log.debug(
+    core.debug(
       '> Current git config\n' +
         JSON.stringify((await git.listConfig()).all, null, 2)
     )
 
     await git.fetch(['--tags', '--force'], log)
 
-    tools.log('> Switching/creating branch...')
+    core.info('> Switching/creating branch...')
     await git
       .checkout(getInput('branch'), undefined, log)
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
     if (getInput('pull_strategy') == 'NO-PULL')
-      tools.log('> Not pulling from repo.')
+      core.info('> Not pulling from repo.')
     else {
-      tools.log('> Pulling from remote...')
+      core.info('> Pulling from remote...')
       await git.fetch(undefined, log).pull(
         undefined,
         undefined,
@@ -65,11 +66,11 @@ tools.log(`Running in ${baseDir}`)
       )
     }
 
-    tools.log('> Re-staging files...')
+    core.info('> Re-staging files...')
     if (getInput('add')) await add({ ignoreErrors: true })
     if (getInput('remove')) await remove({ ignoreErrors: true })
 
-    tools.log('> Creating commit...')
+    core.info('> Creating commit...')
     await git.commit(
       getInput('message'),
       undefined,
@@ -90,7 +91,7 @@ tools.log(`Running in ${baseDir}`)
     )
 
     if (getInput('tag')) {
-      tools.log('> Tagging commit...')
+      core.info('> Tagging commit...')
       await git
         .tag(matchGitArgs(getInput('tag')), (err, data?) => {
           if (data) setOutput('tagged', 'true')
@@ -101,15 +102,15 @@ tools.log(`Running in ${baseDir}`)
           return log(null, data)
         })
         .catch((err) => tools.exit.failure(err))
-    } else tools.log('> No tag info provided.')
+    } else core.info('> No tag info provided.')
 
     const pushOption = parseBool(getInput('push')) ?? getInput('push')
     if (pushOption) {
       // If the options is `true | string`...
-      tools.log('> Pushing commit to repo...')
+      core.info('> Pushing commit to repo...')
 
       if (pushOption === true) {
-        tools.log.debug(
+        core.debug(
           `Running: git push origin ${getInput('branch')} --set-upstream`
         )
         await git.push(
@@ -122,7 +123,7 @@ tools.log(`Running in ${baseDir}`)
           }
         )
       } else {
-        tools.log.debug(`Running: git push ${pushOption}`)
+        core.debug(`Running: git push ${pushOption}`)
         await git.push(
           undefined,
           undefined,
@@ -135,11 +136,11 @@ tools.log(`Running in ${baseDir}`)
       }
 
       if (getInput('tag')) {
-        tools.log('> Pushing tags to repo...')
+        core.info('> Pushing tags to repo...')
         await git
           .pushTags('origin', undefined, (e, d?) => log(undefined, e || d))
           .catch(() => {
-            tools.log(
+            core.info(
               '> Tag push failed: deleting remote tag and re-pushing...'
             )
             return git
@@ -157,19 +158,19 @@ tools.log(`Running in ${baseDir}`)
               )
               .pushTags('origin', undefined, log)
           })
-      } else tools.log('> No tags to push.')
-    } else tools.log('> Not pushing anything.')
+      } else core.info('> No tags to push.')
+    } else core.info('> Not pushing anything.')
 
-    tools.log.endGroup()
-    tools.log('> Task completed.')
+    core.endGroup()
+    core.info('> Task completed.')
   } else {
-    tools.log.endGroup()
-    tools.log('> Working tree clean. Nothing to commit.')
+    core.endGroup()
+    core.info('> Working tree clean. Nothing to commit.')
   }
 })()
   .then(logOutputs)
   .catch((e) => {
-    tools.log.endGroup()
+    core.endGroup()
     logOutputs()
     tools.exit.failure(e)
   })
@@ -200,9 +201,9 @@ async function checkInputs() {
   if (getInput('add')) {
     const parsed = parseInputArray(getInput('add'))
     if (parsed.length == 1)
-      tools.log('Add input parsed as single string, running 1 git add command.')
+      core.info('Add input parsed as single string, running 1 git add command.')
     else if (parsed.length > 1)
-      tools.log(
+      core.info(
         `Add input parsed as string array, running ${parsed.length} git add commands.`
       )
     else tools.exit.failure('Add input: array length < 1')
@@ -210,11 +211,11 @@ async function checkInputs() {
   if (getInput('remove')) {
     const parsed = parseInputArray(getInput('remove'))
     if (parsed.length == 1)
-      tools.log(
+      core.info(
         'Remove input parsed as single string, running 1 git rm command.'
       )
     else if (parsed.length > 1)
-      tools.log(
+      core.info(
         `Remove input parsed as string array, running ${parsed.length} git rm commands.`
       )
     else tools.exit.failure('Remove input: array length < 1')
@@ -275,7 +276,7 @@ async function checkInputs() {
       )
   }
 
-  tools.log(
+  core.info(
     `> Using '${getInput('author_name')} <${getInput(
       'author_email'
     )}>' as author.`
@@ -287,13 +288,13 @@ async function checkInputs() {
     'message',
     `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
   )
-  tools.log(`> Using "${getInput('message')}" as commit message.`)
+  core.info(`> Using "${getInput('message')}" as commit message.`)
   // #endregion
 
   // #region branch
   const branch = setDefault('branch', defaultBranch || '')
   if (isPR)
-    tools.log(`> Running for a PR, the action will use '${branch}' as ref.`)
+    core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
   // #endregion
 
   // #region signoff
@@ -309,7 +310,7 @@ async function checkInputs() {
 
     if (!parsed) setInput('signoff', undefined)
 
-    tools.log.debug(
+    core.debug(
       `Current signoff option: ${getInput('signoff')} (${typeof getInput(
         'signoff'
       )})`
@@ -319,7 +320,7 @@ async function checkInputs() {
 
   // #region pull_strategy
   if (getInput('pull_strategy') == 'NO-PULL')
-    tools.log.debug("NO-PULL found: won't pull from remote.")
+    core.debug("NO-PULL found: won't pull from remote.")
   // #endregion
 
   // #region push
@@ -327,7 +328,7 @@ async function checkInputs() {
     // It has to be either 'true', 'false', or any other string (use as arguments)
     const parsed = parseBool(getInput('push'))
 
-    tools.log.debug(
+    core.debug(
       `Current push option: '${getInput('push')}' (parsed as ${typeof parsed})`
     )
   }
@@ -358,7 +359,7 @@ async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
             e.message.includes('did not match any files') &&
             logWarning
           )
-            tools.log.warn(
+            core.warning(
               `Add command did not match any file:\n  git add ${args}`
             )
           else throw e
@@ -394,7 +395,7 @@ async function remove({
             e.message.includes('did not match any files')
           )
             logWarning &&
-              tools.log.warn(
+              core.warning(
                 `Remove command did not match any file:\n  git rm ${args}`
               )
           else throw e
@@ -417,7 +418,7 @@ function parseInputArray(input: string): string[] {
       Array.isArray(json) &&
       json.every((e) => typeof e == 'string')
     ) {
-      tools.log.debug(`Input parsed as JSON array of length ${json.length}`)
+      core.debug(`Input parsed as JSON array of length ${json.length}`)
       return json
     }
   } catch {}
@@ -429,19 +430,19 @@ function parseInputArray(input: string): string[] {
       Array.isArray(yaml) &&
       yaml.every((e) => typeof e == 'string')
     ) {
-      tools.log.debug(`Input parsed as YAML array of length ${yaml.length}`)
+      core.debug(`Input parsed as YAML array of length ${yaml.length}`)
       return yaml
     }
   } catch {}
 
-  tools.log.debug('Input parsed as single string')
+  core.debug('Input parsed as single string')
   return [input]
 }
 
 function logOutputs() {
-  tools.log.startGroup('Outputs')
+  core.startGroup('Outputs')
   for (const key in tools.outputs) {
-    tools.log(`${key}: ${tools.outputs[key]}`)
+    core.info(`${key}: ${tools.outputs[key]}`)
   }
-  tools.log.endGroup()
+  core.endGroup()
 }

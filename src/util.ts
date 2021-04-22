@@ -1,4 +1,5 @@
 import { parseArgsStringToArgv } from 'string-argv'
+import * as core from '@actions/core'
 import { Toolkit } from 'actions-toolkit'
 
 export type Input =
@@ -39,7 +40,7 @@ export async function getUserDisplayName(username?: string) {
 
 export function log(err: any | Error, data?: any) {
   if (data) console.log(data)
-  if (err) tools.log.error(err)
+  if (err) core.error(err)
 }
 
 /**
@@ -69,7 +70,7 @@ export function log(err: any | Error, data?: any) {
  */
 export function matchGitArgs(string: string) {
   const parsed = parseArgsStringToArgv(string)
-  tools.log.debug(`Git args parsed:
+  core.debug(`Git args parsed:
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`)
   return parsed
@@ -83,6 +84,6 @@ export function parseBool(value: any) {
 }
 
 export function setOutput(name: Output, value: 'true' | 'false') {
-  tools.log.debug(`Setting output: ${name}=${value}`)
+  core.debug(`Setting output: ${name}=${value}`)
   tools.outputs[name] = value
 }
