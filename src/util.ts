@@ -35,6 +35,10 @@ export async function getUserDisplayName(username?: string) {
 
   const res = await tools.github.users.getByUsername({ username })
 
+  core.debug(
+    `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`
+  )
+
   return res?.data?.name
 }
 
