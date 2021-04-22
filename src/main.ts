@@ -4,7 +4,7 @@ import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
 import {
   getInput,
-  getUserDisplayName,
+  getUserInfo,
   Input,
   log,
   matchGitArgs,
@@ -238,35 +238,39 @@ async function checkInputs() {
     )
 
   // #region author_name, author_email
+  let name, email
   switch (getInput('default_author')) {
     case 'author_username': {
-      setDefault('author_name', `${process.env.GITHUB_ACTOR}`)
-      setDefault(
-        'author_email',
-        `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
-      )
+      name = process.env.GITHUB_ACTOR
+      email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
       break
     }
 
     case 'author_displayname': {
-      const displayname = getInput('author_name')
-        ? undefined
-        : await getUserDisplayName(process.env.GITHUB_ACTOR)
+      if (!getInput('author_name') || !getInput('author_email')) {
+        const res = await getUserInfo(process.env.GITHUB_ACTOR)
+        if (!res?.name)
+          core.warning(
+            "Couldn't fetch author name, filling with author_username."
+          )
+        if (!res?.email)
+          core.warning(
+            "Couldn't fetch author email, filling with author_username."
+          )
 
-      displayname && setDefault('author_name', displayname)
-      setDefault(
-        'author_email',
-        `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
-      )
+        res?.name && (name = res?.name)
+        res?.email && (email = res.email)
+        if (name && email) break
+      }
+
+      !name && (name = process.env.GITHUB_ACTOR)
+      !email && (email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`)
       break
     }
 
     case 'github_actions': {
-      setDefault('author_name', `github-actions`)
-      setDefault(
-        'author_email',
-        '41898282+github-actions[bot]@users.noreply.github.com'
-      )
+      name = 'github-actions'
+      email = '41898282+github-actions[bot]@users.noreply.github.com'
       break
     }
 
@@ -276,6 +280,8 @@ async function checkInputs() {
       )
   }
 
+  setDefault('author_name', name)
+  setDefault('author_email', email)
   core.info(
     `> Using '${getInput('author_name')} <${getInput(
       'author_email'

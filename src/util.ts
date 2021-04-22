@@ -20,7 +20,14 @@ export type Input =
 export type Output = 'committed' | 'pushed' | 'tagged'
 
 type RecordOf<T extends string> = Record<T, string | undefined>
-export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>()
+export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
+  secrets: [
+    'GITHUB_EVENT_PATH',
+    'GITHUB_EVENT_NAME',
+    'GITHUB_REF',
+    'GITHUB_ACTOR'
+  ]
+})
 tools.outputs = {
   committed: 'false',
   pushed: 'false',
@@ -31,7 +38,7 @@ export function getInput(name: Input) {
   return tools.inputs[name] || ''
 }
 
-export async function getUserDisplayName(username?: string) {
+export async function getUserInfo(username?: string) {
   if (!username) return undefined
 
   const res = await tools.github.users.getByUsername({ username })
@@ -40,7 +47,10 @@ export async function getUserDisplayName(username?: string) {
     `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`
   )
 
-  return res?.data?.name
+  return {
+    name: res?.data?.name,
+    email: res?.data?.email
+  }
 }
 
 export function log(err: any | Error, data?: any) {
