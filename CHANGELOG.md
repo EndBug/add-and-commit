@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.2.0] - 2021-04-22
+
+### Added:
+
+- `default_author`: this input allows you to control how the action fills missing author name or email (issue #167)
+- `github_token` input introduced to get token to use in API calls
+
+### Fixed:
+
+- Git args are now parsed with [`string-argv`](https://npm.im/string-argv), the format has to comply with what the package can parse (issue #179)
+
 ## [7.1.2] - 2021-04-16
 
 ### Fixed:
@@ -231,7 +242,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.1.2...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.2.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -264,3 +275,4 @@ First release
 [7.1.0]: https://github.com/EndBug/add-and-commit/compare/v7.0.0...v7.1.0
 [7.1.1]: https://github.com/EndBug/add-and-commit/compare/v7.1.0...v7.1.1
 [7.1.2]: https://github.com/EndBug/add-and-commit/compare/v7.1.1...v7.1.2
+[7.2.0]: https://github.com/EndBug/add-and-commit/compare/v7.1.2...v7.2.0
