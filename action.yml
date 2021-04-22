@@ -9,11 +9,9 @@ inputs:
   author_name:
     description: The name of the user that will be displayed as the author of the commit
     required: false
-    default: ${{ github.actor }}
   author_email:
     description: The email of the user that will be displayed as the author of the commit
     required: false
-    default: ${{ github.actor }}@users.noreply.github.com
   branch:
     description: Name of the branch to use, if different from the one that triggered the workflow
     required: false
@@ -21,6 +19,10 @@ inputs:
     description: The directory where your repository is located. You should use actions/checkout first to set it up
     required: false
     default: '.'
+  default_author:
+    description: How the action should fill missing author name or email.
+    required: false
+    default: 'github_actor'
   message:
     description: The message for the commit
     required: false
@@ -41,6 +43,12 @@ inputs:
   tag:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
+    
+  # Input not required from the user
+  github_token:
+    description: The token used to make requests to the GitHub API. It's NOT used to make commits and should not be changed.
+    required: false
+    default: ${{ github.token }}
 
 outputs:
   committed:

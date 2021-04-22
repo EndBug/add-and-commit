@@ -1,66 +1,61 @@
-import {
-  info,
-  setFailed,
-  warning,
-  debug,
-  startGroup,
-  endGroup
-} from '@actions/core'
+import * as core from '@actions/core'
 import path from 'path'
 import simpleGit, { Response } from 'simple-git'
 import YAML from 'js-yaml'
 import {
   getInput,
+  getUserInfo,
   Input,
   log,
   matchGitArgs,
-  outputs,
   parseBool,
-  setOutput
+  setOutput,
+  tools
 } from './util'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
-console.log(`Running in ${baseDir}`)
+core.info(`Running in ${baseDir}`)
 ;(async () => {
-  await checkInputs().catch(setFailed)
+  await checkInputs().catch(core.setFailed)
 
-  startGroup('Internal logs')
-  info('> Staging files...')
+  core.startGroup('Internal logs')
+  core.info('> Staging files...')
 
   if (getInput('add')) {
-    info('> Adding files...')
+    core.info('> Adding files...')
     await add()
-  } else info('> No files to add.')
+  } else core.info('> No files to add.')
 
   if (getInput('remove')) {
-    info('> Removing files...')
+    core.info('> Removing files...')
     await remove()
-  } else info('> No files to remove.')
+  } else core.info('> No files to remove.')
 
-  info('> Checking for uncommitted changes in the git working tree...')
+  core.info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
   if (changedFiles > 0) {
-    info(`> Found ${changedFiles} changed files.`)
+    core.info(`> Found ${changedFiles} changed files.`)
 
     await git
       .addConfig('user.email', getInput('author_email'), undefined, log)
       .addConfig('user.name', getInput('author_name'), undefined, log)
-    debug(
+    core.debug(
       '> Current git config\n' +
         JSON.stringify((await git.listConfig()).all, null, 2)
     )
 
     await git.fetch(['--tags', '--force'], log)
 
-    info('> Switching/creating branch...')
+    core.info('> Switching/creating branch...')
     await git
       .checkout(getInput('branch'), undefined, log)
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
-    if (getInput('pull_strategy') == 'NO-PULL') info('> Not pulling from repo.')
+    if (getInput('pull_strategy') == 'NO-PULL')
+      core.info('> Not pulling from repo.')
     else {
-      info('> Pulling from remote...')
+      core.info('> Pulling from remote...')
       await git.fetch(undefined, log).pull(
         undefined,
         undefined,
@@ -71,11 +66,11 @@ console.log(`Running in ${baseDir}`)
       )
     }
 
-    info('> Re-staging files...')
+    core.info('> Re-staging files...')
     if (getInput('add')) await add({ ignoreErrors: true })
     if (getInput('remove')) await remove({ ignoreErrors: true })
 
-    info('> Creating commit...')
+    core.info('> Creating commit...')
     await git.commit(
       getInput('message'),
       undefined,
@@ -96,7 +91,7 @@ console.log(`Running in ${baseDir}`)
     )
 
     if (getInput('tag')) {
-      info('> Tagging commit...')
+      core.info('> Tagging commit...')
       await git
         .tag(matchGitArgs(getInput('tag')), (err, data?) => {
           if (data) setOutput('tagged', 'true')
@@ -106,16 +101,18 @@ console.log(`Running in ${baseDir}`)
           setOutput('tagged', 'true')
           return log(null, data)
         })
-        .catch((err) => setFailed(err))
-    } else info('> No tag info provided.')
+        .catch((err) => core.setFailed(err))
+    } else core.info('> No tag info provided.')
 
     const pushOption = parseBool(getInput('push')) ?? getInput('push')
     if (pushOption) {
       // If the options is `true | string`...
-      info('> Pushing commit to repo...')
+      core.info('> Pushing commit to repo...')
 
       if (pushOption === true) {
-        debug(`Running: git push origin ${getInput('branch')} --set-upstream`)
+        core.debug(
+          `Running: git push origin ${getInput('branch')} --set-upstream`
+        )
         await git.push(
           'origin',
           getInput('branch'),
@@ -126,7 +123,7 @@ console.log(`Running in ${baseDir}`)
           }
         )
       } else {
-        debug(`Running: git push ${pushOption}`)
+        core.debug(`Running: git push ${pushOption}`)
         await git.push(
           undefined,
           undefined,
@@ -139,11 +136,13 @@ console.log(`Running in ${baseDir}`)
       }
 
       if (getInput('tag')) {
-        info('> Pushing tags to repo...')
+        core.info('> Pushing tags to repo...')
         await git
           .pushTags('origin', undefined, (e, d?) => log(undefined, e || d))
           .catch(() => {
-            info('> Tag push failed: deleting remote tag and re-pushing...')
+            core.info(
+              '> Tag push failed: deleting remote tag and re-pushing...'
+            )
             return git
               .push(
                 undefined,
@@ -159,21 +158,21 @@ console.log(`Running in ${baseDir}`)
               )
               .pushTags('origin', undefined, log)
           })
-      } else info('> No tags to push.')
-    } else info('> Not pushing anything.')
+      } else core.info('> No tags to push.')
+    } else core.info('> Not pushing anything.')
 
-    endGroup()
-    info('> Task completed.')
+    core.endGroup()
+    core.info('> Task completed.')
   } else {
-    endGroup()
-    info('> Working tree clean. Nothing to commit.')
+    core.endGroup()
+    core.info('> Working tree clean. Nothing to commit.')
   }
 })()
   .then(logOutputs)
   .catch((e) => {
-    endGroup()
+    core.endGroup()
     logOutputs()
-    setFailed(e)
+    core.setFailed(e)
   })
 
 async function checkInputs() {
@@ -202,32 +201,82 @@ async function checkInputs() {
   if (getInput('add')) {
     const parsed = parseInputArray(getInput('add'))
     if (parsed.length == 1)
-      info('Add input parsed as single string, running 1 git add command.')
+      core.info('Add input parsed as single string, running 1 git add command.')
     else if (parsed.length > 1)
-      info(
+      core.info(
         `Add input parsed as string array, running ${parsed.length} git add commands.`
       )
-    else setFailed('Add input: array length < 1')
+    else core.setFailed('Add input: array length < 1')
   }
   if (getInput('remove')) {
     const parsed = parseInputArray(getInput('remove'))
     if (parsed.length == 1)
-      info('Remove input parsed as single string, running 1 git rm command.')
+      core.info(
+        'Remove input parsed as single string, running 1 git rm command.'
+      )
     else if (parsed.length > 1)
-      info(
+      core.info(
         `Remove input parsed as string array, running ${parsed.length} git rm commands.`
       )
-    else setFailed('Remove input: array length < 1')
+    else core.setFailed('Remove input: array length < 1')
   }
   // #endregion
 
+  // #region default_author
+  const default_author_valid = ['github_actor', 'user_info', 'github_actions']
+  if (!default_author_valid.includes(getInput('default_author')))
+    throw new Error(
+      `'${getInput(
+        'default_author'
+      )}' is not a valid value for default_author. Valid values: ${default_author_valid.join(
+        ', '
+      )}`
+    )
+
   // #region author_name, author_email
-  setDefault('author_name', `${process.env.GITHUB_ACTOR}`)
-  setDefault(
-    'author_email',
-    `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
-  )
-  info(
+  let name, email
+  switch (getInput('default_author')) {
+    case 'github_actor': {
+      name = process.env.GITHUB_ACTOR
+      email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
+      break
+    }
+
+    case 'user_info': {
+      if (!getInput('author_name') || !getInput('author_email')) {
+        const res = await getUserInfo(process.env.GITHUB_ACTOR)
+        if (!res?.name)
+          core.warning("Couldn't fetch author name, filling with github_actor.")
+        if (!res?.email)
+          core.warning(
+            "Couldn't fetch author email, filling with github_actor."
+          )
+
+        res?.name && (name = res?.name)
+        res?.email && (email = res.email)
+        if (name && email) break
+      }
+
+      !name && (name = process.env.GITHUB_ACTOR)
+      !email && (email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`)
+      break
+    }
+
+    case 'github_actions': {
+      name = 'github-actions'
+      email = '41898282+github-actions[bot]@users.noreply.github.com'
+      break
+    }
+
+    default:
+      throw new Error(
+        'This should not happen, please contact the author of this action. (checkInputs.author)'
+      )
+  }
+
+  setDefault('author_name', name)
+  setDefault('author_email', email)
+  core.info(
     `> Using '${getInput('author_name')} <${getInput(
       'author_email'
     )}>' as author.`
@@ -239,12 +288,13 @@ async function checkInputs() {
     'message',
     `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
   )
-  info(`> Using "${getInput('message')}" as commit message.`)
+  core.info(`> Using "${getInput('message')}" as commit message.`)
   // #endregion
 
   // #region branch
   const branch = setDefault('branch', defaultBranch || '')
-  if (isPR) info(`> Running for a PR, the action will use '${branch}' as ref.`)
+  if (isPR)
+    core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
   // #endregion
 
   // #region signoff
@@ -260,7 +310,7 @@ async function checkInputs() {
 
     if (!parsed) setInput('signoff', undefined)
 
-    debug(
+    core.debug(
       `Current signoff option: ${getInput('signoff')} (${typeof getInput(
         'signoff'
       )})`
@@ -270,7 +320,7 @@ async function checkInputs() {
 
   // #region pull_strategy
   if (getInput('pull_strategy') == 'NO-PULL')
-    debug("NO-PULL found: won't pull from remote.")
+    core.debug("NO-PULL found: won't pull from remote.")
   // #endregion
 
   // #region push
@@ -278,11 +328,17 @@ async function checkInputs() {
     // It has to be either 'true', 'false', or any other string (use as arguments)
     const parsed = parseBool(getInput('push'))
 
-    debug(
+    core.debug(
       `Current push option: '${getInput('push')}' (parsed as ${typeof parsed})`
     )
   }
   // #endregion
+
+  // #region github_token
+  if (!getInput('github_token'))
+    core.warning(
+      'No github_token has been detected, the action may fail if it needs to use the API'
+    )
 }
 
 async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
@@ -309,7 +365,9 @@ async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
             e.message.includes('did not match any files') &&
             logWarning
           )
-            warning(`Add command did not match any file:\n  git add ${args}`)
+            core.warning(
+              `Add command did not match any file:\n  git add ${args}`
+            )
           else throw e
         })
     )
@@ -343,7 +401,7 @@ async function remove({
             e.message.includes('did not match any files')
           )
             logWarning &&
-              warning(
+              core.warning(
                 `Remove command did not match any file:\n  git rm ${args}`
               )
           else throw e
@@ -366,7 +424,7 @@ function parseInputArray(input: string): string[] {
       Array.isArray(json) &&
       json.every((e) => typeof e == 'string')
     ) {
-      debug(`Input parsed as JSON array of length ${json.length}`)
+      core.debug(`Input parsed as JSON array of length ${json.length}`)
       return json
     }
   } catch {}
@@ -378,19 +436,19 @@ function parseInputArray(input: string): string[] {
       Array.isArray(yaml) &&
       yaml.every((e) => typeof e == 'string')
     ) {
-      debug(`Input parsed as YAML array of length ${yaml.length}`)
+      core.debug(`Input parsed as YAML array of length ${yaml.length}`)
       return yaml
     }
   } catch {}
 
-  debug('Input parsed as single string')
+  core.debug('Input parsed as single string')
   return [input]
 }
 
 function logOutputs() {
-  startGroup('Outputs')
-  for (const key in outputs) {
-    info(`${key}: ${outputs[key]}`)
+  core.startGroup('Outputs')
+  for (const key in tools.outputs) {
+    core.info(`${key}: ${tools.outputs[key]}`)
   }
-  endGroup()
+  core.endGroup()
 }

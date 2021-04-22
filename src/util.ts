@@ -1,5 +1,6 @@
-import * as core from '@actions/core'
 import { parseArgsStringToArgv } from 'string-argv'
+import * as core from '@actions/core'
+import { Toolkit } from 'actions-toolkit'
 
 export type Input =
   | 'add'
@@ -7,22 +8,49 @@ export type Input =
   | 'author_email'
   | 'branch'
   | 'cwd'
+  | 'default_author'
   | 'message'
   | 'pull_strategy'
   | 'push'
   | 'remove'
   | 'signoff'
   | 'tag'
+  | 'github_token'
 
-export const outputs = {
+export type Output = 'committed' | 'pushed' | 'tagged'
+
+type RecordOf<T extends string> = Record<T, string | undefined>
+export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
+  secrets: [
+    'GITHUB_EVENT_PATH',
+    'GITHUB_EVENT_NAME',
+    'GITHUB_REF',
+    'GITHUB_ACTOR'
+  ]
+})
+tools.outputs = {
   committed: 'false',
   pushed: 'false',
   tagged: 'false'
 }
-export type Output = keyof typeof outputs
 
 export function getInput(name: Input) {
-  return core.getInput(name)
+  return tools.inputs[name] || ''
+}
+
+export async function getUserInfo(username?: string) {
+  if (!username) return undefined
+
+  const res = await tools.github.users.getByUsername({ username })
+
+  core.debug(
+    `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`
+  )
+
+  return {
+    name: res?.data?.name,
+    email: res?.data?.email
+  }
 }
 
 export function log(err: any | Error, data?: any) {
@@ -72,7 +100,5 @@ export function parseBool(value: any) {
 
 export function setOutput(name: Output, value: 'true' | 'false') {
   core.debug(`Setting output: ${name}=${value}`)
-  outputs[name] = value
-  return core.setOutput(name, value)
+  tools.outputs[name] = value
 }
-for (const key in outputs) setOutput(key as Output, outputs[key])
