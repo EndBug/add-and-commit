@@ -38,14 +38,14 @@
     "string-argv": "^0.3.1"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.0",
+    "@types/js-yaml": "^4.0.1",
     "@types/node": "^12.12.54",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "@vercel/ncc": "^0.27.0",
     "all-contributors-cli": "^6.20.0",
     "eslint": "^7.25.0",
-    "eslint-config-prettier": "^8.2.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "prettier": "^2.2.1",
