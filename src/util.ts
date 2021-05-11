@@ -117,4 +117,5 @@ export function readJSON(filePath: string) {
 export function setOutput(name: Output, value: 'true' | 'false') {
   core.debug(`Setting output: ${name}=${value}`)
   tools.outputs[name] = value
+  core.setOutput(name, value)
 }
