@@ -241,6 +241,15 @@
         "bug",
         "ideas"
       ]
+    },
+    {
+      "login": "vincentchu12",
+      "name": "Vincent Chu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23532586?v=4",
+      "profile": "https://github.com/vincentchu12",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
