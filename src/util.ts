@@ -1,6 +1,7 @@
 import { parseArgsStringToArgv } from 'string-argv'
 import * as core from '@actions/core'
 import { Toolkit } from 'actions-toolkit'
+import fs from 'fs'
 
 export type Input =
   | 'add'
@@ -96,6 +97,21 @@ export function parseBool(value: any) {
     const parsed = JSON.parse(value)
     if (typeof parsed == 'boolean') return parsed
   } catch {}
+}
+
+export function readJSON(filePath: string) {
+  let fileContent: string
+  try {
+    fileContent = fs.readFileSync(filePath, { encoding: 'utf8' })
+  } catch {
+    throw `Couldn't read file. File path: ${filePath}`
+  }
+
+  try {
+    return JSON.parse(fileContent)
+  } catch {
+    throw `Couldn't parse file to JSON. File path: ${filePath}`
+  }
 }
 
 export function setOutput(name: Output, value: 'true' | 'false') {

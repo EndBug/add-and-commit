@@ -9,6 +9,7 @@ import {
   log,
   matchGitArgs,
   parseBool,
+  readJSON,
   setOutput,
   tools
 } from './util'
@@ -186,8 +187,9 @@ async function checkInputs() {
   }
 
   const eventPath = process.env.GITHUB_EVENT_PATH,
-    event = eventPath && require(eventPath),
-    isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
+    event = eventPath && readJSON(eventPath)
+
+  const isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
     defaultBranch = isPR
       ? (event?.pull_request?.head?.ref as string)
       : process.env.GITHUB_REF?.substring(11)
