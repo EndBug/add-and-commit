@@ -29,7 +29,7 @@ export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
     'GITHUB_ACTOR'
   ]
 })
-tools.outputs = {
+export const outputs: Record<Output, 'true' | 'false'> = {
   committed: 'false',
   pushed: 'false',
   tagged: 'false'
@@ -114,8 +114,11 @@ export function readJSON(filePath: string) {
   }
 }
 
-export function setOutput(name: Output, value: 'true' | 'false') {
+export function setOutput<T extends Output>(name: T, value: typeof outputs[T]) {
   core.debug(`Setting output: ${name}=${value}`)
-  tools.outputs[name] = value
+  outputs[name] = value
   core.setOutput(name, value)
 }
+
+// Setup default output values
+Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value))

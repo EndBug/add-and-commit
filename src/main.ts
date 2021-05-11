@@ -8,10 +8,10 @@ import {
   Input,
   log,
   matchGitArgs,
+  outputs,
   parseBool,
   readJSON,
-  setOutput,
-  tools
+  setOutput
 } from './util'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
@@ -449,8 +449,8 @@ function parseInputArray(input: string): string[] {
 
 function logOutputs() {
   core.startGroup('Outputs')
-  for (const key in tools.outputs) {
-    core.info(`${key}: ${tools.outputs[key]}`)
+  for (const key in outputs) {
+    core.info(`${key}: ${outputs[key]}`)
   }
   core.endGroup()
 }
