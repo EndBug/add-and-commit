@@ -139,11 +139,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: EndBug/add-and-commit@v7.0.0
+      - uses: EndBug/add-and-commit@v7
         with:
           default_author: github_actions
 ```
-
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
