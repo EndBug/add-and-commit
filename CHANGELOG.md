@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.2.1] - 2021-05-11
+
+### Fixed:
+
+- Fixed an issue with missing outputs (#189)
+
 ## [7.2.0] - 2021-04-22
 
 ### Added:
@@ -242,7 +248,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.2.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.2.1...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -276,3 +282,4 @@ First release
 [7.1.1]: https://github.com/EndBug/add-and-commit/compare/v7.1.0...v7.1.1
 [7.1.2]: https://github.com/EndBug/add-and-commit/compare/v7.1.1...v7.1.2
 [7.2.0]: https://github.com/EndBug/add-and-commit/compare/v7.1.2...v7.2.0
+[7.2.1]: https://github.com/EndBug/add-and-commit/compare/v7.2.0...v7.2.1
