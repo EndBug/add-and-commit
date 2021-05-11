@@ -247,6 +247,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://xenoterracide.com"><img src="https://avatars.githubusercontent.com/u/5517?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Caleb Cushing</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Axenoterracide" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://ruohola.dev"><img src="https://avatars.githubusercontent.com/u/33625218?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eero Ruohola</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Aruohola" title="Bug reports">🐛</a> <a href="#ideas-ruohola" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/vincentchu12"><img src="https://avatars.githubusercontent.com/u/23532586?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Vincent Chu</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Avincentchu12" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/cwsites"><img src="https://avatars.githubusercontent.com/u/1242102?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matt H</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=CWSites" title="Documentation">📖</a></td>
   </tr>
 </table>
 
