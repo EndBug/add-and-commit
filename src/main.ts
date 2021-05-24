@@ -9,7 +9,6 @@ import {
   log,
   matchGitArgs,
   outputs,
-  parseBool,
   readJSON,
   setOutput
 } from './util'
@@ -105,7 +104,12 @@ core.info(`Running in ${baseDir}`)
         .catch((err) => core.setFailed(err))
     } else core.info('> No tag info provided.')
 
-    const pushOption = parseBool(getInput('push')) ?? getInput('push')
+    let pushOption: string | boolean
+    try {
+      pushOption = getInput('push', true)
+    } catch {
+      pushOption = getInput('push')
+    }
     if (pushOption) {
       // If the options is `true | string`...
       core.info('> Pushing commit to repo...')
@@ -301,7 +305,7 @@ async function checkInputs() {
 
   // #region signoff
   if (getInput('signoff')) {
-    const parsed = parseBool(getInput('signoff'))
+    const parsed = getInput('signoff', true)
 
     if (parsed === undefined)
       throw new Error(
@@ -328,11 +332,15 @@ async function checkInputs() {
   // #region push
   if (getInput('push')) {
     // It has to be either 'true', 'false', or any other string (use as arguments)
-    const parsed = parseBool(getInput('push'))
+    let value: string | boolean
 
-    core.debug(
-      `Current push option: '${getInput('push')}' (parsed as ${typeof parsed})`
-    )
+    try {
+      value = getInput('push', true)
+    } catch {
+      value = getInput('push')
+    }
+
+    core.debug(`Current push option: '${value}' (parsed as ${typeof value})`)
   }
   // #endregion
 
