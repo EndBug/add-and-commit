@@ -35,7 +35,10 @@ export const outputs: Record<Output, 'true' | 'false'> = {
   tagged: 'false'
 }
 
-export function getInput(name: Input) {
+export function getInput(name: Input, bool: true): boolean
+export function getInput(name: Input, bool?: false): string
+export function getInput(name: Input, bool = false) {
+  if (bool) return core.getBooleanInput(name)
   return tools.inputs[name] || ''
 }
 
@@ -90,13 +93,6 @@ export function matchGitArgs(string: string) {
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`)
   return parsed
-}
-
-export function parseBool(value: any) {
-  try {
-    const parsed = JSON.parse(value)
-    if (typeof parsed == 'boolean') return parsed
-  } catch {}
 }
 
 export function readJSON(filePath: string) {

@@ -58,7 +58,7 @@ Add a step like this to your workflow:
     # Default: ''
     remove: './dir/old_file.js'
 
-    # Whether to use the --signoff option on `git commit` (only `true` and `false` are accepted)
+    # Whether to use the --signoff option on `git commit` (only boolean values accepted*)
     # Default: false
     signoff: true
 
