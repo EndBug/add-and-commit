@@ -8,7 +8,7 @@ You can use this GitHub Action to commit changes made in your workflow run direc
 This is **heavily** inspired by [git-auto-commit-action](https://github.com/stefanzweifel/git-auto-commit-action) (by [Stefan Zweifel](https://github.com/stefanzweifel)): that action automatically detects changed files and commits them. While this is useful for most situations, this doesn't commit untracked files and can sometimes commit unintended changes (such as `package-lock.json` or similar, that may have happened during previous steps).  
 This action lets you choose the path that you want to use when adding & committing changes so that it works as you would normally do using `git` on your machine.
 
-## Usage
+## Inputs
 
 Add a step like this to your workflow:
 
@@ -72,19 +72,19 @@ Add a step like this to your workflow:
 Multiple options let you provide the git arguments that you want the action to use. It's important to note that these arguments **are not actually used with a CLI command**, but they are parsed by a package called [`string-argv`](https://npm.im/string-argv), and then used with [`simple-git`](https://npm.im/simple-git).  
 What does this mean for you? It means that string that contain a lot of nested quotes may be parsed incorrectly, and that specific ways of declaring arguments may not be supported by this libraries. If you're having issues with your argument strings you can check whether they're being parsed correctly either by [enabling debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) for your workflow runs or by testing it directly with `string-argv` ([RunKit demo](https://npm.runkit.com/string-argv)): if each argument and option is aprsed correctly you'll see an array where every string is an option or value.
 
-### Adding files:
+### Adding files
 
 The action adds files using a regular `git add` command, so you can put every kind of argument in the `add` option. For example, if you want to force-add a file: `./path/to/file.txt --force`.  
 The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git add` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
 
-### Deleting files:
+### Deleting files
 
 You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. As with the `add` argument, you can use every option `git rm` allows (e.g. add `--force` to ignore `.gitignore` rules).  
 The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git rm` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
 
-### Pushing:
+### Pushing
 
 By default the action runs the following command: `git push origin ${branch input} --set-upstream`. You can use the `push` input to modify this behavior, here's what you can set it to:
 
@@ -95,11 +95,11 @@ By default the action runs the following command: `git push origin ${branch inpu
 
 One way to use this is if you want to force push to a branch of your repo: you'll need to set the `push` input to, for example, `origin yourBranch --force`.
 
-### Tagging:
+### Tagging
 
 You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
 
-### Tokens:
+### Tokens
 
 When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
@@ -117,7 +117,7 @@ Some users reported that they were getting an error:
 
 If you're getting this error and you're using `actions/checkout@v1`, try upgrading to `actions/checkout@v2`. If you're still having problems after upgrading, feel free to open an issue. Issue ref: [#146](https://github.com/EndBug/add-and-commit/issues/146)
 
-### Outputs:
+## Outputs
 
 The action provides these outputs:
 
@@ -127,7 +127,7 @@ The action provides these outputs:
 
 For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
 
-### Examples:
+## Examples
 
 If you don't want to use your GitHub username for the CI commits, you can use the `default_author` option to make it appear as if it was made by "github-actions"
 
