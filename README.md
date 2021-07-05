@@ -39,7 +39,7 @@ Add a step like this to your workflow:
     # - github_actor -> UserName <UserName@users.noreply.github.com>
     # - user_info -> Your Display Name <your-actual@email.com>
     # - github_actions -> github-actions <email associated with the github logo>
-    # Default:
+    # Default: github_actor
     default_author: github_actor
 
     # The message for the commit
