@@ -42,7 +42,12 @@ Add a step like this to your workflow:
     # Default: github_actor
     default_author: github_actor
 
-    # The message for the commit
+    # The message for the commit. Works also with GitHub Context and expressions. For example:
+    # - message: ${{ github.run_id }}
+    # and also with multiline strings:
+    # - message: |
+    #     first line text
+    #     second line text with ${{ github.run_id }}
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
