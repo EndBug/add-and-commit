@@ -79,9 +79,6 @@ core.info(`Running in ${baseDir}`)
       getInput('message'),
       undefined,
       {
-        // '--author': `"${getInput('author_name')} <${getInput(
-        //   'author_email'
-        // )}>"`,
         ...(getInput('signoff')
           ? {
               '--signoff': null
