@@ -36,6 +36,7 @@ Add a step like this to your workflow:
     committer_name: Committer Name
 
     # The email of the custom committer you want to use, if different from the author of the commit.
+    # If one uses actions@github.com, the icon of https://github.com/actions/ will be shown as committer in the GitHub ui.
     # Default: the email of the author (set with either author_email or default_author)
     committer_email: mail@example.com
 
