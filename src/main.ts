@@ -40,6 +40,10 @@ core.info(`Running in ${baseDir}`)
     await git
       .addConfig('user.email', getInput('author_email'), undefined, log)
       .addConfig('user.name', getInput('author_name'), undefined, log)
+      .addConfig('author.email', getInput('author_email'), undefined, log)
+      .addConfig('author.name', getInput('author_name'), undefined, log)
+      .addConfig('committer.email', getInput('committer_email'), undefined, log)
+      .addConfig('committer.name', getInput('committer_name'), undefined, log)
     core.debug(
       '> Current git config\n' +
         JSON.stringify((await git.listConfig()).all, null, 2)
@@ -75,9 +79,9 @@ core.info(`Running in ${baseDir}`)
       getInput('message'),
       undefined,
       {
-        '--author': `"${getInput('author_name')} <${getInput(
-          'author_email'
-        )}>"`,
+        // '--author': `"${getInput('author_name')} <${getInput(
+        //   'author_email'
+        // )}>"`,
         ...(getInput('signoff')
           ? {
               '--signoff': null
@@ -238,6 +242,7 @@ async function checkInputs() {
         ', '
       )}`
     )
+  // #endregion
 
   // #region author_name, author_email
   let name, email
@@ -286,6 +291,25 @@ async function checkInputs() {
     `> Using '${getInput('author_name')} <${getInput(
       'author_email'
     )}>' as author.`
+  )
+  // #endregion
+
+  // #region committer_name, committer_email
+  if (getInput('committer_name') || getInput('committer_email'))
+    core.info(
+      `> Using custom committer info: ${
+        getInput('committer_name') ||
+        getInput('author_name') + ' [from author info]'
+      } <${
+        getInput('committer_email') ||
+        getInput('author_email') + ' [from author info]'
+      }>`
+    )
+
+  setDefault('committer_name', getInput('author_name'))
+  setDefault('committer_email', getInput('author_email'))
+  core.debug(
+    `Committer: ${getInput('committer_name')} <${getInput('committer_email')}>`
   )
   // #endregion
 
@@ -349,6 +373,7 @@ async function checkInputs() {
     core.warning(
       'No github_token has been detected, the action may fail if it needs to use the API'
     )
+  // #endregion
 }
 
 async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
