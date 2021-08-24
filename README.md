@@ -130,6 +130,7 @@ If you're getting this error and you're using `actions/checkout@v1`, try upgradi
 The action provides these outputs:
 
 - `committed`: whether the action has created a commit (`'true'` or `'false'`)
+- `commit_sha`: the short 7-digit sha of the commit that has just been created
 - `pushed`: whether the action has pushed to the remote (`'true'` or `'false'`)
 - `tagged`: whether the action has created a tag (`'true'` or `'false'`)
 
@@ -164,7 +165,6 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
     committer_email: actions@github.com
 ```
 
-
 <img src="https://user-images.githubusercontent.com/26386270/130594443-b881fae7-3064-4020-a4cc-6db37ef0df65.png" height=70/>
 
 ```yaml
@@ -174,7 +174,6 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
     committer_name: GitHub Actions
     committer_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
-
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
@@ -237,8 +236,6 @@ jobs:
           add: '*.txt --force'
           cwd: './pathToRepo/'
 ```
-
-
 
 ## Contributors ✨
 
