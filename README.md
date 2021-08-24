@@ -13,25 +13,33 @@ This action lets you choose the path that you want to use when adding & committi
 Add a step like this to your workflow:
 
 ```yaml
-- uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+- uses: EndBug/add-and-commit@v7 # You can change this to use a specific version.
   with:
     # The arguments for the `git add` command (see the paragraph below for more info)
     # Default: '.'
     add: 'src'
 
-    # The name of the user that will be displayed as the author of the commit
+    # The name of the user that will be displayed as the author of the commit.
     # Default: depends on the default_author input
-    author_name: Your Name
+    author_name: Author Name
 
-    # The email of the user that will be displayed as the author of the commit
+    # The email of the user that will be displayed as the author of the commit.
     # Default: depends on the default_author input
     author_email: mail@example.com
 
-    # Name of the branch to use, if different from the one that triggered the workflow
+    # The name of the branch to use, if different from the one that triggered the workflow.
     # Default: the branch that triggered the run
     branch: some-branch
 
-    # The local path to the directory where your repository is located. You should use actions/checkout first to set it up
+    # The name of the custom committer you want to use, if different from the author of the commit.
+    # Default: the name of the author (set with either author_name or default_author)
+    committer_name: Committer Name
+
+    # The email of the custom committer you want to use, if different from the author of the commit.
+    # Default: the email of the author (set with either author_email or default_author)
+    committer_email: mail@example.com
+
+    # The local path to the directory where your repository is located. You should use actions/checkout first to set it up.
     # Default: '.'
     cwd: './path/to/the/repo'
 
@@ -42,7 +50,7 @@ Add a step like this to your workflow:
     # Default: github_actor
     default_author: github_actor
 
-    # The message for the commit
+    # The message for the commit.
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
@@ -144,6 +152,30 @@ jobs:
           default_author: github_actions
 ```
 
+You can also use the `committer_name` and `committer_email` inputs to make it appear as if GitHub Actions is the committer, here are a couple of example steps:
+
+<img src="https://user-images.githubusercontent.com/26386270/130594168-1d910710-e2d0-4b06-9324-cbe5dde59154.png" height=70/>
+
+```yaml
+- uses: EndBug/add-and-commit@v7
+  with:
+    message: Show GitHub Actions logo
+    committer_name: GitHub Actions
+    committer_email: actions@github.com
+```
+
+
+<img src="https://user-images.githubusercontent.com/26386270/130594443-b881fae7-3064-4020-a4cc-6db37ef0df65.png" height=70/>
+
+```yaml
+- uses: EndBug/add-and-commit@v7
+  with:
+    message: Show GitHub logo
+    committer_name: GitHub Actions
+    committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+```
+
+
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
 ```yaml
@@ -205,6 +237,8 @@ jobs:
           add: '*.txt --force'
           cwd: './pathToRepo/'
 ```
+
+
 
 ## Contributors ✨
 

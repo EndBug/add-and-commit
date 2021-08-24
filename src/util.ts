@@ -8,6 +8,8 @@ export type Input =
   | 'author_name'
   | 'author_email'
   | 'branch'
+  | 'committer_name'
+  | 'committer_email'
   | 'cwd'
   | 'default_author'
   | 'message'
