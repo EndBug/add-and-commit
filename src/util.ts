@@ -20,7 +20,7 @@ export type Input =
   | 'tag'
   | 'github_token'
 
-export type Output = 'committed' | 'pushed' | 'tagged'
+export type Output = 'committed' | 'commit_sha' | 'pushed' | 'tagged'
 
 type RecordOf<T extends string> = Record<T, string | undefined>
 export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
@@ -31,8 +31,9 @@ export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
     'GITHUB_ACTOR'
   ]
 })
-export const outputs: Record<Output, 'true' | 'false'> = {
+export const outputs: Record<Output, any> = {
   committed: 'false',
+  commit_sha: undefined,
   pushed: 'false',
   tagged: 'false'
 }

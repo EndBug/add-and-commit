@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import path from 'path'
-import simpleGit, { Response } from 'simple-git'
+import simpleGit, { CommitSummary, Response } from 'simple-git'
 import YAML from 'js-yaml'
 import {
   getInput,
@@ -85,8 +85,11 @@ core.info(`Running in ${baseDir}`)
             }
           : {})
       },
-      (err, data?) => {
-        if (data) setOutput('committed', 'true')
+      (err, data?: CommitSummary) => {
+        if (data) {
+          setOutput('committed', 'true')
+          setOutput('commit_sha', data.commit)
+        }
         return log(err, data)
       }
     )
