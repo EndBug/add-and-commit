@@ -152,6 +152,30 @@ jobs:
           default_author: github_actions
 ```
 
+You can also use the `committer_name` and `committer_email` inputs to make it appear as if GitHub Actions is the committer, here are a couple of example steps:
+
+<img src="https://user-images.githubusercontent.com/26386270/130594168-1d910710-e2d0-4b06-9324-cbe5dde59154.png" height=70/>
+
+```yaml
+- uses: EndBug/add-and-commit@v7
+  with:
+    message: Show GitHub Actions logo
+    committer_name: GitHub Actions
+    committer_email: actions@github.com
+```
+
+
+<img src="https://user-images.githubusercontent.com/26386270/130594443-b881fae7-3064-4020-a4cc-6db37ef0df65.png" height=70/>
+
+```yaml
+- uses: EndBug/add-and-commit@v7
+  with:
+    message: Show GitHub logo
+    committer_name: GitHub Actions
+    committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+```
+
+
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
 ```yaml
@@ -213,6 +237,8 @@ jobs:
           add: '*.txt --force'
           cwd: './pathToRepo/'
 ```
+
+
 
 ## Contributors ✨
 
