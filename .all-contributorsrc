@@ -268,6 +268,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "koppor",
+      "name": "Oliver Kopp",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1366654?v=4",
+      "profile": "https://orcid.org/0000-0001-6962-4290",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,

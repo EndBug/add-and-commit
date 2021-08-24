@@ -284,6 +284,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.linkedin.com/in/cwsites"><img src="https://avatars.githubusercontent.com/u/1242102?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matt H</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=CWSites" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/danielwerg"><img src="https://avatars.githubusercontent.com/u/35052399?v=4?s=100" width="100px;" alt=""/><br /><sub><b>danielwerg</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=danielwerg" title="Documentation">📖</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://orcid.org/0000-0001-6962-4290"><img src="https://avatars.githubusercontent.com/u/1366654?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oliver Kopp</b></sub></a><br /><a href="#ideas-koppor" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
