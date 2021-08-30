@@ -5,7 +5,7 @@ import YAML from 'js-yaml'
 import {
   getInput,
   getUserInfo,
-  Input,
+  input,
   log,
   matchGitArgs,
   outputs,
@@ -15,6 +15,9 @@ import {
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
+
+const exitErrors: Error[] = []
+
 core.info(`Running in ${baseDir}`)
 ;(async () => {
   await checkInputs().catch(core.setFailed)
@@ -22,14 +25,15 @@ core.info(`Running in ${baseDir}`)
   core.startGroup('Internal logs')
   core.info('> Staging files...')
 
+  const peh = getInput('pathspec_error_handling')
   if (getInput('add')) {
     core.info('> Adding files...')
-    await add()
+    await add(peh == 'ignore' ? 'pathspec' : 'none')
   } else core.info('> No files to add.')
 
   if (getInput('remove')) {
     core.info('> Removing files...')
-    await remove()
+    await remove(peh == 'ignore' ? 'pathspec' : 'none')
   } else core.info('> No files to remove.')
 
   core.info('> Checking for uncommitted changes in the git working tree...')
@@ -71,8 +75,8 @@ core.info(`Running in ${baseDir}`)
     }
 
     core.info('> Re-staging files...')
-    if (getInput('add')) await add({ ignoreErrors: true })
-    if (getInput('remove')) await remove({ ignoreErrors: true })
+    if (getInput('add')) await add('all')
+    if (getInput('remove')) await remove('all')
 
     core.info('> Creating commit...')
     await git.commit(
@@ -97,7 +101,7 @@ core.info(`Running in ${baseDir}`)
     if (getInput('tag')) {
       core.info('> Tagging commit...')
       await git
-        .tag(matchGitArgs(getInput('tag')), (err, data?) => {
+        .tag(matchGitArgs(getInput('tag') || ''), (err, data?) => {
           if (data) setOutput('tagged', 'true')
           return log(err, data)
         })
@@ -159,7 +163,7 @@ core.info(`Running in ${baseDir}`)
                 {
                   '--delete': null,
                   origin: null,
-                  [matchGitArgs(getInput('tag')).filter(
+                  [matchGitArgs(getInput('tag') || '').filter(
                     (w) => !w.startsWith('-')
                   )[0]]: null
                 },
@@ -177,6 +181,14 @@ core.info(`Running in ${baseDir}`)
     core.info('> Working tree clean. Nothing to commit.')
   }
 })()
+  .then(() => {
+    // Check for exit errors
+    if (exitErrors.length == 1) throw exitErrors[0]
+    else if (exitErrors.length > 1) {
+      exitErrors.forEach((e) => core.error(e))
+      throw 'There have been multiple runtime errors.'
+    }
+  })
   .then(logOutputs)
   .catch((e) => {
     core.endGroup()
@@ -185,11 +197,11 @@ core.info(`Running in ${baseDir}`)
   })
 
 async function checkInputs() {
-  function setInput(input: Input, value: string | undefined) {
+  function setInput(input: input, value: string | undefined) {
     if (value) return (process.env[`INPUT_${input.toUpperCase()}`] = value)
     else return delete process.env[`INPUT_${input.toUpperCase()}`]
   }
-  function setDefault(input: Input, value: string) {
+  function setDefault(input: input, value: string) {
     if (!getInput(input)) setInput(input, value)
     return getInput(input)
   }
@@ -219,7 +231,7 @@ async function checkInputs() {
     else core.setFailed('Add input: array length < 1')
   }
   if (getInput('remove')) {
-    const parsed = parseInputArray(getInput('remove'))
+    const parsed = parseInputArray(getInput('remove') || '')
     if (parsed.length == 1)
       core.info(
         'Remove input parsed as single string, running 1 git rm command.'
@@ -327,25 +339,16 @@ async function checkInputs() {
     core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
   // #endregion
 
-  // #region signoff
-  if (getInput('signoff')) {
-    const parsed = getInput('signoff', true)
-
-    if (parsed === undefined)
-      throw new Error(
-        `"${getInput(
-          'signoff'
-        )}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`
-      )
-
-    if (!parsed) setInput('signoff', undefined)
-
-    core.debug(
-      `Current signoff option: ${getInput('signoff')} (${typeof getInput(
-        'signoff'
-      )})`
+  // #region pathspec_error_handling
+  const peh_valid = ['ignore', 'exitImmediately', 'exitAtEnd']
+  if (!peh_valid.includes(getInput('pathspec_error_handling')))
+    throw new Error(
+      `"${getInput(
+        'pathspec_error_handling'
+      )}" is not a valid value for the 'pathspec_error_handling' input. Valid values are: ${peh_valid.join(
+        ', '
+      )}`
     )
-  }
   // #endregion
 
   // #region pull_strategy
@@ -368,6 +371,27 @@ async function checkInputs() {
   }
   // #endregion
 
+  // #region signoff
+  if (getInput('signoff')) {
+    const parsed = getInput('signoff', true)
+
+    if (parsed === undefined)
+      throw new Error(
+        `"${getInput(
+          'signoff'
+        )}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`
+      )
+
+    if (!parsed) setInput('signoff', undefined)
+
+    core.debug(
+      `Current signoff option: ${getInput('signoff')} (${typeof getInput(
+        'signoff'
+      )})`
+    )
+  }
+  // #endregion
+
   // #region github_token
   if (!getInput('github_token'))
     core.warning(
@@ -376,9 +400,9 @@ async function checkInputs() {
   // #endregion
 }
 
-async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
-  (void | Response<void>)[]
-> {
+async function add(
+  ignoreErrors: 'all' | 'pathspec' | 'none' = 'none'
+): Promise<(void | Response<void>)[]> {
   const input = getInput('add')
   if (!input) return []
 
@@ -391,19 +415,26 @@ async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
       // If any of them fails, the whole function will return a Promise rejection
       await git
         .add(matchGitArgs(args), (err: any, data?: any) =>
-          log(ignoreErrors ? null : err, data)
+          log(ignoreErrors == 'all' ? null : err, data)
         )
         .catch((e: Error) => {
-          if (ignoreErrors) return
+          // if I should ignore every error, return
+          if (ignoreErrors == 'all') return
+
+          // if it's a pathspec error...
           if (
             e.message.includes('fatal: pathspec') &&
-            e.message.includes('did not match any files') &&
-            logWarning
-          )
-            core.warning(
-              `Add command did not match any file:\n  git add ${args}`
-            )
-          else throw e
+            e.message.includes('did not match any files')
+          ) {
+            if (ignoreErrors == 'pathspec') return
+
+            const peh = getInput('pathspec_error_handling'),
+              err = new Error(
+                `Add command did not match any file:\n  git add ${args}`
+              )
+            if (peh == 'exitImmediately') throw err
+            if (peh == 'exitAtEnd') exitErrors.push(err)
+          } else throw e
         })
     )
   }
@@ -411,10 +442,9 @@ async function add({ logWarning = true, ignoreErrors = false } = {}): Promise<
   return res
 }
 
-async function remove({
-  logWarning = true,
-  ignoreErrors = false
-} = {}): Promise<(void | Response<void>)[]> {
+async function remove(
+  ignoreErrors: 'all' | 'pathspec' | 'none' = 'none'
+): Promise<(void | Response<void>)[]> {
   const input = getInput('remove')
   if (!input) return []
 
@@ -427,19 +457,26 @@ async function remove({
       // If any of them fails, the whole function will return a Promise rejection
       await git
         .rm(matchGitArgs(args), (e: any, d?: any) =>
-          log(ignoreErrors ? null : e, d)
+          log(ignoreErrors == 'all' ? null : e, d)
         )
         .catch((e: Error) => {
-          if (ignoreErrors) return
+          // if I should ignore every error, return
+          if (ignoreErrors == 'all') return
+
+          // if it's a pathspec error...
           if (
             e.message.includes('fatal: pathspec') &&
             e.message.includes('did not match any files')
-          )
-            logWarning &&
-              core.warning(
+          ) {
+            if (ignoreErrors == 'pathspec') return
+
+            const peh = getInput('pathspec_error_handling'),
+              err = new Error(
                 `Remove command did not match any file:\n  git rm ${args}`
               )
-          else throw e
+            if (peh == 'exitImmediately') throw err
+            if (peh == 'exitAtEnd') exitErrors.push(err)
+          } else throw e
         })
     )
   }
