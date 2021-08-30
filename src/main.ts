@@ -430,7 +430,7 @@ async function add(
 
             const peh = getInput('pathspec_error_handling'),
               err = new Error(
-                `Add command did not match any file:\n  git add ${args}`
+                `Add command did not match any file: git add ${args}`
               )
             if (peh == 'exitImmediately') throw err
             if (peh == 'exitAtEnd') exitErrors.push(err)
