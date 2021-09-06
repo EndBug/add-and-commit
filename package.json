@@ -40,7 +40,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.3",
     "@types/node": "^12.12.54",
-    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.29.3",
     "@vercel/ncc": "^0.30.0",
     "all-contributors-cli": "^6.20.0",
