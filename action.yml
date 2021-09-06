@@ -32,6 +32,10 @@ inputs:
   message:
     description: The message for the commit
     required: false
+  pathspec_error_handling:
+    description: The way the action should handle pathspec errors from the add and remove commands.
+    required: false
+    default: ignore
   pull_strategy:
     description: The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
     required: false
