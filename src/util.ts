@@ -3,27 +3,44 @@ import * as core from '@actions/core'
 import { Toolkit } from 'actions-toolkit'
 import fs from 'fs'
 
-export type Input =
-  | 'add'
-  | 'author_name'
-  | 'author_email'
-  | 'branch'
-  | 'committer_name'
-  | 'committer_email'
-  | 'cwd'
-  | 'default_author'
-  | 'message'
-  | 'pull_strategy'
-  | 'push'
-  | 'remove'
-  | 'signoff'
-  | 'tag'
-  | 'github_token'
+interface InputTypes {
+  add: string
+  author_name: string
+  author_email: string
+  branch: string
+  committer_name: string
+  committer_email: string
+  cwd: string
+  default_author: 'github_actor' | 'user_info' | 'github_actions'
+  message: string
+  pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
+  pull_strategy: string
+  push: string
+  remove: string | undefined
+  signoff: undefined
+  tag: string | undefined
 
-export type Output = 'committed' | 'commit_sha' | 'pushed' | 'tagged'
+  github_token: string | undefined
+}
+export type input = keyof InputTypes
+
+interface OutputTypes {
+  committed: 'true' | 'false'
+  commit_sha: string | undefined
+  pushed: 'true' | 'false'
+  tagged: 'true' | 'false'
+}
+export type output = keyof OutputTypes
+
+export const outputs: OutputTypes = {
+  committed: 'false',
+  commit_sha: undefined,
+  pushed: 'false',
+  tagged: 'false'
+}
 
 type RecordOf<T extends string> = Record<T, string | undefined>
-export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
+export const tools = new Toolkit<RecordOf<input>, RecordOf<output>>({
   secrets: [
     'GITHUB_EVENT_PATH',
     'GITHUB_EVENT_NAME',
@@ -31,18 +48,19 @@ export const tools = new Toolkit<RecordOf<Input>, RecordOf<Output>>({
     'GITHUB_ACTOR'
   ]
 })
-export const outputs: Record<Output, any> = {
-  committed: 'false',
-  commit_sha: undefined,
-  pushed: 'false',
-  tagged: 'false'
-}
 
-export function getInput(name: Input, bool: true): boolean
-export function getInput(name: Input, bool?: false): string
-export function getInput(name: Input, bool = false) {
-  if (bool) return core.getBooleanInput(name)
-  return tools.inputs[name] || ''
+export function getInput<T extends input>(name: T, parseAsBool: true): boolean
+export function getInput<T extends input>(
+  name: T,
+  parseAsBool?: false
+): InputTypes[T]
+export function getInput<T extends input>(
+  name: T,
+  parseAsBool = false
+): InputTypes[T] | boolean {
+  if (parseAsBool) return core.getBooleanInput(name)
+  // @ts-expect-error
+  return core.getInput(name)
 }
 
 export async function getUserInfo(username?: string) {
@@ -113,7 +131,7 @@ export function readJSON(filePath: string) {
   }
 }
 
-export function setOutput<T extends Output>(name: T, value: typeof outputs[T]) {
+export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
   core.debug(`Setting output: ${name}=${value}`)
   outputs[name] = value
   core.setOutput(name, value)

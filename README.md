@@ -54,6 +54,13 @@ Add a step like this to your workflow:
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
 
+    # The way the action should handle pathspec errors from the add and remove commands. Three options are available:
+    # - ignore -> errors will be logged but the step won't fail
+    # - exitImmediately -> the action will stop right away, and the step will fail
+    # - exitAtEnd -> the action will go on, every pathspec error will be logged at the end, the step will fail.
+    # Default: ignore
+    pathspec_error_handling: ignore
+
     # The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
     # Default: '--no-rebase'
     pull_strategy: 'NO-PULL or --no-rebase or --no-ff or --rebase'
