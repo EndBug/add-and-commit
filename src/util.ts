@@ -14,7 +14,8 @@ interface InputTypes {
   default_author: 'github_actor' | 'user_info' | 'github_actions'
   message: string
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
-  pull_strategy: string
+  pull: string | undefined
+  pull_strategy: string | undefined
   push: string
   remove: string | undefined
   signoff: undefined

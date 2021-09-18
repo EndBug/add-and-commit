@@ -26,6 +26,7 @@ core.info(`Running in ${baseDir}`)
   core.info('> Staging files...')
 
   const peh = getInput('pathspec_error_handling')
+
   if (getInput('add')) {
     core.info('> Adding files...')
     await add(peh == 'ignore' ? 'pathspec' : 'none')
@@ -60,18 +61,16 @@ core.info(`Running in ${baseDir}`)
       .checkout(getInput('branch'), undefined, log)
       .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
 
-    if (getInput('pull_strategy') == 'NO-PULL')
-      core.info('> Not pulling from repo.')
+    // The current default value is set here.
+    // When the depreacted pull_strategy input is removed, the default should be set via the action manifest.
+    const pull = getInput('pull') || getInput('pull_strategy') || '--no-rebase'
+    if (pull == 'NO-PULL') core.info('> Not pulling from repo.')
     else {
       core.info('> Pulling from remote...')
-      await git.fetch(undefined, log).pull(
-        undefined,
-        undefined,
-        {
-          [getInput('pull_strategy')]: null
-        },
-        log
-      )
+      core.debug(`Current git pull arguments: ${pull}`)
+      await git
+        .fetch(undefined, log)
+        .pull(undefined, undefined, matchGitArgs(pull || ''), log)
     }
 
     core.info('> Re-staging files...')
@@ -351,8 +350,13 @@ async function checkInputs() {
     )
   // #endregion
 
-  // #region pull_strategy
-  if (getInput('pull_strategy') == 'NO-PULL')
+  // #region pull, pull_strategy [deprecated]
+  if (getInput('pull') && getInput('pull_strategy'))
+    throw new Error(
+      "You can't use both pull and pull_strategy as action inputs. Please remove pull_strategy, which is deprecated."
+    )
+
+  if ([getInput('pull'), getInput('pull_strategy')].includes('NO-PULL'))
     core.debug("NO-PULL found: won't pull from remote.")
   // #endregion
 
