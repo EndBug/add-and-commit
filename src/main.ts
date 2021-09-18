@@ -70,7 +70,7 @@ core.info(`Running in ${baseDir}`)
       core.debug(`Current git pull arguments: ${pull}`)
       await git
         .fetch(undefined, log)
-        .pull(undefined, undefined, matchGitArgs(pull || ''), log)
+        .pull(undefined, undefined, matchGitArgs(pull), log)
     }
 
     core.info('> Re-staging files...')
