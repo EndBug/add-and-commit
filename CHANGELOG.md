@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.4.0] - 2021-09-30
+
+### Added:
+
+- Added `pull` input: you can use it to change the arguments of the `git pull` command (#294)
+
+### Changed:
+
+- Deprecated `pull_strategy`: use `pull` instead (#294)
+
 ## [7.3.0] - 2021-09-06
 
 ### Added:
@@ -256,7 +266,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.3.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.4.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -292,3 +302,4 @@ First release
 [7.2.0]: https://github.com/EndBug/add-and-commit/compare/v7.1.2...v7.2.0
 [7.2.1]: https://github.com/EndBug/add-and-commit/compare/v7.2.0...v7.2.1
 [7.3.0]: https://github.com/EndBug/add-and-commit/compare/v7.2.1...v7.3.0
+[7.4.0]: https://github.com/EndBug/add-and-commit/compare/v7.3.0...v7.4.0
