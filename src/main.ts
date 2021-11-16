@@ -60,7 +60,12 @@ core.info(`Running in ${baseDir}`)
     /** This should store whether the branch already existed, of if a new one was created */
     let branchType!: 'existing' | 'new'
     await git
-      .checkout(getInput('branch'), undefined, log)
+      .checkout(getInput('branch'), undefined, () =>
+        log(
+          undefined,
+          `'${getInput('branch')}' branch not found, trying to create one.`
+        )
+      )
       .then(() => (branchType = 'existing'))
       .catch(() => {
         branchType = 'new'
