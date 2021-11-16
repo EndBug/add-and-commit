@@ -57,13 +57,24 @@ core.info(`Running in ${baseDir}`)
     await git.fetch(['--tags', '--force'], log)
 
     core.info('> Switching/creating branch...')
+    /** This should store whether the branch already existed, of if a new one was created */
+    let branchType!: 'existing' | 'new'
     await git
       .checkout(getInput('branch'), undefined, log)
-      .catch(() => git.checkoutLocalBranch(getInput('branch'), log))
+      .then(() => (branchType = 'existing'))
+      .catch(() => {
+        branchType = 'new'
+        git.checkoutLocalBranch(getInput('branch'), log)
+      })
 
-    // The current default value is set here.
-    // When the depreacted pull_strategy input is removed, the default should be set via the action manifest.
-    const pull = getInput('pull') || getInput('pull_strategy') || '--no-rebase'
+    /* 
+      The current default value is set here: it will not pull when it has 
+      created a new branch, it will use --rebase when the branch already existed 
+    */
+    const pull =
+      getInput('pull') ||
+      getInput('pull_strategy') ||
+      (branchType == 'new' ? 'NO-PULL' : '--no-rebase')
     if (pull == 'NO-PULL') core.info('> Not pulling from repo.')
     else {
       core.info('> Pulling from remote...')
