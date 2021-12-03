@@ -20,7 +20,7 @@ const exitErrors: Error[] = []
 
 core.info(`Running in ${baseDir}`)
 ;(async () => {
-  await checkInputs().catch(core.setFailed)
+  await checkInputs()
 
   core.startGroup('Internal logs')
   core.info('> Staging files...')
