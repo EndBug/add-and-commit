@@ -287,6 +287,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "drewwells",
+      "name": "Drew Wells",
+      "avatar_url": "https://avatars.githubusercontent.com/u/239123?v=4",
+      "profile": "http://blog.madewithdrew.com/",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
