@@ -97,7 +97,7 @@ core.info(`Running in ${baseDir}`)
     core.info('> Creating commit...')
     await git.commit(
       getInput('message'),
-      undefined,
+      matchGitArgs(getInput('commit') || ''),
       (err, data?: CommitSummary) => {
         if (data) {
           setOutput('committed', 'true')

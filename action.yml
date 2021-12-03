@@ -19,6 +19,9 @@ inputs:
     description: How the action should behave when the targeted branch is missing
     required: false
     default: throw
+  commit:
+    description: Additional arguments for the git commit command
+    required: false
   committer_name:
     description: The name of the custom committer you want to use
     required: false 
