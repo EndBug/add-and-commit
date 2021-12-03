@@ -31,6 +31,10 @@ Add a step like this to your workflow:
     # Default: the branch that triggered the run
     branch: some-branch
 
+    # How the action should behave when the targeted branch is missing: "create" will create a new one on the remote, "throw" will exit
+    # Default: throw
+    branch_mode: create
+
     # The name of the custom committer you want to use, if different from the author of the commit.
     # Default: the name of the author (set with either author_name or default_author)
     committer_name: Committer Name
