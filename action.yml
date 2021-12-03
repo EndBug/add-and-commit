@@ -46,12 +46,6 @@ inputs:
   pull:
     description: Arguments for the git pull command. Use NO-PULL to avoid the action pulling at all.
     required: false
-    # Default value currently set in runtime
-    # default: '--no-rebase'
-  pull_strategy:
-    description: The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
-    required: false
-    deprecationMessage: The 'pull_strategy' input is deprecated, please use 'pull'
   push:
     description: Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (more info in the README)
     required: false

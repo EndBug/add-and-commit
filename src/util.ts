@@ -17,7 +17,6 @@ interface InputTypes {
   message: string
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
   pull: string | undefined
-  pull_strategy: string | undefined
   push: string
   remove: string | undefined
   tag: string | undefined

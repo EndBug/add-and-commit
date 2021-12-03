@@ -78,9 +78,7 @@ core.info(`Running in ${baseDir}`)
       created a new branch, it will use --rebase when the branch already existed 
     */
     const pull =
-      getInput('pull') ||
-      getInput('pull_strategy') ||
-      (branchType == 'new' ? 'NO-PULL' : '--no-rebase')
+      getInput('pull') || (branchType == 'new' ? 'NO-PULL' : '--no-rebase')
     if (pull == 'NO-PULL') core.info('> Not pulling from repo.')
     else {
       core.info('> Pulling from remote...')
@@ -372,13 +370,8 @@ async function checkInputs() {
     )
   // #endregion
 
-  // #region pull, pull_strategy [deprecated]
-  if (getInput('pull') && getInput('pull_strategy'))
-    throw new Error(
-      "You can't use both pull and pull_strategy as action inputs. Please remove pull_strategy, which is deprecated."
-    )
-
-  if ([getInput('pull'), getInput('pull_strategy')].includes('NO-PULL'))
+  // #region pull
+  if (getInput('pull') == 'NO-PULL')
     core.debug("NO-PULL found: won't pull from remote.")
   // #endregion
 
