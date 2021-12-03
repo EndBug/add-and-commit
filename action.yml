@@ -15,6 +15,10 @@ inputs:
   branch:
     description: Name of the branch to use, if different from the one that triggered the workflow
     required: false
+  branch_mode:
+    description: How the action should behave when the targeted branch is missing
+    required: false
+    default: throw
   committer_name:
     description: The name of the custom committer you want to use
     required: false 

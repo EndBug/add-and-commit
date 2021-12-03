@@ -60,16 +60,17 @@ core.info(`Running in ${baseDir}`)
     /** This should store whether the branch already existed, of if a new one was created */
     let branchType!: 'existing' | 'new'
     await git
-      .checkout(getInput('branch'), undefined, () =>
-        log(
-          undefined,
-          `'${getInput('branch')}' branch not found, trying to create one.`
-        )
-      )
+      .checkout(getInput('branch'))
       .then(() => (branchType = 'existing'))
       .catch(() => {
-        branchType = 'new'
-        git.checkoutLocalBranch(getInput('branch'), log)
+        if (getInput('branch_mode') == 'create') {
+          log(
+            undefined,
+            `'${getInput('branch')}' branch not found, trying to create one.`
+          )
+          branchType = 'new'
+          return git.checkoutLocalBranch(getInput('branch'), log)
+        } else throw `'${getInput('branch')}' branch not found.`
       })
 
     /* 
@@ -352,6 +353,18 @@ async function checkInputs() {
   const branch = setDefault('branch', defaultBranch || '')
   if (isPR)
     core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
+  // #endregion
+
+  // #region branch_mode
+  const branch_mode_valid = ['throw', 'create']
+  if (!branch_mode_valid.includes(getInput('branch_mode')))
+    throw new Error(
+      `"${getInput(
+        'branch_mode'
+      )}" is not a valid value for the 'branch_mode' input. Valid values are: ${branch_mode_valid.join(
+        ', '
+      )}`
+    )
   // #endregion
 
   // #region pathspec_error_handling

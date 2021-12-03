@@ -8,6 +8,7 @@ interface InputTypes {
   author_name: string
   author_email: string
   branch: string
+  branch_mode: 'throw' | 'create'
   committer_name: string
   committer_email: string
   cwd: string
