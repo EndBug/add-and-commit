@@ -296,6 +296,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "JavierSegoviaCordoba",
+      "name": "Javier Segovia Córdoba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7463564?v=4",
+      "profile": "https://kotlin.desarrollador-android.com/",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
