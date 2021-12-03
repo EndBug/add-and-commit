@@ -9,6 +9,7 @@ interface InputTypes {
   author_email: string
   branch: string
   branch_mode: 'throw' | 'create'
+  commit: string | undefined
   committer_name: string
   committer_email: string
   cwd: string
@@ -19,7 +20,6 @@ interface InputTypes {
   pull_strategy: string | undefined
   push: string
   remove: string | undefined
-  signoff: undefined
   tag: string | undefined
 
   github_token: string | undefined

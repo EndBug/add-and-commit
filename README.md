@@ -77,10 +77,6 @@ Add a step like this to your workflow:
     # Default: ''
     remove: './dir/old_file.js'
 
-    # Whether to use the --signoff option on `git commit` (only boolean values accepted*)
-    # Default: false
-    signoff: true
-
     # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
     tag: 'v1.0.0 --force'
