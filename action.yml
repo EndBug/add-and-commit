@@ -56,9 +56,6 @@ inputs:
   remove:
     description: Arguments for the git rm command
     required: false
-  signoff:
-    description: Whether to use the --signoff option on git commit
-    required: false
   tag:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false

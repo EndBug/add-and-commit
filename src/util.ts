@@ -19,7 +19,6 @@ interface InputTypes {
   pull_strategy: string | undefined
   push: string
   remove: string | undefined
-  signoff: undefined
   tag: string | undefined
 
   github_token: string | undefined

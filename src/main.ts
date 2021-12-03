@@ -98,13 +98,6 @@ core.info(`Running in ${baseDir}`)
     await git.commit(
       getInput('message'),
       undefined,
-      {
-        ...(getInput('signoff')
-          ? {
-              '--signoff': null
-            }
-          : {})
-      },
       (err, data?: CommitSummary) => {
         if (data) {
           setOutput('committed', 'true')
@@ -401,27 +394,6 @@ async function checkInputs() {
     }
 
     core.debug(`Current push option: '${value}' (parsed as ${typeof value})`)
-  }
-  // #endregion
-
-  // #region signoff
-  if (getInput('signoff')) {
-    const parsed = getInput('signoff', true)
-
-    if (parsed === undefined)
-      throw new Error(
-        `"${getInput(
-          'signoff'
-        )}" is not a valid value for the 'signoff' input: only "true" and "false" are allowed.`
-      )
-
-    if (!parsed) setInput('signoff', undefined)
-
-    core.debug(
-      `Current signoff option: ${getInput('signoff')} (${typeof getInput(
-        'signoff'
-      )})`
-    )
   }
   // #endregion
 
