@@ -295,6 +295,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://orcid.org/0000-0001-6962-4290"><img src="https://avatars.githubusercontent.com/u/1366654?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oliver Kopp</b></sub></a><br /><a href="#ideas-koppor" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/Glidias"><img src="https://avatars.githubusercontent.com/u/190195?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Glenn Ko</b></sub></a><br /><a href="#ideas-Glidias" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://blog.madewithdrew.com/"><img src="https://avatars.githubusercontent.com/u/239123?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Drew Wells</b></sub></a><br /><a href="#ideas-drewwells" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
