@@ -47,41 +47,31 @@ core.info(`Running in ${baseDir}`)
 
     await git.fetch(['--tags', '--force'], log)
 
-    core.info('> Switching/creating branch...')
-    /** This should store whether the branch already existed, of if a new one was created */
-    let branchType!: 'existing' | 'new'
-    await git
-      .checkout(getInput('branch'))
-      .then(() => (branchType = 'existing'))
-      .catch(() => {
+    const targetBranch = getInput('branch')
+    if (targetBranch) {
+      await git.checkout(targetBranch).catch(() => {
         if (getInput('branch_mode') == 'create') {
           log(
             undefined,
-            `'${getInput('branch')}' branch not found, trying to create one.`
+            `'${targetBranch}' branch not found, trying to create one.`
           )
-          branchType = 'new'
-          return git.checkoutLocalBranch(getInput('branch'), log)
-        } else throw `'${getInput('branch')}' branch not found.`
+          return git.checkoutLocalBranch(targetBranch, log)
+        } else throw `'${targetBranch}' branch not found.`
       })
+    }
 
     /* 
       The current default value is set here: it will not pull when it has 
       created a new branch, it will use --rebase when the branch already existed 
     */
-    const pull =
-      getInput('pull') || (branchType == 'new' ? 'NO-PULL' : '--no-rebase')
-    if (pull == 'NO-PULL') core.info('> Not pulling from repo.')
-    else {
+    const pullOption = getInput('pull')
+    if (pullOption) {
       core.info('> Pulling from remote...')
-      core.debug(`Current git pull arguments: ${pull}`)
+      core.debug(`Current git pull arguments: ${pullOption}`)
       await git
         .fetch(undefined, log)
-        .pull(undefined, undefined, matchGitArgs(pull), log)
-    }
-
-    core.info('> Re-staging files...')
-    if (getInput('add')) await add('all')
-    if (getInput('remove')) await remove('all')
+        .pull(undefined, undefined, matchGitArgs(pullOption), log)
+    } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
     await git.commit(

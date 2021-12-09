@@ -1,5 +1,72 @@
 import * as core from '@actions/core'
-import { getUserInfo, parseInputArray, readJSON } from './util'
+import { getUserInfo, parseInputArray } from './util'
+
+interface InputTypes {
+  add: string
+  author_name: string
+  author_email: string
+  branch: string | undefined
+  branch_mode: 'throw' | 'create'
+  commit: string | undefined
+  committer_name: string
+  committer_email: string
+  cwd: string
+  default_author: 'github_actor' | 'user_info' | 'github_actions'
+  message: string
+  pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
+  pull: string | undefined
+  push: string
+  remove: string | undefined
+  tag: string | undefined
+
+  github_token: string | undefined
+}
+export type input = keyof InputTypes
+
+interface OutputTypes {
+  committed: 'true' | 'false'
+  commit_sha: string | undefined
+  pushed: 'true' | 'false'
+  tagged: 'true' | 'false'
+}
+export type output = keyof OutputTypes
+
+export const outputs: OutputTypes = {
+  committed: 'false',
+  commit_sha: undefined,
+  pushed: 'false',
+  tagged: 'false'
+}
+// Setup default output values
+Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value))
+
+export function getInput<T extends input>(name: T, parseAsBool: true): boolean
+export function getInput<T extends input>(
+  name: T,
+  parseAsBool?: false
+): InputTypes[T]
+export function getInput<T extends input>(
+  name: T,
+  parseAsBool = false
+): InputTypes[T] | boolean {
+  if (parseAsBool) return core.getBooleanInput(name)
+  // @ts-expect-error
+  return core.getInput(name)
+}
+
+export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
+  core.debug(`Setting output: ${name}=${value}`)
+  outputs[name] = value
+  core.setOutput(name, value)
+}
+
+export function logOutputs() {
+  core.startGroup('Outputs')
+  for (const key in outputs) {
+    core.info(`${key}: ${outputs[key]}`)
+  }
+  core.endGroup()
+}
 
 export async function checkInputs() {
   function setInput(input: input, value: string | undefined) {
@@ -10,14 +77,6 @@ export async function checkInputs() {
     if (!getInput(input)) setInput(input, value)
     return getInput(input)
   }
-
-  const eventPath = process.env.GITHUB_EVENT_PATH,
-    event = eventPath && readJSON(eventPath)
-
-  const isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
-    defaultBranch = isPR
-      ? (event?.pull_request?.head?.ref as string)
-      : process.env.GITHUB_REF?.substring(11)
 
   // #region add, remove
   if (!getInput('add') && !getInput('remove'))
@@ -138,12 +197,6 @@ export async function checkInputs() {
   core.info(`> Using "${getInput('message')}" as commit message.`)
   // #endregion
 
-  // #region branch
-  const branch = setDefault('branch', defaultBranch || '')
-  if (isPR)
-    core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
-  // #endregion
-
   // #region branch_mode
   const branch_mode_valid = ['throw', 'create']
   if (!branch_mode_valid.includes(getInput('branch_mode')))
@@ -168,11 +221,6 @@ export async function checkInputs() {
     )
   // #endregion
 
-  // #region pull
-  if (getInput('pull') == 'NO-PULL')
-    core.debug("NO-PULL found: won't pull from remote.")
-  // #endregion
-
   // #region push
   if (getInput('push')) {
     // It has to be either 'true', 'false', or any other string (use as arguments)
@@ -194,71 +242,4 @@ export async function checkInputs() {
       'No github_token has been detected, the action may fail if it needs to use the API'
     )
   // #endregion
-}
-
-interface InputTypes {
-  add: string
-  author_name: string
-  author_email: string
-  branch: string
-  branch_mode: 'throw' | 'create'
-  commit: string | undefined
-  committer_name: string
-  committer_email: string
-  cwd: string
-  default_author: 'github_actor' | 'user_info' | 'github_actions'
-  message: string
-  pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
-  pull: string | undefined
-  push: string
-  remove: string | undefined
-  tag: string | undefined
-
-  github_token: string | undefined
-}
-export type input = keyof InputTypes
-
-interface OutputTypes {
-  committed: 'true' | 'false'
-  commit_sha: string | undefined
-  pushed: 'true' | 'false'
-  tagged: 'true' | 'false'
-}
-export type output = keyof OutputTypes
-
-export const outputs: OutputTypes = {
-  committed: 'false',
-  commit_sha: undefined,
-  pushed: 'false',
-  tagged: 'false'
-}
-// Setup default output values
-Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value))
-
-export function getInput<T extends input>(name: T, parseAsBool: true): boolean
-export function getInput<T extends input>(
-  name: T,
-  parseAsBool?: false
-): InputTypes[T]
-export function getInput<T extends input>(
-  name: T,
-  parseAsBool = false
-): InputTypes[T] | boolean {
-  if (parseAsBool) return core.getBooleanInput(name)
-  // @ts-expect-error
-  return core.getInput(name)
-}
-
-export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
-  core.debug(`Setting output: ${name}=${value}`)
-  outputs[name] = value
-  core.setOutput(name, value)
-}
-
-export function logOutputs() {
-  core.startGroup('Outputs')
-  for (const key in outputs) {
-    core.info(`${key}: ${outputs[key]}`)
-  }
-  core.endGroup()
 }
