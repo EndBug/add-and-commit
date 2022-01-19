@@ -112,7 +112,10 @@ If you want the action to commit in a new branch, you can use the `new_branch` i
 
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 
-If that's the case, you need to make sure that the branch you want to commit to is already checked out before you run the action. If you want to commit files "across different branches", here are two ways to do it:
+If that's the case, you need to make sure that the branch you want to commit to is already checked out before you run the action.  
+If you're **really** sure that you want to commit to that branch, you can also force-push by setting the `push` input to something like `origin yourBranchName --set-upstream --force`.
+
+If you want to commit files "across different branches", here are two ways to do it:
 
 1. You can check them out in two different directories, generate your files, move them to your destination and then run `add-and-commit` in the destination directory using the `cwd` input.
 2. You can manually commit those files with `git` commands as you would on your machine. There are several ways to do this depending on the scenario. One of them if to stash your changes, checkout the destination branch, and popping the stash. You can then use the `add-and-commit` action as usual. Please note that this is just an example and may not work for you, since your use case may be different.
