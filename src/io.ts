@@ -5,14 +5,13 @@ interface InputTypes {
   add: string
   author_name: string
   author_email: string
-  branch: string | undefined
-  branch_mode: 'throw' | 'create'
   commit: string | undefined
   committer_name: string
   committer_email: string
   cwd: string
   default_author: 'github_actor' | 'user_info' | 'github_actions'
   message: string
+  new_branch: string | undefined
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
   pull: string | undefined
   push: string
@@ -195,18 +194,6 @@ export async function checkInputs() {
     `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
   )
   core.info(`> Using "${getInput('message')}" as commit message.`)
-  // #endregion
-
-  // #region branch_mode
-  const branch_mode_valid = ['throw', 'create']
-  if (!branch_mode_valid.includes(getInput('branch_mode')))
-    throw new Error(
-      `"${getInput(
-        'branch_mode'
-      )}" is not a valid value for the 'branch_mode' input. Valid values are: ${branch_mode_valid.join(
-        ', '
-      )}`
-    )
   // #endregion
 
   // #region pathspec_error_handling

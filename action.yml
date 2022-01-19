@@ -12,13 +12,6 @@ inputs:
   author_email:
     description: The email of the user that will be displayed as the author of the commit
     required: false
-  branch:
-    description: Name of the branch to switch to.
-    required: false
-  branch_mode:
-    description: How the action should behave when the targeted branch is missing ("throw" or "create")
-    required: false
-    default: create
   commit:
     description: Additional arguments for the git commit command
     required: false
@@ -38,6 +31,9 @@ inputs:
     default: 'github_actor'
   message:
     description: The message for the commit
+    required: false
+  new_branch:
+    description: The name of the branch to create.
     required: false
   pathspec_error_handling:
     description: The way the action should handle pathspec errors from the add and remove commands.

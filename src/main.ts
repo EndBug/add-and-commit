@@ -47,23 +47,19 @@ core.info(`Running in ${baseDir}`)
 
     await git.fetch(['--tags', '--force'], log)
 
-    const targetBranch = getInput('branch')
+    const targetBranch = getInput('new_branch')
     if (targetBranch) {
-      await git.checkout(targetBranch).catch(() => {
-        if (getInput('branch_mode') == 'create') {
-          log(
-            undefined,
-            `'${targetBranch}' branch not found, trying to create one.`
-          )
+      await git
+        .checkout(targetBranch)
+        .then(() => {
+          log(undefined, `'${targetBranch}' branch already existed.`)
+        })
+        .catch(() => {
+          log(undefined, `Creating '${targetBranch}' branch.`)
           return git.checkoutLocalBranch(targetBranch, log)
-        } else throw `'${targetBranch}' branch not found.`
-      })
+        })
     }
 
-    /* 
-      The current default value is set here: it will not pull when it has 
-      created a new branch, it will use --rebase when the branch already existed 
-    */
     const pullOption = getInput('pull')
     if (pullOption) {
       core.info('> Pulling from remote...')
@@ -112,11 +108,13 @@ core.info(`Running in ${baseDir}`)
 
       if (pushOption === true) {
         core.debug(
-          `Running: git push origin ${getInput('branch')} --set-upstream`
+          `Running: git push origin ${
+            getInput('new_branch') || ''
+          } --set-upstream`
         )
         await git.push(
           'origin',
-          getInput('branch'),
+          getInput('new_branch'),
           { '--set-upstream': null },
           (err, data?) => {
             if (data) setOutput('pushed', 'true')
