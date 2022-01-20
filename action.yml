@@ -62,8 +62,10 @@ inputs:
 outputs:
   committed:
     description: Whether the action has created a commit.
+  commit_long_sha:
+    description: The complete SHA of the commit that has been created.
   commit_sha:
-    description: The SHA of the commit that has been created.
+    description: The short SHA of the commit that has been created.
   pushed:
     description: Whether the action has pushed to the remote.
   tagged:

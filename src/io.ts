@@ -24,6 +24,7 @@ export type input = keyof InputTypes
 
 interface OutputTypes {
   committed: 'true' | 'false'
+  commit_long_sha: string | undefined
   commit_sha: string | undefined
   pushed: 'true' | 'false'
   tagged: 'true' | 'false'
@@ -32,6 +33,7 @@ export type output = keyof OutputTypes
 
 export const outputs: OutputTypes = {
   committed: 'false',
+  commit_long_sha: undefined,
   commit_sha: undefined,
   pushed: 'false',
   tagged: 'false'
