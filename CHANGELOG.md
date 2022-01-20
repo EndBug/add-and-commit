@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.0] - 2022-01-20
+
+### Fixed:
+
+- **[BREAKING]** The action will now work with whatever ref has been checked out, without pulling or switching branches by default. You can still pull using the `pull` input and create a new branch with the newly-added `new_branch` input. For more info, check commit [`6fdb34e`](https://github.com/EndBug/add-and-commit/commit/6fdb34ed01d242c909eeb7e31bf1c4d37db43a54).
+
+### Removed:
+
+- **[BREAKING]** The `signoff` input has been removed, use `commit` instead. (#331)
+- **[BREAKING]** The `pull_strategy` input has been removed, use `pull` instead.
+- **[BREAKING]** The `branch` and `branch_mode` inputs have been removed, check commit [`6fdb34e`](https://github.com/EndBug/add-and-commit/commit/6fdb34ed01d242c909eeb7e31bf1c4d37db43a54) for more info.
+
+### Added:
+
+- Added the `commit` input, that allows you to change the arguments for the `git commit` command. (#331)
+- Added the `new_branch` input. ([`6fdb34e`](https://github.com/EndBug/add-and-commit/commit/6fdb34ed01d242c909eeb7e31bf1c4d37db43a54))
+- Added the `commit_long_sha` output. (#349)
+
 ## [7.5.0] - 2021-12-03
 
 ### Added:
@@ -272,7 +290,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v7.5.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -310,3 +328,4 @@ First release
 [7.3.0]: https://github.com/EndBug/add-and-commit/compare/v7.2.1...v7.3.0
 [7.4.0]: https://github.com/EndBug/add-and-commit/compare/v7.3.0...v7.4.0
 [7.5.0]: https://github.com/EndBug/add-and-commit/compare/v7.4.0...v7.5.0
+[8.0.0]: https://github.com/EndBug/add-and-commit/compare/v7.5.0...v8.0.0
