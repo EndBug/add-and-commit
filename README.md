@@ -3,10 +3,15 @@
 [![Public workflows that use this action.](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi-endbug.vercel.app%2Fapi%2Fgithub-actions%2Fused-by%3Faction%3DEndBug%2Fadd-and-commit%26badge%3Dtrue)](https://github.com/search?o=desc&q=EndBug+add-and-commit+path%3A.github%2Fworkflows+language%3AYAML&s=&type=Code)
 [![All Contributors](https://img.shields.io/github/all-contributors/EndBug/add-and-commit)](#contributors-)
 
-You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc....
+You can use this GitHub Action to commit changes made in your workflow run directly to your repo: for example, you use it to lint your code, update documentation, commit updated builds, etc...
 
-This is **heavily** inspired by [git-auto-commit-action](https://github.com/stefanzweifel/git-auto-commit-action) (by [Stefan Zweifel](https://github.com/stefanzweifel)): that action automatically detects changed files and commits them. While this is useful for most situations, this doesn't commit untracked files and can sometimes commit unintended changes (such as `package-lock.json` or similar, that may have happened during previous steps).  
-This action lets you choose the path that you want to use when adding & committing changes so that it works as you would normally do using `git` on your machine.
+## Table of contents
+
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [FAQs](#faqs)
+- [Examples](#examples)
+- [Contributors](#contributors)
 
 ## Inputs
 
@@ -124,7 +129,21 @@ If you want to commit files "across different branches", here are two ways to do
 
 You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
 
-### Tokens
+## Outputs
+
+The action provides these outputs:
+
+- `committed`: whether the action has created a commit (`'true'` or `'false'`)
+- `commit_long_sha`: the full SHA of the commit that has just been created
+- `commit_sha`: the short 7-character SHA of the commit that has just been created
+- `pushed`: whether the action has pushed to the remote (`'true'` or `'false'`)
+- `tagged`: whether the action has created a tag (`'true'` or `'false'`)
+
+For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
+
+## FAQs
+
+### About tokens
 
 When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
 Changing the token with which the repo is configured can be useful if you want to run CI checks on the commit pushed by this action; anyway, it has to be set up outside of this action.
@@ -149,19 +168,9 @@ Some users reported that they were getting an error:
 
 If you're getting this error and you're using `actions/checkout@v1`, try upgrading to `actions/checkout@v2`. If you're still having problems after upgrading, feel free to open an issue. Issue ref: [#146](https://github.com/EndBug/add-and-commit/issues/146)
 
-## Outputs
-
-The action provides these outputs:
-
-- `committed`: whether the action has created a commit (`'true'` or `'false'`)
-- `commit_long_sha`: the full SHA of the commit that has just been created
-- `commit_sha`: the short 7-character SHA of the commit that has just been created
-- `pushed`: whether the action has pushed to the remote (`'true'` or `'false'`)
-- `tagged`: whether the action has created a tag (`'true'` or `'false'`)
-
-For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
-
 ## Examples
+
+### Different author/committer configurations
 
 If you don't want to use your GitHub username for the CI commits, you can use the `default_author` option to make it appear as if it was made by "github-actions"
 
@@ -200,6 +209,8 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
     committer_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
 
+### Automated linting
+
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
 
 ```yaml
@@ -233,6 +244,8 @@ jobs:
           message: 'Your commit message'
           add: '*.js'
 ```
+
+### Running the action in a different directory
 
 If you need to run the action on a repository that is not located in [`$GITHUB_WORKSPACE`](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/using-environment-variables#default-environment-variables), you can use the `cwd` option: the action uses a `cd` normal command, so the path should follow bash standards.
 
@@ -321,6 +334,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+### Additional credits
+
+This action is inspired by [`git-auto-commit-action`](https://github.com/stefanzweifel/git-auto-commit-action) by [Stefan Zweifel](https://github.com/stefanzweifel).
 
 ## License
 
