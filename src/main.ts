@@ -1,17 +1,8 @@
 import * as core from '@actions/core'
 import path from 'path'
 import simpleGit, { CommitSummary, Response } from 'simple-git'
-import YAML from 'js-yaml'
-import {
-  getInput,
-  getUserInfo,
-  input,
-  log,
-  matchGitArgs,
-  outputs,
-  readJSON,
-  setOutput
-} from './util'
+import { checkInputs, getInput, logOutputs, setOutput } from './io'
+import { log, matchGitArgs, parseInputArray } from './util'
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '')
 const git = simpleGit({ baseDir })
@@ -56,41 +47,27 @@ core.info(`Running in ${baseDir}`)
 
     await git.fetch(['--tags', '--force'], log)
 
-    core.info('> Switching/creating branch...')
-    /** This should store whether the branch already existed, of if a new one was created */
-    let branchType!: 'existing' | 'new'
-    await git
-      .checkout(getInput('branch'))
-      .then(() => (branchType = 'existing'))
-      .catch(() => {
-        if (getInput('branch_mode') == 'create') {
-          log(
-            undefined,
-            `'${getInput('branch')}' branch not found, trying to create one.`
-          )
-          branchType = 'new'
-          return git.checkoutLocalBranch(getInput('branch'), log)
-        } else throw `'${getInput('branch')}' branch not found.`
-      })
-
-    /* 
-      The current default value is set here: it will not pull when it has 
-      created a new branch, it will use --rebase when the branch already existed 
-    */
-    const pull =
-      getInput('pull') || (branchType == 'new' ? 'NO-PULL' : '--no-rebase')
-    if (pull == 'NO-PULL') core.info('> Not pulling from repo.')
-    else {
-      core.info('> Pulling from remote...')
-      core.debug(`Current git pull arguments: ${pull}`)
+    const targetBranch = getInput('new_branch')
+    if (targetBranch) {
       await git
-        .fetch(undefined, log)
-        .pull(undefined, undefined, matchGitArgs(pull), log)
+        .checkout(targetBranch)
+        .then(() => {
+          log(undefined, `'${targetBranch}' branch already existed.`)
+        })
+        .catch(() => {
+          log(undefined, `Creating '${targetBranch}' branch.`)
+          return git.checkoutLocalBranch(targetBranch, log)
+        })
     }
 
-    core.info('> Re-staging files...')
-    if (getInput('add')) await add('all')
-    if (getInput('remove')) await remove('all')
+    const pullOption = getInput('pull')
+    if (pullOption) {
+      core.info('> Pulling from remote...')
+      core.debug(`Current git pull arguments: ${pullOption}`)
+      await git
+        .fetch(undefined, log)
+        .pull(undefined, undefined, matchGitArgs(pullOption), log)
+    } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
     await git.commit(
@@ -131,11 +108,13 @@ core.info(`Running in ${baseDir}`)
 
       if (pushOption === true) {
         core.debug(
-          `Running: git push origin ${getInput('branch')} --set-upstream`
+          `Running: git push origin ${
+            getInput('new_branch') || ''
+          } --set-upstream`
         )
         await git.push(
           'origin',
-          getInput('branch'),
+          getInput('new_branch'),
           { '--set-upstream': null },
           (err, data?) => {
             if (data) setOutput('pushed', 'true')
@@ -202,201 +181,6 @@ core.info(`Running in ${baseDir}`)
     logOutputs()
     core.setFailed(e)
   })
-
-async function checkInputs() {
-  function setInput(input: input, value: string | undefined) {
-    if (value) return (process.env[`INPUT_${input.toUpperCase()}`] = value)
-    else return delete process.env[`INPUT_${input.toUpperCase()}`]
-  }
-  function setDefault(input: input, value: string) {
-    if (!getInput(input)) setInput(input, value)
-    return getInput(input)
-  }
-
-  const eventPath = process.env.GITHUB_EVENT_PATH,
-    event = eventPath && readJSON(eventPath)
-
-  const isPR = process.env.GITHUB_EVENT_NAME?.includes('pull_request'),
-    defaultBranch = isPR
-      ? (event?.pull_request?.head?.ref as string)
-      : process.env.GITHUB_REF?.substring(11)
-
-  // #region add, remove
-  if (!getInput('add') && !getInput('remove'))
-    throw new Error(
-      "Both 'add' and 'remove' are empty, the action has nothing to do."
-    )
-
-  if (getInput('add')) {
-    const parsed = parseInputArray(getInput('add'))
-    if (parsed.length == 1)
-      core.info('Add input parsed as single string, running 1 git add command.')
-    else if (parsed.length > 1)
-      core.info(
-        `Add input parsed as string array, running ${parsed.length} git add commands.`
-      )
-    else core.setFailed('Add input: array length < 1')
-  }
-  if (getInput('remove')) {
-    const parsed = parseInputArray(getInput('remove') || '')
-    if (parsed.length == 1)
-      core.info(
-        'Remove input parsed as single string, running 1 git rm command.'
-      )
-    else if (parsed.length > 1)
-      core.info(
-        `Remove input parsed as string array, running ${parsed.length} git rm commands.`
-      )
-    else core.setFailed('Remove input: array length < 1')
-  }
-  // #endregion
-
-  // #region default_author
-  const default_author_valid = ['github_actor', 'user_info', 'github_actions']
-  if (!default_author_valid.includes(getInput('default_author')))
-    throw new Error(
-      `'${getInput(
-        'default_author'
-      )}' is not a valid value for default_author. Valid values: ${default_author_valid.join(
-        ', '
-      )}`
-    )
-  // #endregion
-
-  // #region author_name, author_email
-  let name, email
-  switch (getInput('default_author')) {
-    case 'github_actor': {
-      name = process.env.GITHUB_ACTOR
-      email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
-      break
-    }
-
-    case 'user_info': {
-      if (!getInput('author_name') || !getInput('author_email')) {
-        const res = await getUserInfo(process.env.GITHUB_ACTOR)
-        if (!res?.name)
-          core.warning("Couldn't fetch author name, filling with github_actor.")
-        if (!res?.email)
-          core.warning(
-            "Couldn't fetch author email, filling with github_actor."
-          )
-
-        res?.name && (name = res?.name)
-        res?.email && (email = res.email)
-        if (name && email) break
-      }
-
-      !name && (name = process.env.GITHUB_ACTOR)
-      !email && (email = `${process.env.GITHUB_ACTOR}@users.noreply.github.com`)
-      break
-    }
-
-    case 'github_actions': {
-      name = 'github-actions'
-      email = '41898282+github-actions[bot]@users.noreply.github.com'
-      break
-    }
-
-    default:
-      throw new Error(
-        'This should not happen, please contact the author of this action. (checkInputs.author)'
-      )
-  }
-
-  setDefault('author_name', name)
-  setDefault('author_email', email)
-  core.info(
-    `> Using '${getInput('author_name')} <${getInput(
-      'author_email'
-    )}>' as author.`
-  )
-  // #endregion
-
-  // #region committer_name, committer_email
-  if (getInput('committer_name') || getInput('committer_email'))
-    core.info(
-      `> Using custom committer info: ${
-        getInput('committer_name') ||
-        getInput('author_name') + ' [from author info]'
-      } <${
-        getInput('committer_email') ||
-        getInput('author_email') + ' [from author info]'
-      }>`
-    )
-
-  setDefault('committer_name', getInput('author_name'))
-  setDefault('committer_email', getInput('author_email'))
-  core.debug(
-    `Committer: ${getInput('committer_name')} <${getInput('committer_email')}>`
-  )
-  // #endregion
-
-  // #region message
-  setDefault(
-    'message',
-    `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
-  )
-  core.info(`> Using "${getInput('message')}" as commit message.`)
-  // #endregion
-
-  // #region branch
-  const branch = setDefault('branch', defaultBranch || '')
-  if (isPR)
-    core.info(`> Running for a PR, the action will use '${branch}' as ref.`)
-  // #endregion
-
-  // #region branch_mode
-  const branch_mode_valid = ['throw', 'create']
-  if (!branch_mode_valid.includes(getInput('branch_mode')))
-    throw new Error(
-      `"${getInput(
-        'branch_mode'
-      )}" is not a valid value for the 'branch_mode' input. Valid values are: ${branch_mode_valid.join(
-        ', '
-      )}`
-    )
-  // #endregion
-
-  // #region pathspec_error_handling
-  const peh_valid = ['ignore', 'exitImmediately', 'exitAtEnd']
-  if (!peh_valid.includes(getInput('pathspec_error_handling')))
-    throw new Error(
-      `"${getInput(
-        'pathspec_error_handling'
-      )}" is not a valid value for the 'pathspec_error_handling' input. Valid values are: ${peh_valid.join(
-        ', '
-      )}`
-    )
-  // #endregion
-
-  // #region pull
-  if (getInput('pull') == 'NO-PULL')
-    core.debug("NO-PULL found: won't pull from remote.")
-  // #endregion
-
-  // #region push
-  if (getInput('push')) {
-    // It has to be either 'true', 'false', or any other string (use as arguments)
-    let value: string | boolean
-
-    try {
-      value = getInput('push', true)
-    } catch {
-      value = getInput('push')
-    }
-
-    core.debug(`Current push option: '${value}' (parsed as ${typeof value})`)
-  }
-  // #endregion
-
-  // #region github_token
-  if (!getInput('github_token'))
-    core.warning(
-      'No github_token has been detected, the action may fail if it needs to use the API'
-    )
-  // #endregion
-}
 
 async function add(
   ignoreErrors: 'all' | 'pathspec' | 'none' = 'none'
@@ -480,45 +264,4 @@ async function remove(
   }
 
   return res
-}
-
-/**
- * Tries to parse a JSON array, then a YAML array.
- * If both fail, it returns an array containing the input value as its only element
- */
-function parseInputArray(input: string): string[] {
-  try {
-    const json = JSON.parse(input)
-    if (
-      json &&
-      Array.isArray(json) &&
-      json.every((e) => typeof e == 'string')
-    ) {
-      core.debug(`Input parsed as JSON array of length ${json.length}`)
-      return json
-    }
-  } catch {}
-
-  try {
-    const yaml = YAML.load(input)
-    if (
-      yaml &&
-      Array.isArray(yaml) &&
-      yaml.every((e) => typeof e == 'string')
-    ) {
-      core.debug(`Input parsed as YAML array of length ${yaml.length}`)
-      return yaml
-    }
-  } catch {}
-
-  core.debug('Input parsed as single string')
-  return [input]
-}
-
-function logOutputs() {
-  core.startGroup('Outputs')
-  for (const key in outputs) {
-    core.info(`${key}: ${outputs[key]}`)
-  }
-  core.endGroup()
 }

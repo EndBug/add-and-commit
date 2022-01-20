@@ -12,13 +12,6 @@ inputs:
   author_email:
     description: The email of the user that will be displayed as the author of the commit
     required: false
-  branch:
-    description: Name of the branch to use, if different from the one that triggered the workflow
-    required: false
-  branch_mode:
-    description: How the action should behave when the targeted branch is missing
-    required: false
-    default: throw
   commit:
     description: Additional arguments for the git commit command
     required: false
@@ -39,12 +32,15 @@ inputs:
   message:
     description: The message for the commit
     required: false
+  new_branch:
+    description: The name of the branch to create.
+    required: false
   pathspec_error_handling:
     description: The way the action should handle pathspec errors from the add and remove commands.
     required: false
     default: ignore
   pull:
-    description: Arguments for the git pull command. Use NO-PULL to avoid the action pulling at all.
+    description: Arguments for the git pull command. By default, the action does not pull.
     required: false
   push:
     description: Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (more info in the README)

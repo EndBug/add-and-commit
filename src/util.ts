@@ -1,44 +1,9 @@
 import { parseArgsStringToArgv } from 'string-argv'
 import * as core from '@actions/core'
+import YAML from 'js-yaml'
 import { Toolkit } from 'actions-toolkit'
 import fs from 'fs'
-
-interface InputTypes {
-  add: string
-  author_name: string
-  author_email: string
-  branch: string
-  branch_mode: 'throw' | 'create'
-  commit: string | undefined
-  committer_name: string
-  committer_email: string
-  cwd: string
-  default_author: 'github_actor' | 'user_info' | 'github_actions'
-  message: string
-  pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
-  pull: string | undefined
-  push: string
-  remove: string | undefined
-  tag: string | undefined
-
-  github_token: string | undefined
-}
-export type input = keyof InputTypes
-
-interface OutputTypes {
-  committed: 'true' | 'false'
-  commit_sha: string | undefined
-  pushed: 'true' | 'false'
-  tagged: 'true' | 'false'
-}
-export type output = keyof OutputTypes
-
-export const outputs: OutputTypes = {
-  committed: 'false',
-  commit_sha: undefined,
-  pushed: 'false',
-  tagged: 'false'
-}
+import { input, output } from './io'
 
 type RecordOf<T extends string> = Record<T, string | undefined>
 export const tools = new Toolkit<RecordOf<input>, RecordOf<output>>({
@@ -49,20 +14,6 @@ export const tools = new Toolkit<RecordOf<input>, RecordOf<output>>({
     'GITHUB_ACTOR'
   ]
 })
-
-export function getInput<T extends input>(name: T, parseAsBool: true): boolean
-export function getInput<T extends input>(
-  name: T,
-  parseAsBool?: false
-): InputTypes[T]
-export function getInput<T extends input>(
-  name: T,
-  parseAsBool = false
-): InputTypes[T] | boolean {
-  if (parseAsBool) return core.getBooleanInput(name)
-  // @ts-expect-error
-  return core.getInput(name)
-}
 
 export async function getUserInfo(username?: string) {
   if (!username) return undefined
@@ -117,6 +68,39 @@ export function matchGitArgs(string: string) {
   return parsed
 }
 
+/**
+ * Tries to parse a JSON array, then a YAML array.
+ * If both fail, it returns an array containing the input value as its only element
+ */
+export function parseInputArray(input: string): string[] {
+  try {
+    const json = JSON.parse(input)
+    if (
+      json &&
+      Array.isArray(json) &&
+      json.every((e) => typeof e == 'string')
+    ) {
+      core.debug(`Input parsed as JSON array of length ${json.length}`)
+      return json
+    }
+  } catch {}
+
+  try {
+    const yaml = YAML.load(input)
+    if (
+      yaml &&
+      Array.isArray(yaml) &&
+      yaml.every((e) => typeof e == 'string')
+    ) {
+      core.debug(`Input parsed as YAML array of length ${yaml.length}`)
+      return yaml
+    }
+  } catch {}
+
+  core.debug('Input parsed as single string')
+  return [input]
+}
+
 export function readJSON(filePath: string) {
   let fileContent: string
   try {
@@ -131,12 +115,3 @@ export function readJSON(filePath: string) {
     throw `Couldn't parse file to JSON. File path: ${filePath}`
   }
 }
-
-export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
-  core.debug(`Setting output: ${name}=${value}`)
-  outputs[name] = value
-  core.setOutput(name, value)
-}
-
-// Setup default output values
-Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value))
