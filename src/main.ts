@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import path from 'path'
-import simpleGit, { CommitSummary, Response } from 'simple-git'
+import simpleGit, { Response } from 'simple-git'
 import { checkInputs, getInput, logOutputs, setOutput } from './io'
 import { log, matchGitArgs, parseInputArray } from './util'
 
@@ -70,17 +70,20 @@ core.info(`Running in ${baseDir}`)
     } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
-    await git.commit(
-      getInput('message'),
-      matchGitArgs(getInput('commit') || ''),
-      (err, data?: CommitSummary) => {
-        if (data) {
-          setOutput('committed', 'true')
-          setOutput('commit_sha', data.commit)
-        }
-        return log(err, data)
-      }
-    )
+    const commitData = await git
+      .commit(getInput('message'), matchGitArgs(getInput('commit') || ''))
+      .catch((err) => {
+        log(err)
+      })
+    if (commitData) {
+      log(undefined, commitData)
+      setOutput('committed', 'true')
+      setOutput('commit_sha', commitData.commit)
+      await git
+        .revparse(commitData.commit)
+        .then((long_sha) => setOutput('commit_long_sha', long_sha))
+        .catch((err) => core.warning(`Couldn't parse long SHA:\n${err}`))
+    }
 
     if (getInput('tag')) {
       core.info('> Tagging commit...')
