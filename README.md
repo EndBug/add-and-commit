@@ -18,7 +18,7 @@ You can use this GitHub Action to commit changes made in your workflow run direc
 Add a step like this to your workflow:
 
 ```yaml
-- uses: EndBug/add-and-commit@v7 # You can change this to use a specific version.
+- uses: EndBug/add-and-commit@v8 # You can change this to use a specific version.
   with:
     # The arguments for the `git add` command (see the paragraph below for more info)
     # Default: '.'
@@ -182,7 +182,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: EndBug/add-and-commit@v7
+      - uses: EndBug/add-and-commit@v8
         with:
           default_author: github_actions
 ```
@@ -192,7 +192,7 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
 <img src="https://user-images.githubusercontent.com/26386270/130594168-1d910710-e2d0-4b06-9324-cbe5dde59154.png" height=70/>
 
 ```yaml
-- uses: EndBug/add-and-commit@v7
+- uses: EndBug/add-and-commit@v8
   with:
     message: Show GitHub Actions logo
     committer_name: GitHub Actions
@@ -202,7 +202,7 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
 <img src="https://user-images.githubusercontent.com/26386270/130594443-b881fae7-3064-4020-a4cc-6db37ef0df65.png" height=70/>
 
 ```yaml
-- uses: EndBug/add-and-commit@v7
+- uses: EndBug/add-and-commit@v8
   with:
     message: Show GitHub logo
     committer_name: GitHub Actions
@@ -237,7 +237,7 @@ jobs:
         run: eslint "src/**" --fix
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v8
         with:
           author_name: Your Name
           author_email: mail@example.com
@@ -268,7 +268,7 @@ jobs:
       - run: echo "123" > ./pathToRepo/file.txt
 
       # ...and then use the action as you would normally do, but providing the path to the repo
-      - uses: EndBug/add-and-commit@v7
+      - uses: EndBug/add-and-commit@v8
         with:
           message: 'Add the very useful text file'
           add: '*.txt --force'
