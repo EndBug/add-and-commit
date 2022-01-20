@@ -11,7 +11,7 @@ You can use this GitHub Action to commit changes made in your workflow run direc
 - [Outputs](#outputs)
 - [FAQs](#faqs)
 - [Examples](#examples)
-- [Contributors](#contributors)
+- [Contributors](#contributors-)
 
 ## Inputs
 
