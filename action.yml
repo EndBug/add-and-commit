@@ -1,5 +1,5 @@
 name: Add & Commit
-description: Add & commit files from a path directly from GitHub Actions
+description: Automatically commit changes made in your workflow run directly to your repo
 
 inputs:
   add:
