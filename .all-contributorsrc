@@ -333,6 +333,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "prince-chrismc",
+      "name": "Chris Mc",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16867443?v=4",
+      "profile": "https://github.com/prince-chrismc",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
