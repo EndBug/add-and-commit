@@ -143,6 +143,28 @@ For more info on how to use outputs, see ["Context and expression syntax"](https
 
 ## FAQs
 
+### Working with PRs
+
+By default, when you use `actions/checkout` on a PR, it will checkout the head commit in a detached head state.
+If you want to make some changes, you have to checkout the branch the PR is coming from in the head repo.  
+You can set it up like this:
+
+```yaml
+- uses: actions/checkout@v2
+    with:
+      repository: ${{ github.event.pull_request.head.repo.full_name }}
+      ref: ${{ github.event.pull_request.head.ref }}
+```
+
+You can find the full docs for payloads of `pull_request` events [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#webhook-payload-example-32).
+
+If you're planning on running this only on "internal" PRs (where head and base are in the same repo) then you can omit the `repository` input.  
+If you're planning to use this with PRs coming from other forks, please keep in mind that you might not have write access to those repos.
+You can try setting up the repo with your PAT, as explained in the ["About tokens" paragraph](#about-tokens) of this section.
+
+Keep in mind that this "custom checkout" is meant only for PRs: if your workflow runs on multiple events (like `push` or `workflow_dispatch`), you could try having this step run only for `pull_request` events, while other ones will trigger the usual checkout.  
+If you wish to do so, you can use the `step.if` property, [here](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsif)'s the docs.
+
 ### About tokens
 
 When pushing, the action uses the token that the local git repository has been configured with: that means that if you want to change it you'll need to do it in the steps that run before this action. For example: if you set up your repo with [`actions/checkout`](https://github.com/actions/checkout/) then you have to add the token there.  
