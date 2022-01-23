@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[BREAKING]** The `signoff` input has been removed, use `commit` instead. (#331)
 - **[BREAKING]** The `pull_strategy` input has been removed, use `pull` instead.
 - **[BREAKING]** The `branch` and `branch_mode` inputs have been removed, check commit [`6fdb34e`](https://github.com/EndBug/add-and-commit/commit/6fdb34ed01d242c909eeb7e31bf1c4d37db43a54) for more info.
+- **[BREAKING]** The `pull` input doesn't support `NO-PULL` anymore: if you don't want the action to pull, simply remove the input, as it's the default behavior now.
 
 ### Added:
 
