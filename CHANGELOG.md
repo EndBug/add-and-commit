@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.1] - 2022-01-23
+
+### Fixed:
+
+- Fixed a bug that prevented the `--allow-empty` flag from being used for the `commit` input. (#352)
+- Fixed README and CHANGELOG docs for the `pull` input, that were still showing the option to use `NO-PULL` to prevent pulling (while now it's the default behavior). (#354)
+- Added a paragraph to the FAQs section of the README, that explains how to work with PRs in v8. (#351)
+
 ## [8.0.0] - 2022-01-20
 
 ### Fixed:
@@ -291,7 +299,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.0...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.1...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -330,3 +338,4 @@ First release
 [7.4.0]: https://github.com/EndBug/add-and-commit/compare/v7.3.0...v7.4.0
 [7.5.0]: https://github.com/EndBug/add-and-commit/compare/v7.4.0...v7.5.0
 [8.0.0]: https://github.com/EndBug/add-and-commit/compare/v7.5.0...v8.0.0
+[8.0.1]: https://github.com/EndBug/add-and-commit/compare/v8.0.0...v8.0.1
