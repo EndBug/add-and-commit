@@ -31,9 +31,16 @@ core.info(`Running in ${baseDir}`)
   core.info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
   // continue if there are any changes or if the allow-empty commit argument is included
-  if (changedFiles > 0 || matchGitArgs(getInput('commit') || '').includes('--allow-empty')) {
+  if (
+    changedFiles > 0 ||
+    matchGitArgs(getInput('commit') || '').includes('--allow-empty')
+  ) {
     core.info(`> Found ${changedFiles} changed files.`)
-    core.debug(`--allow-empty argument detected: ${matchGitArgs(getInput('commit') || '').includes('--allow-empty')}`)
+    core.debug(
+      `--allow-empty argument detected: ${matchGitArgs(
+        getInput('commit') || ''
+      ).includes('--allow-empty')}`
+    )
 
     await git
       .addConfig('user.email', getInput('author_email'), undefined, log)
