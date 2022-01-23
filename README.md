@@ -350,6 +350,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/mcargille"><img src="https://avatars.githubusercontent.com/u/20142895?v=4?s=100" width="100px;" alt=""/><br /><sub><b>mcargille</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Amcargille" title="Bug reports">🐛</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=mcargille" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/secondmanveran"><img src="https://avatars.githubusercontent.com/u/97000801?v=4?s=100" width="100px;" alt=""/><br /><sub><b>secondman</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=secondmanveran" title="Documentation">📖</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/prince-chrismc"><img src="https://avatars.githubusercontent.com/u/16867443?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Mc</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=prince-chrismc" title="Documentation">📖</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
