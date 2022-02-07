@@ -32,6 +32,10 @@ Add a step like this to your workflow:
     # Default: depends on the default_author input
     author_email: mail@example.com
 
+    # Additional arguments for the git commit command. The --message argument is already set by the message input.
+    # Default: ''
+    commit: --signoff
+
     # The name of the custom committer you want to use, if different from the author of the commit.
     # Default: the name of the author (set with either author_name or default_author)
     committer_name: Committer Name
