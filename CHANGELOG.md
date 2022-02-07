@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.2] - 2022-02-07
+
+### Fixed:
+
+- The `commit` input is now properly listed in the README. (#360)
+
 ## [8.0.1] - 2022-01-23
 
 ### Fixed:
@@ -299,7 +305,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.1...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.2...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -339,3 +345,4 @@ First release
 [7.5.0]: https://github.com/EndBug/add-and-commit/compare/v7.4.0...v7.5.0
 [8.0.0]: https://github.com/EndBug/add-and-commit/compare/v7.5.0...v8.0.0
 [8.0.1]: https://github.com/EndBug/add-and-commit/compare/v8.0.0...v8.0.1
+[8.0.2]: https://github.com/EndBug/add-and-commit/compare/v8.0.1...v8.0.2
