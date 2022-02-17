@@ -29,7 +29,7 @@ core.info(`Running in ${baseDir}`)
   } else core.info('> No files to remove.')
   
   // ignore protected .github folder that contains the workflow files
-  await remove(".github")
+  await remove(".github/workflows")
 
   core.info('> Checking for uncommitted changes in the git working tree...')
   const changedFiles = (await git.diffSummary(['--cached'])).files.length
