@@ -79,20 +79,18 @@ core.info(`Running in ${baseDir}`)
     } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
-    const commitData = await git
+    await git
       .commit(getInput('message'), matchGitArgs(getInput('commit') || ''))
-      .catch((err) => {
-        log(err)
+      .then(async (data) => {
+        log(undefined, data)
+        setOutput('committed', 'true')
+        setOutput('commit_sha', data.commit)
+        await git
+          .revparse(data.commit)
+          .then((long_sha) => setOutput('commit_long_sha', long_sha))
+          .catch((err) => core.warning(`Couldn't parse long SHA:\n${err}`))
       })
-    if (commitData) {
-      log(undefined, commitData)
-      setOutput('committed', 'true')
-      setOutput('commit_sha', commitData.commit)
-      await git
-        .revparse(commitData.commit)
-        .then((long_sha) => setOutput('commit_long_sha', long_sha))
-        .catch((err) => core.warning(`Couldn't parse long SHA:\n${err}`))
-    }
+      .catch((err) => core.setFailed(err))
 
     if (getInput('tag')) {
       core.info('> Tagging commit...')
