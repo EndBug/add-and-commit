@@ -351,6 +351,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "sconix",
+      "name": "Janne Julkunen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/921515?v=4",
+      "profile": "https://github.com/sconix",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
