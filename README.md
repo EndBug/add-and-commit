@@ -84,6 +84,10 @@ Add a step like this to your workflow:
     # Arguments for the git tag command (the tag name always needs to be the first word not preceded by an hyphen)
     # Default: ''
     tag: 'v1.0.0 --force'
+
+    # Arguments for the git push --tags command (any additional argument will be added after --tags)
+    # Default: ''
+    tag_push: '--force
 ```
 
 ### Git arguments
@@ -130,7 +134,9 @@ If you want to commit files "across different branches", here are two ways to do
 
 ### Tagging
 
-You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).
+You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).  
+You can also change the arguments of the push command for tags: every argument in the `tag_push` input will be appended to the `git push --tags` command.  
+For more info on how git arguments are parsed, see [the "Git arguments" section](#git-arguments).
 
 ## Outputs
 
@@ -141,6 +147,7 @@ The action provides these outputs:
 - `commit_sha`: the short 7-character SHA of the commit that has just been created
 - `pushed`: whether the action has pushed to the remote (`'true'` or `'false'`)
 - `tagged`: whether the action has created a tag (`'true'` or `'false'`)
+- `tag_pushed`: whether the action has pushed a tag (`'true'` or `'false'`)
 
 For more info on how to use outputs, see ["Context and expression syntax"](https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions).
 
