@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.0.0] - 2022-03-11
+
+### Changed:
+
+- **[BREAKING]** The action will now fail when the `git commit` command fails. (#370)
+- **[BREAKING]** The action won't try deleting and re-creting tags when it fails to push them, it's now up to you to set the proper arguments (see the `tag_push` input). (#367)
+
+### Added:
+
+- `tag_push` input: you can now set the arguments of the `git push --tags` command.
+- `tag_pushed` output: whether the action pushed tags.
+
 ## [8.0.2] - 2022-02-07
 
 ### Fixed:
@@ -305,7 +317,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v8.0.2...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v9.0.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -346,3 +358,4 @@ First release
 [8.0.0]: https://github.com/EndBug/add-and-commit/compare/v7.5.0...v8.0.0
 [8.0.1]: https://github.com/EndBug/add-and-commit/compare/v8.0.0...v8.0.1
 [8.0.2]: https://github.com/EndBug/add-and-commit/compare/v8.0.1...v8.0.2
+[9.0.0]: https://github.com/EndBug/add-and-commit/compare/v8.0.2...v9.0.0
