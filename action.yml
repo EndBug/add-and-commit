@@ -52,6 +52,9 @@ inputs:
   tag:
     description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
     required: false
+  tag_push:
+    description: Arguments for the git push --tags command (any additional argument will be added after --tags)
+    required: false
     
   # Input not required from the user
   github_token:
@@ -70,6 +73,8 @@ outputs:
     description: Whether the action has pushed to the remote.
   tagged:
     description: Whether the action has created a tag.
+  tag_pushed:
+    description: Whether the action has pushed a tag.
 
 runs:
   using: node12

@@ -17,6 +17,7 @@ interface InputTypes {
   push: string
   remove: string | undefined
   tag: string | undefined
+  tag_push: string | undefined
 
   github_token: string | undefined
 }
@@ -28,6 +29,7 @@ interface OutputTypes {
   commit_sha: string | undefined
   pushed: 'true' | 'false'
   tagged: 'true' | 'false'
+  tag_pushed: 'true' | 'false'
 }
 export type output = keyof OutputTypes
 
@@ -36,7 +38,8 @@ export const outputs: OutputTypes = {
   commit_long_sha: undefined,
   commit_sha: undefined,
   pushed: 'false',
-  tagged: 'false'
+  tagged: 'false',
+  tag_pushed: 'false'
 }
 // Setup default output values
 Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value))

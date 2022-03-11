@@ -149,26 +149,12 @@ core.info(`Running in ${baseDir}`)
       if (getInput('tag')) {
         core.info('> Pushing tags to repo...')
         await git
-          .pushTags('origin', undefined, (e, d?) => log(undefined, e || d))
-          .catch(() => {
-            core.info(
-              '> Tag push failed: deleting remote tag and re-pushing...'
-            )
-            return git
-              .push(
-                undefined,
-                undefined,
-                {
-                  '--delete': null,
-                  origin: null,
-                  [matchGitArgs(getInput('tag') || '').filter(
-                    (w) => !w.startsWith('-')
-                  )[0]]: null
-                },
-                log
-              )
-              .pushTags('origin', undefined, log)
+          .pushTags('origin', matchGitArgs(getInput('tag_push') || ''))
+          .then((data) => {
+            setOutput('tag_pushed', 'true')
+            return log(null, data)
           })
+          .catch((err) => core.setFailed(err))
       } else core.info('> No tags to push.')
     } else core.info('> Not pushing anything.')
 
