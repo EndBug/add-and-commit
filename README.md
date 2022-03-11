@@ -364,6 +364,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/prince-chrismc"><img src="https://avatars.githubusercontent.com/u/16867443?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Mc</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=prince-chrismc" title="Documentation">📖</a></td>
     <td align="center"><a href="https://linkedin.com/in/namyalg"><img src="https://avatars.githubusercontent.com/u/53875297?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Namya LG</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=Namyalg" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/sconix"><img src="https://avatars.githubusercontent.com/u/921515?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janne Julkunen</b></sub></a><br /><a href="#ideas-sconix" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://joshcena.com"><img src="https://avatars.githubusercontent.com/u/55398995?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joshua Chen</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AJosh-Cena" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
