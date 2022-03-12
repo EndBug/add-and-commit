@@ -87,7 +87,7 @@ Add a step like this to your workflow:
 
     # Arguments for the git push --tags command (any additional argument will be added after --tags)
     # Default: ''
-    tag_push: '--force
+    tag_push: '--force'
 ```
 
 ### Git arguments
