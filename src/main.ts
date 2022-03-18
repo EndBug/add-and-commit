@@ -178,14 +178,12 @@ core.info(`Running in ${baseDir}`)
     core.setFailed(e)
   })
 
-async function add(
-  ignoreErrors: 'all' | 'pathspec' | 'none' = 'none'
-): Promise<(void | Response<void>)[]> {
+async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
   const input = getInput('add')
   if (!input) return []
 
   const parsed = parseInputArray(input)
-  const res: (void | Response<void>)[] = []
+  const res: (string | void)[] = []
 
   for (const args of parsed) {
     res.push(
