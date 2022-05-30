@@ -366,6 +366,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/sconix"><img src="https://avatars.githubusercontent.com/u/921515?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janne Julkunen</b></sub></a><br /><a href="#ideas-sconix" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://joshcena.com"><img src="https://avatars.githubusercontent.com/u/55398995?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joshua Chen</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AJosh-Cena" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://akimon658.github.io"><img src="https://avatars.githubusercontent.com/u/81888693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Akimo</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=Akimon658" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://revolunet.com"><img src="https://avatars.githubusercontent.com/u/124937?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Julien Bouquillon</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=revolunet" title="Documentation">📖</a></td>
   </tr>
 </table>
 
