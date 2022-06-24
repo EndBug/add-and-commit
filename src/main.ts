@@ -78,9 +78,20 @@ core.info(`Running in ${baseDir}`)
         .fetch(undefined, log)
         .pull(undefined, undefined, matchGitArgs(pullOption), log)
 
-      core.info('> Re-staging files...')
-      if (getInput('add')) await add(ignoreErrors)
-      if (getInput('remove')) await remove(ignoreErrors)
+      core.info('> Checking for conflicts...')
+      const status = await git.status(undefined, log)
+
+      if (!status.conflicted.length) {
+        core.info('> No conflicts found.')
+        core.info('> Re-staging files...')
+        if (getInput('add')) await add(ignoreErrors)
+        if (getInput('remove')) await remove(ignoreErrors)
+      } else
+        throw new Error(
+          `There are ${
+            status.conflicted.length
+          } conflicting files: ${status.conflicted.join(',')}`
+        )
     } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
