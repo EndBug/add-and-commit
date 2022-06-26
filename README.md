@@ -369,6 +369,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://revolunet.com"><img src="https://avatars.githubusercontent.com/u/124937?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Julien Bouquillon</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=revolunet" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/AvivPeledTalon"><img src="https://avatars.githubusercontent.com/u/92471076?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aviv Peled</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3AAvivPeledTalon" title="Bug reports">🐛</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/onedr0p"><img src="https://avatars.githubusercontent.com/u/213795?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Devin Buhl</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Aonedr0p" title="Bug reports">🐛</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
