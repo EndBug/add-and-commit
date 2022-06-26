@@ -1,4 +1,4 @@
-name: Keep the versions up-to-date
+name: Update tags
 
 on:
   release:
@@ -6,10 +6,8 @@ on:
 
 jobs:
   actions-tagger:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
-      - uses: Actions-R-Us/actions-tagger@v1
+      - uses: Actions-R-Us/actions-tagger@v2
         with:
-          publish_latest: true
-        env:
-          GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+          publish_latest_tag: true

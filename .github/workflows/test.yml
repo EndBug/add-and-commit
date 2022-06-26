@@ -6,17 +6,23 @@ on:
 
 jobs:
   build:
-    name: Test build
+    name: Build
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - run: npm i
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - run: npm ci
       - run: npm run build
 
   lint:
-    name: Check linting
+    name: Lint
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - run: npm i
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - run: npm ci
       - run: npm run lint
