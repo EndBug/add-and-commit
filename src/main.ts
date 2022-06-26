@@ -16,16 +16,17 @@ core.info(`Running in ${baseDir}`)
   core.startGroup('Internal logs')
   core.info('> Staging files...')
 
-  const peh = getInput('pathspec_error_handling')
+  const ignoreErrors =
+    getInput('pathspec_error_handling') == 'ignore' ? 'pathspec' : 'none'
 
   if (getInput('add')) {
     core.info('> Adding files...')
-    await add(peh == 'ignore' ? 'pathspec' : 'none')
+    await add(ignoreErrors)
   } else core.info('> No files to add.')
 
   if (getInput('remove')) {
     core.info('> Removing files...')
-    await remove(peh == 'ignore' ? 'pathspec' : 'none')
+    await remove(ignoreErrors)
   } else core.info('> No files to remove.')
 
   core.info('> Checking for uncommitted changes in the git working tree...')
@@ -76,6 +77,21 @@ core.info(`Running in ${baseDir}`)
       await git
         .fetch(undefined, log)
         .pull(undefined, undefined, matchGitArgs(pullOption), log)
+
+      core.info('> Checking for conflicts...')
+      const status = await git.status(undefined, log)
+
+      if (!status.conflicted.length) {
+        core.info('> No conflicts found.')
+        core.info('> Re-staging files...')
+        if (getInput('add')) await add(ignoreErrors)
+        if (getInput('remove')) await remove(ignoreErrors)
+      } else
+        throw new Error(
+          `There are ${
+            status.conflicted.length
+          } conflicting files: ${status.conflicted.join(',')}`
+        )
     } else core.info('> Not pulling from repo.')
 
     core.info('> Creating commit...')
