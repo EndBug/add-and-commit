@@ -90,7 +90,7 @@ core.info(`Running in ${baseDir}`)
         throw new Error(
           `There are ${
             status.conflicted.length
-          } conflicting files: ${status.conflicted.join(',')}`
+          } conflicting files: ${status.conflicted.join(', ')}`
         )
     } else core.info('> Not pulling from repo.')
 
