@@ -55,10 +55,12 @@ core.info(`Running in ${baseDir}`)
         JSON.stringify((await git.listConfig()).all, null, 2)
     )
 
+    core.info('> Fetching repo...')
     await git.fetch(['--tags', '--force'], log)
 
     const targetBranch = getInput('new_branch')
     if (targetBranch) {
+      core.debug('> Checking-out branch...')
       await git
         .checkout(targetBranch)
         .then(() => {
