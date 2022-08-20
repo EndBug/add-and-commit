@@ -55,8 +55,19 @@ core.info(`Running in ${baseDir}`)
         JSON.stringify((await git.listConfig()).all, null, 2)
     )
 
-    core.info('> Fetching repo...')
-    await git.fetch(['--tags', '--force'], log)
+    let fetchOption: string | boolean
+    try {
+      fetchOption = getInput('fetch', true)
+    } catch {
+      fetchOption = getInput('fetch')
+    }
+    if (fetchOption) {
+      core.info('> Fetching repo...')
+      await git.fetch(
+        matchGitArgs(fetchOption === true ? '' : fetchOption),
+        log
+      )
+    } else core.info('> Not fetching repo.')
 
     const targetBranch = getInput('new_branch')
     if (targetBranch) {
