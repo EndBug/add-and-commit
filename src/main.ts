@@ -71,7 +71,7 @@ core.info(`Running in ${baseDir}`)
 
     const targetBranch = getInput('new_branch')
     if (targetBranch) {
-      core.debug('> Checking-out branch...')
+      core.info('> Checking-out branch...')
 
       if (!fetchOption)
         core.warning(
