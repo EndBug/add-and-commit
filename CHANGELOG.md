@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.0] - 2022-08-22
+### Added:
+- The `fetch` input allows you to customize the `git fetch` command, or to prevent the action from fetching at all.
+
 ## [9.0.1] - 2022-06-26
 ### Fixed:
 - Now files are re-staged after pulling, so that the action works as intended when using options such as `pull: --rebase --autostash`
@@ -321,7 +325,7 @@ First release
 
 #
 
-[unreleased]: https://github.com/EndBug/add-and-commit/compare/v9.0.1...HEAD
+[unreleased]: https://github.com/EndBug/add-and-commit/compare/v9.1.0...HEAD
 [1.0.0]: https://github.com/EndBug/add-and-commit/tree/v1.0.0
 [2.0.0]: https://github.com/EndBug/add-and-commit/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/EndBug/add-and-commit/compare/v2.0.0...v2.1.0
@@ -364,3 +368,4 @@ First release
 [8.0.2]: https://github.com/EndBug/add-and-commit/compare/v8.0.1...v8.0.2
 [9.0.0]: https://github.com/EndBug/add-and-commit/compare/v8.0.2...v9.0.0
 [9.0.1]: https://github.com/EndBug/add-and-commit/compare/v9.0.0...v9.0.1
+[9.1.0]: https://github.com/EndBug/add-and-commit/compare/v9.0.1...v9.1.0
