@@ -385,6 +385,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/onedr0p"><img src="https://avatars.githubusercontent.com/u/213795?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Devin Buhl</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Aonedr0p" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://erekspeed.com"><img src="https://avatars.githubusercontent.com/u/1176550?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Erek Speed</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Amelink14" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://kachkaev.uk"><img src="https://avatars.githubusercontent.com/u/608862?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alexander Kachkaev</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Akachkaev" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
