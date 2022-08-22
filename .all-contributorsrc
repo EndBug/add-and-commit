@@ -405,6 +405,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "melink14",
+      "name": "Erek Speed",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1176550?v=4",
+      "profile": "https://erekspeed.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
