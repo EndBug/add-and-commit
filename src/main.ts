@@ -55,10 +55,29 @@ core.info(`Running in ${baseDir}`)
         JSON.stringify((await git.listConfig()).all, null, 2)
     )
 
-    await git.fetch(['--tags', '--force'], log)
+    let fetchOption: string | boolean
+    try {
+      fetchOption = getInput('fetch', true)
+    } catch {
+      fetchOption = getInput('fetch')
+    }
+    if (fetchOption) {
+      core.info('> Fetching repo...')
+      await git.fetch(
+        matchGitArgs(fetchOption === true ? '' : fetchOption),
+        log
+      )
+    } else core.info('> Not fetching repo.')
 
     const targetBranch = getInput('new_branch')
     if (targetBranch) {
+      core.info('> Checking-out branch...')
+
+      if (!fetchOption)
+        core.warning(
+          'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+        )
+
       await git
         .checkout(targetBranch)
         .then(() => {
@@ -110,6 +129,12 @@ core.info(`Running in ${baseDir}`)
 
     if (getInput('tag')) {
       core.info('> Tagging commit...')
+
+      if (!fetchOption)
+        core.warning(
+          'Creating a tag without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+        )
+
       await git
         .tag(matchGitArgs(getInput('tag') || ''), (err, data?) => {
           if (data) setOutput('tagged', 'true')
@@ -162,6 +187,7 @@ core.info(`Running in ${baseDir}`)
 
       if (getInput('tag')) {
         core.info('> Pushing tags to repo...')
+
         await git
           .pushTags('origin', matchGitArgs(getInput('tag_push') || ''))
           .then((data) => {

@@ -54,6 +54,11 @@ Add a step like this to your workflow:
     # Default: github_actor
     default_author: github_actor
 
+    # Arguments for the git fetch command. If set to false, the action won't fetch the repo.
+    # For more info as to why fetching is usually recommended, please see the "Performance on large repos" FAQ. 
+    # Default: --tags --force
+    fetch: false
+
     # The message for the commit.
     # Default: 'Commit from GitHub Actions (name of the workflow)'
     message: 'Your commit message'
@@ -199,6 +204,14 @@ Some users reported that they were getting an error:
 ```
 
 If you're getting this error and you're using `actions/checkout@v1`, try upgrading to `actions/checkout@v2`. If you're still having problems after upgrading, feel free to open an issue. Issue ref: [#146](https://github.com/EndBug/add-and-commit/issues/146)
+
+### Performance on large repos
+
+By default, the action will fetch the repository before starting to work on it: this ensures that it can see the already existing refs.  
+
+When working with a repository that has a lot of branches and tags, fetching it can take a long time. If the fetch step is taking too much time, you can decide to skip it by setting the `fetch` input to `false`: this will prevent the action from running `git fetch` altogether. 
+
+Please note that you have to set up your workflow accordingly: not fetching the repo can impact branch and tag creation within the action, and for this reason it's recommended to disable it only if necessary. Issue ref: [#386](https://github.com/EndBug/add-and-commit/issues/386)
 
 ## Examples
 

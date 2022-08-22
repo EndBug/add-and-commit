@@ -10,6 +10,7 @@ interface InputTypes {
   committer_email: string
   cwd: string
   default_author: 'github_actor' | 'user_info' | 'github_actions'
+  fetch: string
   message: string
   new_branch: string | undefined
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd'
@@ -122,6 +123,20 @@ export async function checkInputs() {
         ', '
       )}`
     )
+  // #endregion
+
+  // #region fetch
+  if (getInput('fetch')) {
+    let value: string | boolean
+
+    try {
+      value = getInput('fetch', true)
+    } catch {
+      value = getInput('fetch')
+    }
+
+    core.debug(`Currrent fetch option: '${value}' (parsed as ${typeof value})`)
+  }
   // #endregion
 
   // #region author_name, author_email

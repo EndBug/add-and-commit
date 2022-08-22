@@ -29,6 +29,10 @@ inputs:
     description: How the action should fill missing author name or email.
     required: false
     default: 'github_actor'
+  fetch:
+    description: Arguments for the git fetch command (if 'false', the action won't fetch the repo)
+    required: false
+    default: --tags --force
   message:
     description: The message for the commit
     required: false
