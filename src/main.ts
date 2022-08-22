@@ -72,6 +72,12 @@ core.info(`Running in ${baseDir}`)
     const targetBranch = getInput('new_branch')
     if (targetBranch) {
       core.debug('> Checking-out branch...')
+
+      if (!fetchOption)
+        core.warning(
+          'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+        )
+
       await git
         .checkout(targetBranch)
         .then(() => {
@@ -123,6 +129,12 @@ core.info(`Running in ${baseDir}`)
 
     if (getInput('tag')) {
       core.info('> Tagging commit...')
+
+      if (!fetchOption)
+        core.warning(
+          'Creating a tag without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+        )
+
       await git
         .tag(matchGitArgs(getInput('tag') || ''), (err, data?) => {
           if (data) setOutput('tagged', 'true')
@@ -175,6 +187,7 @@ core.info(`Running in ${baseDir}`)
 
       if (getInput('tag')) {
         core.info('> Pushing tags to repo...')
+
         await git
           .pushTags('origin', matchGitArgs(getInput('tag_push') || ''))
           .then((data) => {
