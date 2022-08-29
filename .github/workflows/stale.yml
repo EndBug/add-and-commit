@@ -6,22 +6,4 @@ on:
 
 jobs:
   stale:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/stale@v5
-        with:
-          days-before-stale: 20
-          days-before-close: 5
-          stale-issue-message: >
-            This issue has been automatically marked as stale because it has not had
-            recent activity. It will be closed if no further activity occurs. Thank you
-            for your contributions.
-          stale-pr-message: >
-            This PR has been automatically marked as stale because it has not had
-            recent activity. It will be closed if no further activity occurs. Thank you
-            for your contributions.
-          stale-issue-label: 'status: stale'
-          stale-pr-label: 'status: stale'
-          close-issue-reason: not_planned
-          exempt-issue-labels: 'pinned,security,status: pinned,type: security'
-          exempt-pr-labels: 'pinned,security,status: pinned,type: security'
+    uses: EndBug/workflows/stale.yml@main
