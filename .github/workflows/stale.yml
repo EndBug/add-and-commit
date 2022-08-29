@@ -6,4 +6,4 @@ on:
 
 jobs:
   stale:
-    uses: EndBug/workflows/stale.yml@main
+    uses: EndBug/workflows/.github/workflows/stale.yml@main
