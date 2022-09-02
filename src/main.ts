@@ -14,6 +14,27 @@ core.info(`Running in ${baseDir}`)
   await checkInputs()
 
   core.startGroup('Internal logs')
+
+  let worktreeDir: string,
+    worktreeAdd: string,
+    worktreeRemove: string | undefined
+  if (getInput('worktree')) {
+    core.info('> Creating worktree...')
+    ;[worktreeDir, worktreeAdd, worktreeRemove] = parseInputArray(
+      getInput('worktree') || ''
+    )
+    worktreeAdd = worktreeAdd || worktreeDir
+    worktreeRemove = worktreeRemove || worktreeDir
+
+    core.debug(`Running: git worktree add ${worktreeAdd}`)
+    await git
+      .raw('worktree', 'add', ...worktreeAdd.split(' '))
+      .then((data) => log(undefined, data))
+
+    core.info('> Changing working directory...')
+    await git.cwd(worktreeDir)
+  } else core.info('> Not creating a worktree.')
+
   core.info('> Staging files...')
 
   const ignoreErrors =
@@ -197,6 +218,17 @@ core.info(`Running in ${baseDir}`)
           .catch((err) => core.setFailed(err))
       } else core.info('> No tags to push.')
     } else core.info('> Not pushing anything.')
+
+    if (worktreeRemove) {
+      core.info('> Switching back to previous working directory...')
+      await git.cwd(baseDir)
+
+      core.info('> Removing worktree...')
+      core.debug(`Running: git worktree remove ${worktreeRemove}`)
+      await git
+        .raw('worktree', 'remove', worktreeRemove.split(' '))
+        .then((data) => log(undefined, data))
+    } else core.info('> No worktree to remove.')
 
     core.endGroup()
     core.info('> Task completed.')

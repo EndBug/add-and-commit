@@ -59,7 +59,10 @@ inputs:
   tag_push:
     description: Arguments for the git push --tags command (any additional argument will be added after --tags)
     required: false
-    
+  worktree:
+    description: Arguments for the git worktree commands, see the README for usage
+    required: false
+
   # Input not required from the user
   github_token:
     description: The token used to make requests to the GitHub API. It's NOT used to make commits and should not be changed.

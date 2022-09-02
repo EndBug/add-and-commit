@@ -19,6 +19,7 @@ interface InputTypes {
   remove: string | undefined
   tag: string | undefined
   tag_push: string | undefined
+  worktree: string | undefined
 
   github_token: string | undefined
 }
@@ -241,6 +242,29 @@ export async function checkInputs() {
 
     core.debug(`Current push option: '${value}' (parsed as ${typeof value})`)
   }
+  // #endregion
+
+  // #region worktree
+  if (getInput('worktree')) {
+    const parsed = parseInputArray(getInput('worktree') || '')
+
+    if (parsed.length == 1)
+      core.info(
+        "Worktree input parsed as single string, it will be used as if it's the path to the worktree."
+      )
+    else if (parsed.length == 2 || parsed.length == 3)
+      core.info(
+        'Worktree input parsed as [string, string, string], it will be used as follows:\n' +
+          '0: path to the worktree directory\n' +
+          '1: arguments for the git worktree add command (including the directory), defaults to the directory\n' +
+          '2: arguments for the git worktree remove command (including the directory), defaults to the directory'
+      )
+    else
+      core.setFailed(
+        `Worktree input parsed as an array of length ${parsed.length}, correct lenghts are 1, 2, and 3.`
+      )
+  }
+
   // #endregion
 
   // #region github_token
