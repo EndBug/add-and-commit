@@ -1,6 +1,6 @@
 {
   "name": "add-and-commit",
-  "version": "9.1.0",
+  "version": "9.1.1",
   "private": true,
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/index.js",
