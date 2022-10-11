@@ -81,7 +81,7 @@ outputs:
     description: Whether the action has pushed a tag.
 
 runs:
-  using: node12
+  using: node16
   main: lib/index.js
 
 branding:
