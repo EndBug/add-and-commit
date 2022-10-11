@@ -423,6 +423,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ManuelRauber",
+      "name": "Manuel Rauber",
+      "avatar_url": "https://avatars.githubusercontent.com/u/740791?v=4",
+      "profile": "https://manuel-rauber.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
