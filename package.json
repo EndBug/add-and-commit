@@ -9,7 +9,6 @@
     "watch": "ncc build src/main.ts --watch --out lib",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts --fix src",
-    "changelog": "ts-node scripts/changelog.ts && npm i",
     "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -49,7 +48,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
     "prettier": "^2.7.1",
-    "ts-node": "^10.9.1",
     "typescript": "^4.8.4",
     "yamljs": "^0.3.0"
   }
