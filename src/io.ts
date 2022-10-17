@@ -135,7 +135,7 @@ export async function checkInputs() {
       value = getInput('fetch')
     }
 
-    core.debug(`Currrent fetch option: '${value}' (parsed as ${typeof value})`)
+    core.debug(`Current fetch option: '${value}' (parsed as ${typeof value})`)
   }
   // #endregion
 
