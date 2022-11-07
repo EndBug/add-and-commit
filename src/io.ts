@@ -228,6 +228,13 @@ export async function checkInputs() {
     )
   // #endregion
 
+  // #region pull
+  if (getInput('pull') == 'NO-PULL')
+    core.warning(
+      "`NO-PULL` is a legacy option for the `pull` input. If you don't want the action to pull the repo, simply remove this input."
+    )
+  // #endregion
+
   // #region push
   if (getInput('push')) {
     // It has to be either 'true', 'false', or any other string (use as arguments)
