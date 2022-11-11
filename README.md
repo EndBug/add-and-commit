@@ -386,7 +386,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://erekspeed.com"><img src="https://avatars.githubusercontent.com/u/1176550?v=4?s=100" width="100px;" alt="Erek Speed"/><br /><sub><b>Erek Speed</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Amelink14" title="Bug reports">🐛</a></td>
       <td align="center"><a href="https://kachkaev.uk"><img src="https://avatars.githubusercontent.com/u/608862?v=4?s=100" width="100px;" alt="Alexander Kachkaev"/><br /><sub><b>Alexander Kachkaev</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Akachkaev" title="Bug reports">🐛</a></td>
       <td align="center"><a href="https://manuel-rauber.com"><img src="https://avatars.githubusercontent.com/u/740791?v=4?s=100" width="100px;" alt="Manuel Rauber"/><br /><sub><b>Manuel Rauber</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=ManuelRauber" title="Code">💻</a></td>
-      <td align="center"><a href="http://heisenbug.blogspot.com"><img src="https://avatars.githubusercontent.com/u/1312006?v=4?s=100" width="100px;" alt="Gabor Greif"/><br /><sub><b>Gabor Greif</b></sub></a><br /><a href="#maintenance-ggreif" title="Maintenance">🚧</a></td>
+      <td align="center"><a href="http://heisenbug.blogspot.com"><img src="https://avatars.githubusercontent.com/u/1312006?v=4?s=100" width="100px;" alt="Gabor Greif"/><br /><sub><b>Gabor Greif</b></sub></a><br /><a href="#maintenance-ggreif" title="Maintenance">🚧</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=ggreif" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
