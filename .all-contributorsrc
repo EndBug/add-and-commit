@@ -439,7 +439,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1312006?v=4",
       "profile": "http://heisenbug.blogspot.com",
       "contributions": [
-        "maintenance"
+        "maintenance",
+        "doc"
       ]
     }
   ],
