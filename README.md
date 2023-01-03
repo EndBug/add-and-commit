@@ -108,9 +108,10 @@ You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 
 
 ### Deleting files
 
-You can delete files with the `remove` option: that runs a `git rm` command that will stage the files in the given path for removal. As with the `add` argument, you can use every option `git rm` allows (e.g. add `--force` to ignore `.gitignore` rules).  
-The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on.  
-You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git rm` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
+The `remove` option can be used if a predetermined list of files needs to be removed. The `remove` option runs `git rm`
+ command with any options passed into the `remove` setting.
+ 
+If instead you want deleted files to be autodetected and committed, you can use existing git support for that feature. `git add` supports the [`--no-ignore-removal`/`-A`](https://git-scm.com/docs/git-add#Documentation/git-add.txt--A) option which will detect deleted files just as it detects modified files. To use this ability, prepend `--no-ignore-removal` to the `add` option.
 
 ### Pushing
 
