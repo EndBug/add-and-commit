@@ -108,10 +108,9 @@ You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 
 
 ### Deleting files
 
-The `remove` option can be used if a predetermined list of files needs to be removed. The `remove` option runs `git rm`
- command with any options passed into the `remove` setting.
+The `remove` option can be used if a predetermined list of files needs to be removed. It runs the `git rm` command, so you can pass every kind of argument with it. As if with the [`add` input](#adding-files), you can also use JSON or YAML arrays to make the action run multiple `git rm` commands.
  
-If instead you want deleted files to be autodetected and committed, you can use existing git support for that feature. `git add` supports the [`--no-ignore-removal`/`-A`](https://git-scm.com/docs/git-add#Documentation/git-add.txt--A) option which will detect deleted files just as it detects modified files. To use this ability, prepend `--no-ignore-removal` to the `add` option.
+If you want deleted files to be auto-detected and committed, you can use the [`--no-ignore-removal`/`-A`](https://git-scm.com/docs/git-add#Documentation/git-add.txt--A) git arguments.
 
 ### Pushing
 
