@@ -442,6 +442,15 @@
         "maintenance",
         "doc"
       ]
+    },
+    {
+      "login": "keithrfung",
+      "name": "Keith Fung",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10125297?v=4",
+      "profile": "http://keithrfung.dev",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
