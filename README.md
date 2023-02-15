@@ -217,7 +217,7 @@ Please note that you have to set up your workflow accordingly: not fetching the 
 
 ### Different author/committer configurations
 
-If you don't want to use your GitHub username for the CI commits, you can use the `default_author` option to make it appear as if it was made by "github-actions"
+If you don't want to use your GitHub username for the CI commits, you can use the `default_author` input to make it appear as if it was made by "GitHub Actions", by setting its value to `github_actions`.
 
 <img src="https://user-images.githubusercontent.com/26386270/115738624-80b51780-a38d-11eb-9bbe-77461654274c.png" height=40/>
 
