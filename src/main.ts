@@ -119,11 +119,8 @@ core.info(`Running in ${baseDir}`)
       .then(async (data) => {
         log(undefined, data)
         setOutput('committed', 'true')
-        setOutput('commit_sha', data.commit)
-        await git
-          .revparse(data.commit)
-          .then((long_sha) => setOutput('commit_long_sha', long_sha))
-          .catch((err) => core.warning(`Couldn't parse long SHA:\n${err}`))
+        setOutput('commit_long_sha', data.commit)
+        setOutput('commit_sha', data.commit.substring(0, 7))
       })
       .catch((err) => core.setFailed(err))
 
