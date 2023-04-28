@@ -390,6 +390,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://keithrfung.dev"><img src="https://avatars.githubusercontent.com/u/10125297?v=4?s=100" width="100px;" alt="Keith Fung"/><br /><sub><b>Keith Fung</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=keithrfung" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://freshidea.com/jonah"><img src="https://avatars.githubusercontent.com/u/20955511?v=4?s=100" width="100px;" alt="Jonah Lawrence"/><br /><sub><b>Jonah Lawrence</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3ADenverCoder1" title="Bug reports">🐛</a> <a href="https://github.com/EndBug/add-and-commit/commits?author=DenverCoder1" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://azeemba.com/"><img src="https://avatars.githubusercontent.com/u/2160795?v=4?s=100" width="100px;" alt="Azeem Bande-Ali"/><br /><sub><b>Azeem Bande-Ali</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=azeemba" title="Documentation">📖</a></td>
+    </tr>
   </tbody>
 </table>
 

@@ -461,6 +461,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "azeemba",
+      "name": "Azeem Bande-Ali",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2160795?v=4",
+      "profile": "https://azeemba.com/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
