@@ -11,6 +11,7 @@ You can use this GitHub Action to commit changes made in your workflow run direc
 - [FAQs](#faqs)
 - [Examples](#examples)
 - [Contributors](#contributors-)
+- [Articles](#articles)
 
 ## Inputs
 
@@ -317,6 +318,11 @@ jobs:
           add: '*.txt --force'
           cwd: './pathToRepo/'
 ```
+
+## Articles
+
+- [Console by CodeSee #156](https://console.substack.com/p/console-156)
+- [MichealHeap.com](https://michaelheap.com/add-and-commit-action/)
 
 ## Contributors ✨
 
