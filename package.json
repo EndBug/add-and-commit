@@ -34,7 +34,7 @@
     "actions-toolkit": "github:EndBug/actions-toolkit#core-actions",
     "js-yaml": "^4.1.0",
     "simple-git": "^3.18.0",
-    "string-argv": "^0.3.1"
+    "string-argv": "^0.3.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
