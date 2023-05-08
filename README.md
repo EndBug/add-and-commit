@@ -398,6 +398,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://azeemba.com/"><img src="https://avatars.githubusercontent.com/u/2160795?v=4?s=100" width="100px;" alt="Azeem Bande-Ali"/><br /><sub><b>Azeem Bande-Ali</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=azeemba" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ViacheslavKudinov"><img src="https://avatars.githubusercontent.com/u/56436734?v=4?s=100" width="100px;" alt="Viacheslav Kudinov"/><br /><sub><b>Viacheslav Kudinov</b></sub></a><br /><a href="#security-ViacheslavKudinov" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
