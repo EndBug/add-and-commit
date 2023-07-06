@@ -479,8 +479,18 @@
       "contributions": [
         "security"
       ]
+    },
+    {
+      "login": "justanotheranonymoususer",
+      "name": "justanotheranonymoususer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5781692?v=4",
+      "profile": "https://github.com/justanotheranonymoususer",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs"
 }
