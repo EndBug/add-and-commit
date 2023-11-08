@@ -140,7 +140,7 @@ If you want to commit files "across different branches", here are two ways to do
 
 ### Tagging
 
-You can use the `tag` option to enter the arguments for a `git add` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).  
+You can use the `tag` option to enter the arguments for a `git tag` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).  
 You can also change the arguments of the push command for tags: every argument in the `tag_push` input will be appended to the `git push --tags` command.  
 For more info on how git arguments are parsed, see [the "Git arguments" section](#git-arguments).
 
