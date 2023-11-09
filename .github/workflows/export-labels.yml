@@ -13,7 +13,7 @@ jobs:
           # This is needed if you're dealing with private repos.
           token: ${{ secrets.GITHUB_TOKEN }}
 
-          # Set this to `true` if you want to get the raw API reponse. Defaults to `false`.
+          # Set this to `true` if you want to get the raw API response. Defaults to `false`.
           raw-result: false
 
           # By default every label entry will have an `aliases` property set to an empty array.

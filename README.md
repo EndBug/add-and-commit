@@ -166,7 +166,7 @@ If you want to make some changes, you have to checkout the branch the PR is comi
 You can set it up like this:
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
   with:
     repository: ${{ github.event.pull_request.head.repo.full_name }}
     ref: ${{ github.event.pull_request.head.ref }}
@@ -269,10 +269,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
 
       - name: Install dependencies
         run: npm install
@@ -304,7 +304,7 @@ jobs:
 
     steps:
       # If you need to, you can check out your repo to a different location
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: './pathToRepo/'
 
