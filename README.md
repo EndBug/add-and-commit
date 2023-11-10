@@ -401,6 +401,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ViacheslavKudinov"><img src="https://avatars.githubusercontent.com/u/56436734?v=4?s=100" width="100px;" alt="Viacheslav Kudinov"/><br /><sub><b>Viacheslav Kudinov</b></sub></a><br /><a href="#security-ViacheslavKudinov" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/justanotheranonymoususer"><img src="https://avatars.githubusercontent.com/u/5781692?v=4?s=100" width="100px;" alt="justanotheranonymoususer"/><br /><sub><b>justanotheranonymoususer</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Ajustanotheranonymoususer" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://cderv.rbind.io"><img src="https://avatars.githubusercontent.com/u/6791940?v=4?s=100" width="100px;" alt="Christophe Dervieux"/><br /><sub><b>Christophe Dervieux</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=cderv" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/deining"><img src="https://avatars.githubusercontent.com/u/18169566?v=4?s=100" width="100px;" alt="Andreas Deininger"/><br /><sub><b>Andreas Deininger</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=deining" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
