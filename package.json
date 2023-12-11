@@ -44,7 +44,7 @@
     "@vercel/ncc": "^0.38.1",
     "all-contributors-cli": "^6.26.1",
     "eslint": "^8.48.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "husky": "^8.0.3",
     "prettier": "^3.1.0",
