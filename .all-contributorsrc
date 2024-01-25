@@ -506,6 +506,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mdboom",
+      "name": "Michael Droettboom",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38294?v=4",
+      "profile": "http://droettboom.com",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
