@@ -9,7 +9,7 @@
     "watch": "ncc build src/main.ts --watch --out lib",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts --fix src",
-    "prepare": "husky install",
+    "prepare": "husky",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
