@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.6",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.19.1",
     "@vercel/ncc": "^0.38.1",
     "all-contributors-cli": "^6.26.1",
