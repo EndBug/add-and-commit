@@ -74,6 +74,7 @@ export function matchGitArgs(string: string) {
  * If both fail, it returns an array containing the input value as its only element
  */
 export function parseInputArray(input: string): string[] {
+  core.debug(`Parsing input array: ${input}`);
   try {
     const json = JSON.parse(input);
     if (json && Array.isArray(json) && json.every(e => typeof e === 'string')) {
