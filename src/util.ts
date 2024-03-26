@@ -81,9 +81,7 @@ export function parseInputArray(input: string): string[] {
       core.debug(`Input parsed as JSON array of length ${json.length}`);
       return json;
     }
-  } catch {
-    return [];
-  }
+  } catch {} // eslint-disable-line no-empty
 
   try {
     const yaml = YAML.load(input);
@@ -91,9 +89,7 @@ export function parseInputArray(input: string): string[] {
       core.debug(`Input parsed as YAML array of length ${yaml.length}`);
       return yaml;
     }
-  } catch {
-    return [];
-  }
+  } catch {} // eslint-disable-line no-empty
 
   core.debug('Input parsed as single string');
   return [input];
