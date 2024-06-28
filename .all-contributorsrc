@@ -515,6 +515,15 @@
       "contributions": [
         "maintenance"
       ]
+    },
+    {
+      "login": "tommie",
+      "name": "tommie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/216382?v=4",
+      "profile": "https://github.com/tommie",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
