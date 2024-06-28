@@ -255,6 +255,29 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
     committer_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
 
+### Array inputs
+
+Due to limitations in the GitHub action APIs, all inputs must be either strings or booleans.
+The action supports arrays in `add` and `remove`, but they have to be encoded as a string with a YAML flow sequence:
+
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    add: '["afile.txt", "anotherfile.txt"]'
+```
+
+(note the single-quotes) or a YAML block sequence:
+
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    add: |
+      - afile.txt
+      - anotherfile.txt
+```
+
+(Note the pipe character making it a multiline string.)
+
 ### Automated linting
 
 Do you want to lint your JavaScript files, located in the `src` folder, with ESLint, so that fixable changes are done without your intervention? You can use a workflow like this:
