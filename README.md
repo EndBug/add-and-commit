@@ -426,6 +426,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://cderv.rbind.io"><img src="https://avatars.githubusercontent.com/u/6791940?v=4?s=100" width="100px;" alt="Christophe Dervieux"/><br /><sub><b>Christophe Dervieux</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=cderv" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/deining"><img src="https://avatars.githubusercontent.com/u/18169566?v=4?s=100" width="100px;" alt="Andreas Deininger"/><br /><sub><b>Andreas Deininger</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=deining" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://droettboom.com"><img src="https://avatars.githubusercontent.com/u/38294?v=4?s=100" width="100px;" alt="Michael Droettboom"/><br /><sub><b>Michael Droettboom</b></sub></a><br /><a href="#maintenance-mdboom" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tommie"><img src="https://avatars.githubusercontent.com/u/216382?v=4?s=100" width="100px;" alt="tommie"/><br /><sub><b>tommie</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=tommie" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
