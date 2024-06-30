@@ -9,11 +9,9 @@
     "build": "ncc build src/main.ts --minify --out lib",
     "lint": "gts lint",
     "prepare": "husky",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest && npm run lint",
     "clean": "gts clean",
-    "fix": "gts fix",
-    "pretest": "npm run compile",
-    "posttest": "npm run lint"
+    "fix": "gts fix"
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
@@ -23,6 +21,7 @@
     "string-argv": "^0.3.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "20.8.2",
     "@vercel/ncc": "^0.38.1",
@@ -30,6 +29,8 @@
     "eslint-config-prettier": "^9.1.0",
     "gts": "^5.3.1",
     "husky": "^9.1.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
     "typescript": "~5.5.3"
   },
   "engines": {
