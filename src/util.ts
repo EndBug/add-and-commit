@@ -70,19 +70,11 @@ export function matchGitArgs(string: string) {
 }
 
 /**
- * Tries to parse a JSON array, then a YAML array.
- * If both fail, it returns an array containing the input value as its only element
+ * Tries to parse a YAML sequence (which can be a JSON array).
+ * If it fails, it returns an array containing the input value as its only element.
  */
 export function parseInputArray(input: string): string[] {
   core.debug(`Parsing input array: ${input}`);
-  try {
-    const json = JSON.parse(input);
-    if (json && Array.isArray(json) && json.every(e => typeof e === 'string')) {
-      core.debug(`Input parsed as JSON array of length ${json.length}`);
-      return json;
-    }
-  } catch {} // eslint-disable-line no-empty
-
   try {
     const yaml = YAML.load(input);
     if (yaml && Array.isArray(yaml) && yaml.every(e => typeof e === 'string')) {
