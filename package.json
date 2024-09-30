@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "20.8.2",
-    "@vercel/ncc": "^0.38.1",
+    "@vercel/ncc": "^0.38.2",
     "all-contributors-cli": "^6.26.1",
     "eslint-config-prettier": "^9.1.0",
     "gts": "^5.3.1",
