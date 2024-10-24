@@ -21,7 +21,7 @@ export async function getUserInfo(username?: string) {
   const res = await tools.github.users.getByUsername({username});
 
   core.debug(
-    `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`
+    `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`,
   );
 
   return {
