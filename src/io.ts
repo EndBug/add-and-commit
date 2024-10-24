@@ -48,11 +48,11 @@ Object.entries(outputs).forEach(([name, value]) => core.setOutput(name, value));
 export function getInput<T extends input>(name: T, parseAsBool: true): boolean;
 export function getInput<T extends input>(
   name: T,
-  parseAsBool?: false
+  parseAsBool?: false,
 ): InputTypes[T];
 export function getInput<T extends input>(
   name: T,
-  parseAsBool = false
+  parseAsBool = false,
 ): InputTypes[T] | boolean {
   if (parseAsBool) return core.getBooleanInput(name);
   return core.getInput(name) as InputTypes[T];
@@ -85,18 +85,18 @@ export async function checkInputs() {
   // #region add, remove
   if (!getInput('add') && !getInput('remove'))
     throw new Error(
-      "Both 'add' and 'remove' are empty, the action has nothing to do."
+      "Both 'add' and 'remove' are empty, the action has nothing to do.",
     );
 
   if (getInput('add')) {
     const parsed = parseInputArray(getInput('add'));
     if (parsed.length === 1)
       core.info(
-        'Add input parsed as single string, running 1 git add command.'
+        'Add input parsed as single string, running 1 git add command.',
       );
     else if (parsed.length > 1)
       core.info(
-        `Add input parsed as string array, running ${parsed.length} git add commands.`
+        `Add input parsed as string array, running ${parsed.length} git add commands.`,
       );
     else core.setFailed('Add input: array length < 1');
   }
@@ -104,11 +104,11 @@ export async function checkInputs() {
     const parsed = parseInputArray(getInput('remove') || '');
     if (parsed.length === 1)
       core.info(
-        'Remove input parsed as single string, running 1 git rm command.'
+        'Remove input parsed as single string, running 1 git rm command.',
       );
     else if (parsed.length > 1)
       core.info(
-        `Remove input parsed as string array, running ${parsed.length} git rm commands.`
+        `Remove input parsed as string array, running ${parsed.length} git rm commands.`,
       );
     else core.setFailed('Remove input: array length < 1');
   }
@@ -119,10 +119,10 @@ export async function checkInputs() {
   if (!default_author_valid.includes(getInput('default_author')))
     throw new Error(
       `'${getInput(
-        'default_author'
+        'default_author',
       )}' is not a valid value for default_author. Valid values: ${default_author_valid.join(
-        ', '
-      )}`
+        ', ',
+      )}`,
     );
   // #endregion
 
@@ -154,11 +154,11 @@ export async function checkInputs() {
         const res = await getUserInfo(process.env.GITHUB_ACTOR);
         if (!res?.name)
           core.warning(
-            "Couldn't fetch author name, filling with github_actor."
+            "Couldn't fetch author name, filling with github_actor.",
           );
         if (!res?.email)
           core.warning(
-            "Couldn't fetch author email, filling with github_actor."
+            "Couldn't fetch author email, filling with github_actor.",
           );
 
         res?.name && (name = res?.name);
@@ -180,7 +180,7 @@ export async function checkInputs() {
 
     default:
       throw new Error(
-        'This should not happen, please contact the author of this action. (checkInputs.author)'
+        'This should not happen, please contact the author of this action. (checkInputs.author)',
       );
   }
 
@@ -188,8 +188,8 @@ export async function checkInputs() {
   setDefault('author_email', email);
   core.info(
     `> Using '${getInput('author_name')} <${getInput(
-      'author_email'
-    )}>' as author.`
+      'author_email',
+    )}>' as author.`,
   );
   // #endregion
 
@@ -202,20 +202,20 @@ export async function checkInputs() {
       } <${
         getInput('committer_email') ||
         getInput('author_email') + ' [from author info]'
-      }>`
+      }>`,
     );
 
   setDefault('committer_name', getInput('author_name'));
   setDefault('committer_email', getInput('author_email'));
   core.debug(
-    `Committer: ${getInput('committer_name')} <${getInput('committer_email')}>`
+    `Committer: ${getInput('committer_name')} <${getInput('committer_email')}>`,
   );
   // #endregion
 
   // #region message
   setDefault(
     'message',
-    `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`
+    `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`,
   );
   core.info(`> Using "${getInput('message')}" as commit message.`);
   // #endregion
@@ -225,17 +225,17 @@ export async function checkInputs() {
   if (!peh_valid.includes(getInput('pathspec_error_handling')))
     throw new Error(
       `"${getInput(
-        'pathspec_error_handling'
+        'pathspec_error_handling',
       )}" is not a valid value for the 'pathspec_error_handling' input. Valid values are: ${peh_valid.join(
-        ', '
-      )}`
+        ', ',
+      )}`,
     );
   // #endregion
 
   // #region pull
   if (getInput('pull') === 'NO-PULL')
     core.warning(
-      "`NO-PULL` is a legacy option for the `pull` input. If you don't want the action to pull the repo, simply remove this input."
+      "`NO-PULL` is a legacy option for the `pull` input. If you don't want the action to pull the repo, simply remove this input.",
     );
   // #endregion
 
@@ -257,7 +257,7 @@ export async function checkInputs() {
   // #region github_token
   if (!getInput('github_token'))
     core.warning(
-      'No github_token has been detected, the action may fail if it needs to use the API'
+      'No github_token has been detected, the action may fail if it needs to use the API',
     );
   // #endregion
 }
