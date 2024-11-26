@@ -206,6 +206,8 @@ Some users reported that they were getting an error:
 
 If you're getting this error and you're using `actions/checkout@v1`, try upgrading to `actions/checkout@v2`. If you're still having problems after upgrading, feel free to open an issue. Issue ref: [#146](https://github.com/EndBug/add-and-commit/issues/146)
 
+Please note that using `persist-credentials: false` will lead to the same issue.
+
 ### Performance on large repos
 
 By default, the action will fetch the repository before starting to work on it: this ensures that it can see the already existing refs.  
