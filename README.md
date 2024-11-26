@@ -430,6 +430,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://droettboom.com"><img src="https://avatars.githubusercontent.com/u/38294?v=4?s=100" width="100px;" alt="Michael Droettboom"/><br /><sub><b>Michael Droettboom</b></sub></a><br /><a href="#maintenance-mdboom" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tommie"><img src="https://avatars.githubusercontent.com/u/216382?v=4?s=100" width="100px;" alt="tommie"/><br /><sub><b>tommie</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=tommie" title="Documentation">📖</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://minddistrict.de"><img src="https://avatars.githubusercontent.com/u/386619?v=4?s=100" width="100px;" alt="Michael Howitz"/><br /><sub><b>Michael Howitz</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=icemac" title="Documentation">📖</a></td>
+    </tr>
   </tbody>
 </table>
 
