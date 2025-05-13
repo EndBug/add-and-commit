@@ -27,7 +27,7 @@
     "@types/node": "20.8.2",
     "@vercel/ncc": "^0.38.3",
     "all-contributors-cli": "^6.26.1",
-    "eslint-config-prettier": "^10.1.2",
+    "eslint-config-prettier": "^10.1.5",
     "gts": "^6.0.2",
     "husky": "^9.1.7",
     "typescript": "~5.8.3"
