@@ -39,8 +39,8 @@ core.info(`Running in ${baseDir}`);
     core.info(`> Found ${changedFiles} changed files.`);
     core.debug(
       `--allow-empty argument detected: ${matchGitArgs(
-        getInput('commit') || ''
-      ).includes('--allow-empty')}`
+        getInput('commit') || '',
+      ).includes('--allow-empty')}`,
     );
 
     await git
@@ -52,7 +52,7 @@ core.info(`Running in ${baseDir}`);
       .addConfig('committer.name', getInput('committer_name'), undefined, log);
     core.debug(
       '> Current git config\n' +
-        JSON.stringify((await git.listConfig()).all, null, 2)
+        JSON.stringify((await git.listConfig()).all, null, 2),
     );
 
     let fetchOption: string | boolean;
@@ -65,7 +65,7 @@ core.info(`Running in ${baseDir}`);
       core.info('> Fetching repo...');
       await git.fetch(
         matchGitArgs(fetchOption === true ? '' : fetchOption),
-        log
+        log,
       );
     } else core.info('> Not fetching repo.');
 
@@ -75,7 +75,7 @@ core.info(`Running in ${baseDir}`);
 
       if (!fetchOption)
         core.warning(
-          'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+          'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.',
         );
 
       await git
@@ -109,7 +109,7 @@ core.info(`Running in ${baseDir}`);
         throw new Error(
           `There are ${
             status.conflicted.length
-          } conflicting files: ${status.conflicted.join(', ')}`
+          } conflicting files: ${status.conflicted.join(', ')}`,
         );
     } else core.info('> Not pulling from repo.');
 
@@ -129,7 +129,7 @@ core.info(`Running in ${baseDir}`);
 
       if (!fetchOption)
         core.warning(
-          'Creating a tag without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.'
+          'Creating a tag without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.',
         );
 
       await git
@@ -158,7 +158,7 @@ core.info(`Running in ${baseDir}`);
         core.debug(
           `Running: git push origin ${
             getInput('new_branch') || ''
-          } --set-upstream`
+          } --set-upstream`,
         );
         await git.push(
           'origin',
@@ -167,7 +167,7 @@ core.info(`Running in ${baseDir}`);
           (err, data?) => {
             if (data) setOutput('pushed', 'true');
             return log(err, data);
-          }
+          },
         );
       } else {
         core.debug(`Running: git push ${pushOption}`);
@@ -178,7 +178,7 @@ core.info(`Running in ${baseDir}`);
           (err, data?) => {
             if (data) setOutput('pushed', 'true');
             return log(err, data);
-          }
+          },
         );
       }
 
@@ -230,7 +230,7 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
       // If any of them fails, the whole function will return a Promise rejection
       await git
         .add(matchGitArgs(args), (err, data) =>
-          log(ignoreErrors === 'all' ? null : err, data)
+          log(ignoreErrors === 'all' ? null : err, data),
         )
         .catch((e: Error) => {
           // if I should ignore every error, return
@@ -245,12 +245,12 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
 
             const peh = getInput('pathspec_error_handling'),
               err = new Error(
-                `Add command did not match any file: git add ${args}`
+                `Add command did not match any file: git add ${args}`,
               );
             if (peh === 'exitImmediately') throw err;
             if (peh === 'exitAtEnd') exitErrors.push(err);
           } else throw e;
-        })
+        }),
     );
   }
 
@@ -258,7 +258,7 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
 }
 
 async function remove(
-  ignoreErrors: 'all' | 'pathspec' | 'none' = 'none'
+  ignoreErrors: 'all' | 'pathspec' | 'none' = 'none',
 ): Promise<(void | Response<void>)[]> {
   const input = getInput('remove');
   if (!input) return [];
@@ -272,7 +272,7 @@ async function remove(
       // If any of them fails, the whole function will return a Promise rejection
       await git
         .rm(matchGitArgs(args), (e, d) =>
-          log(ignoreErrors === 'all' ? null : e, d)
+          log(ignoreErrors === 'all' ? null : e, d),
         )
         .catch((e: Error) => {
           // if I should ignore every error, return
@@ -287,12 +287,12 @@ async function remove(
 
             const peh = getInput('pathspec_error_handling'),
               err = new Error(
-                `Remove command did not match any file:\n  git rm ${args}`
+                `Remove command did not match any file:\n  git rm ${args}`,
               );
             if (peh === 'exitImmediately') throw err;
             if (peh === 'exitAtEnd') exitErrors.push(err);
           } else throw e;
-        })
+        }),
     );
   }
 

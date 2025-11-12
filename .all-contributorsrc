@@ -524,6 +524,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "icemac",
+      "name": "Michael Howitz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/386619?v=4",
+      "profile": "https://minddistrict.de",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
