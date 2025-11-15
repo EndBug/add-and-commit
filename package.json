@@ -16,7 +16,7 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "actions-toolkit": "github:EndBug/actions-toolkit#core-actions",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "simple-git": "^3.18.0",
     "string-argv": "^0.3.2"
   },
