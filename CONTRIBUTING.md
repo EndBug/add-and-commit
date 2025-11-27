@@ -1,6 +1,6 @@
 # Contributing
 
-If you want to contribute to this project, check out this steps!
+If you want to contribute to this project, check out these steps!
 
 1. Check out existing features to make sure your case is not already covered. Also, try [searching open or closed issues](https://github.com/EndBug/add-and-commit/issues) that may cover the same topic.
 2. Either [open a new issue](https://github.com/EndBug/add-and-commit/issues/new/choose) or comment on an existing one to let everyone know what you're working on.
