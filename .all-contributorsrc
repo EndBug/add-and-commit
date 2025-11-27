@@ -535,6 +535,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "tomas-kovanda",
+      "name": "tomas-kovanda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70589885?v=4",
+      "profile": "https://github.com/tomas-kovanda",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
