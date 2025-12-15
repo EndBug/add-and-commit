@@ -14,7 +14,7 @@
     "fix": "gts fix"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.1",
     "actions-toolkit": "github:EndBug/actions-toolkit#core-actions",
     "js-yaml": "^4.1.1",
     "simple-git": "^3.18.0",
