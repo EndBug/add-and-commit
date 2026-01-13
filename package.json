@@ -28,7 +28,7 @@
     "all-contributors-cli": "^6.26.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "gts": "^6.0.2",
+    "gts": "^7.0.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
