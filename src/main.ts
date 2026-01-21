@@ -149,8 +149,23 @@ core.info(`Running in ${baseDir}`);
         core.info(`> Creating commit ${i + 1}/${messages.length}: "${message}"`);
       }
 
+      // Check for staged changes before attempting commit
+      const stagedChanges = (await git.diffSummary(['--cached'])).files.length;
+      const commitArgs = matchGitArgs(getInput('commit') || '');
+      const allowEmpty = commitArgs.includes('--allow-empty');
+
+      if (stagedChanges === 0 && !allowEmpty) {
+        const errorMsg = `Cannot create commit ${i + 1}/${messages.length}: No staged changes found. Either stage files using add/remove inputs or use '--allow-empty' in the commit input to create empty commits.`;
+        core.setFailed(errorMsg);
+        break;
+      }
+
+      core.debug(
+        `Commit ${i + 1}: ${stagedChanges} staged files, --allow-empty: ${allowEmpty}`,
+      );
+
       await git
-        .commit(message, matchGitArgs(getInput('commit') || ''))
+        .commit(message, commitArgs)
         .then(async data => {
           log(undefined, data);
 
