@@ -141,6 +141,7 @@ core.info(`Running in ${baseDir}`);
     }
 
     // Create commits (one or multiple)
+    let commitFailed = false;
     for (let i = 0; i < messages.length; i++) {
       const message = messages[i];
       const isLastCommit = i === messages.length - 1;
@@ -176,7 +177,15 @@ core.info(`Running in ${baseDir}`);
             setOutput('commit_sha', data.commit.substring(0, 7));
           }
         })
-        .catch(err => core.setFailed(err));
+        .catch(err => {
+          core.setFailed(err);
+          commitFailed = true;
+        });
+
+      // Stop processing if commit failed
+      if (commitFailed) {
+        break;
+      }
 
       // Re-stage files for subsequent commits if there are more to create
       if (!isLastCommit) {
