@@ -114,15 +114,62 @@ core.info(`Running in ${baseDir}`);
     } else core.info('> Not pulling from repo.');
 
     core.info('> Creating commit...');
-    await git
-      .commit(getInput('message'), matchGitArgs(getInput('commit') || ''))
-      .then(async data => {
-        log(undefined, data);
-        setOutput('committed', 'true');
-        setOutput('commit_long_sha', data.commit);
-        setOutput('commit_sha', data.commit.substring(0, 7));
-      })
-      .catch(err => core.setFailed(err));
+
+    // Get commit messages - support for arrays and message templates
+    let messages = parseInputArray(getInput('message'));
+    const messageTemplate = getInput('message_template');
+
+    // Handle message template (reuse previous commit)
+    if (messageTemplate) {
+      try {
+        const previousCommit = await git.log(['-1']);
+        const previousMessage = previousCommit.latest?.message || '';
+
+        if (messageTemplate === 'reuse') {
+          // Reuse the entire previous commit message
+          messages = [previousMessage];
+          core.info(`> Reusing previous commit message: "${previousMessage}"`);
+        } else if (messageTemplate.includes('{original}')) {
+          // Replace {original} placeholder with previous message in the template
+          const templatedMessage = messageTemplate.replace(/\{original\}/g, previousMessage);
+          messages = [templatedMessage];
+          core.info(`> Using message template: "${templatedMessage}"`);
+        }
+      } catch (err) {
+        core.warning(`Could not retrieve previous commit message: ${err}`);
+      }
+    }
+
+    // Create commits (one or multiple)
+    for (let i = 0; i < messages.length; i++) {
+      const message = messages[i];
+      const isLastCommit = i === messages.length - 1;
+
+      if (messages.length > 1) {
+        core.info(`> Creating commit ${i + 1}/${messages.length}: "${message}"`);
+      }
+
+      await git
+        .commit(message, matchGitArgs(getInput('commit') || ''))
+        .then(async data => {
+          log(undefined, data);
+
+          // Only set outputs for the last commit
+          if (isLastCommit) {
+            setOutput('committed', 'true');
+            setOutput('commit_long_sha', data.commit);
+            setOutput('commit_sha', data.commit.substring(0, 7));
+          }
+        })
+        .catch(err => core.setFailed(err));
+
+      // Re-stage files for subsequent commits if there are more to create
+      if (!isLastCommit) {
+        core.info('> Re-staging files for next commit...');
+        if (getInput('add')) await add(ignoreErrors);
+        if (getInput('remove')) await remove(ignoreErrors);
+      }
+    }
 
     if (getInput('tag')) {
       core.info('> Tagging commit...');

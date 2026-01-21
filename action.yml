@@ -34,7 +34,10 @@ inputs:
     required: false
     default: --tags --force
   message:
-    description: The message for the commit
+    description: The message for the commit (can be a string, array of strings for multiple commits)
+    required: false
+  message_template:
+    description: Template for commit message. Use 'reuse' to reuse the previous commit's message exactly, or use '{original}' as a placeholder to include the previous message (e.g., '{original}\n\nFormatted code' to suffix, or 'chore: {original}' to prefix)
     required: false
   new_branch:
     description: The name of the branch to create.

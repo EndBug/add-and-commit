@@ -12,6 +12,7 @@ export interface InputTypes {
   default_author: 'github_actor' | 'user_info' | 'github_actions';
   fetch: string;
   message: string;
+  message_template: string | undefined;
   new_branch: string | undefined;
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd';
   pull: string | undefined;

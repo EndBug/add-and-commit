@@ -62,7 +62,13 @@ Add a step like this to your workflow:
 
     # The message for the commit.
     # Default: 'Commit from GitHub Actions (name of the workflow)'
+    # You can also provide multiple messages as a YAML/JSON array to create multiple commits
     message: 'Your commit message'
+
+    # Template for commit message. Use 'reuse' to reuse the previous commit's message,
+    # or use '{original}' placeholder in your message to include the previous commit message
+    # Default: ''
+    message_template: 'reuse'
 
     # If this input is set, the action will push the commit to a new branch with this name.
     # Default: ''
@@ -257,10 +263,64 @@ You can also use the `committer_name` and `committer_email` inputs to make it ap
     committer_email: 41898282+github-actions[bot]@users.noreply.github.com
 ```
 
+### Multiple commits and reusing commit messages
+
+You can create multiple commits in a single action run by providing an array of commit messages:
+
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message: |
+      - First commit message
+      - Second commit message
+      - Third commit message
+```
+
+#### Reusing previous commit messages
+
+You can reuse the previous commit's message exactly using the `message_template` input:
+
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message_template: 'reuse'
+```
+
+#### Templating with previous commit messages
+
+Use the `{original}` placeholder in `message_template` to include the previous commit message with additional text:
+
+**Suffix the previous message** (useful for formatting commits):
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message_template: '{original}\n\nFormatted code with prettier'
+```
+
+**Prefix the previous message**:
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message_template: 'chore: {original}'
+```
+
+**Wrap the previous message**:
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message_template: 'build: {original}\n\nCo-authored-by: bot@example.com'
+```
+
+This is particularly useful for automated workflows that need to preserve the original commit message while adding context like:
+- Formatting/linting notifications
+- Build system updates
+- Automated fixes
+- Co-author attributions
+
 ### Array inputs
 
 Due to limitations in the GitHub action APIs, all inputs must be either strings or booleans.
-The action supports arrays in `add` and `remove`, but they have to be encoded as a string with a YAML flow sequence:
+The action supports arrays in `add`, `remove`, and now `message`, but they have to be encoded as a string with a YAML flow sequence:
 
 ```yaml
 - uses: EndBug/add-and-commit@v9
@@ -279,6 +339,14 @@ The action supports arrays in `add` and `remove`, but they have to be encoded as
 ```
 
 (Note the pipe character making it a multiline string.)
+
+The same applies to the `message` input when creating multiple commits:
+
+```yaml
+- uses: EndBug/add-and-commit@v9
+  with:
+    message: '["First commit", "Second commit"]'
+```
 
 ### Automated linting
 
