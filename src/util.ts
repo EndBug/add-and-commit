@@ -3,11 +3,12 @@ import * as core from '@actions/core';
 import * as YAML from 'js-yaml';
 import {getOctokit} from '@actions/github';
 import * as fs from 'fs';
+import {getInput} from './io';
 
 function getOctokitClient() {
-  const token = process.env.INPUT_GITHUB_TOKEN;
+  const token = getInput('github_token');
   if (!token) {
-    throw new Error('GITHUB_TOKEN is required');
+    throw new Error('github_token is required');
   }
   return getOctokit(token);
 }
