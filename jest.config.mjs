@@ -5,8 +5,6 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
-    '^@actions/core$': '<rootDir>/node_modules/@actions/core/lib/core.js',
-    '^@actions/github$': '<rootDir>/node_modules/@actions/github/lib/github.js',
   },
   transform: {
     '^.+\\.tsx?$': [
