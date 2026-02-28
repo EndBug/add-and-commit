@@ -1,31 +1,23 @@
 import {parseArgsStringToArgv} from 'string-argv';
 import * as core from '@actions/core';
 import * as YAML from 'js-yaml';
-import {Toolkit} from 'actions-toolkit';
+import {getOctokit} from '@actions/github';
 import * as fs from 'fs';
-import {input, output} from './io';
+import {getInput} from './io';
 
-type RecordOf<T extends string> = Record<T, string | undefined>;
-let tools: Toolkit<RecordOf<input>, RecordOf<output>> | undefined;
-function getToolkit() {
-  if (!tools) {
-    tools = new Toolkit<RecordOf<input>, RecordOf<output>>({
-      secrets: [
-        'GITHUB_EVENT_PATH',
-        'GITHUB_EVENT_NAME',
-        'GITHUB_REF',
-        'GITHUB_ACTOR',
-      ],
-    });
+function getOctokitClient() {
+  const token = getInput('github_token');
+  if (!token) {
+    throw new Error('github_token is required');
   }
-
-  return tools;
+  return getOctokit(token);
 }
 
 export async function getUserInfo(username?: string) {
   if (!username) return undefined;
 
-  const res = await getToolkit().github.users.getByUsername({username});
+  const octokit = getOctokitClient();
+  const res = await octokit.rest.users.getByUsername({username});
 
   core.debug(
     `Fetched github actor from the API: ${JSON.stringify(res?.data, null, 2)}`,
