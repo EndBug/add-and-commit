@@ -2,6 +2,7 @@
   "name": "add-and-commit",
   "version": "9.1.4",
   "private": true,
+  "type": "module",
   "description": "Add & commit files from a path directly from GitHub Actions",
   "main": "lib/index.js",
   "scripts": {
@@ -9,13 +10,13 @@
     "build": "ncc build src/main.ts --minify --out lib",
     "lint": "gts lint",
     "prepare": "husky",
-    "test": "jest && npm run lint",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest && npm run lint",
     "clean": "gts clean",
     "fix": "gts fix"
   },
   "dependencies": {
-    "@actions/core": "^2.0.2",
-    "actions-toolkit": "github:EndBug/actions-toolkit#core-actions",
+    "@actions/core": "^3.0.0",
+    "@actions/github": "^9.0.0",
     "js-yaml": "^4.1.1",
     "simple-git": "^3.18.0",
     "string-argv": "^0.3.2"
