@@ -544,6 +544,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "CodeReaper",
+      "name": "Jakob Jensen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/144055?v=4",
+      "profile": "https://codereaper.com/",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
