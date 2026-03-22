@@ -433,6 +433,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://minddistrict.de"><img src="https://avatars.githubusercontent.com/u/386619?v=4?s=100" width="100px;" alt="Michael Howitz"/><br /><sub><b>Michael Howitz</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=icemac" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tomas-kovanda"><img src="https://avatars.githubusercontent.com/u/70589885?v=4?s=100" width="100px;" alt="tomas-kovanda"/><br /><sub><b>tomas-kovanda</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/commits?author=tomas-kovanda" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://codereaper.com/"><img src="https://avatars.githubusercontent.com/u/144055?v=4?s=100" width="100px;" alt="Jakob Jensen"/><br /><sub><b>Jakob Jensen</b></sub></a><br /><a href="#maintenance-CodeReaper" title="Maintenance">🚧</a></td>
     </tr>
   </tbody>
 </table>
