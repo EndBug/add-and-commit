@@ -1,6 +1,6 @@
 {
   "name": "add-and-commit",
-  "version": "9.1.4",
+  "version": "10.0.0",
   "private": true,
   "type": "module",
   "description": "Add & commit files from a path directly from GitHub Actions",
