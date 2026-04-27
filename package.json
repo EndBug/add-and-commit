@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@actions/core": "^3.0.0",
-    "@actions/github": "^9.1.0",
+    "@actions/github": "^9.1.1",
     "js-yaml": "^4.1.1",
     "simple-git": "^3.18.0",
     "string-argv": "^0.3.2"
