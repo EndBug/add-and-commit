@@ -101,7 +101,7 @@ Add a step like this to your workflow:
 Multiple options let you provide the `git` arguments that you want the action to use. It's important to note that these arguments **are not actually used with a CLI command**, but they are parsed by a package called [`string-argv`](https://npm.im/string-argv), and then used with [`simple-git`](https://npm.im/simple-git).  
 What does this mean for you? It means that strings that contain a lot of nested quotes may be parsed incorrectly, and that specific ways of declaring arguments may not be supported by these libraries. If you're having issues with your argument strings you can check whether they're being parsed correctly either by [enabling debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) for your workflow runs or by testing it directly with `string-argv` ([RunKit demo](https://npm.runkit.com/string-argv)): if each argument and option is parsed correctly you'll see an array where every string is an option or value.
 
-Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary local program during fetch/pull/push.  
+Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary Git transport program during fetch/pull/push.  
 Do not interpolate untrusted data (for example values from `github.event.*`) into `fetch`, `pull`, `push`, or `tag_push` without sanitizing them first.
 
 ### Adding files
@@ -129,7 +129,7 @@ One way to use this is if you want to force push to a branch of your repo: you'l
 
 ### Creating a new branch
 
-If you want the action to commit in a new branch, you can use the `new_branch` input. This must be a valid git branch name (not raw git arguments): it cannot be empty, start with `-`, or contain whitespace/control characters.
+If you want the action to commit in a new branch, you can use the `new_branch` input. This must be a valid git branch name (not raw git arguments): it cannot be empty, start with `-`, contain whitespace/control characters, or fail `git check-ref-format --branch` (for example `feature..name`, `name@{x}`, `name~1`, or a name ending with `.`).
 
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 

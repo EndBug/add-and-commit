@@ -2,6 +2,7 @@ import {parseArgsStringToArgv} from 'string-argv';
 import * as core from '@actions/core';
 import * as YAML from 'js-yaml';
 import {getOctokit} from '@actions/github';
+import {execFileSync} from 'child_process';
 import * as fs from 'fs';
 import {getInput} from './io';
 
@@ -37,7 +38,8 @@ export function log(err: any, data?: any) {
 
 /**
  * Ensures `name` is safe to pass as a single git branch/ref positional argument.
- * Rejects empty values, leading hyphens (git option injection), and whitespace/control chars.
+ * Rejects empty values, leading hyphens (git option injection), whitespace/control
+ * chars, and names rejected by `git check-ref-format --branch`.
  */
 export function assertValidBranchName(name: string): void {
   if (!name || !name.trim()) {
@@ -60,6 +62,17 @@ export function assertValidBranchName(name: string): void {
         `The new_branch value '${name}' contains whitespace or control characters.`,
       );
     }
+  }
+
+  try {
+    // Leading '-' is already rejected above so this cannot be parsed as a flag.
+    execFileSync('git', ['check-ref-format', '--branch', name], {
+      stdio: 'ignore',
+    });
+  } catch {
+    throw new Error(
+      `The new_branch value '${name}' is not a valid git branch name.`,
+    );
   }
 }
 

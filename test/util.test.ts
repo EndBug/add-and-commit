@@ -90,6 +90,21 @@ describe('assertValidBranchName', () => {
       /whitespace or control/,
     );
   });
+
+  it('rejects names that fail git check-ref-format --branch', () => {
+    expect(() => assertValidBranchName('feature..name')).toThrow(
+      /not a valid git branch name/,
+    );
+    expect(() => assertValidBranchName('name@{x}')).toThrow(
+      /not a valid git branch name/,
+    );
+    expect(() => assertValidBranchName('name~1')).toThrow(
+      /not a valid git branch name/,
+    );
+    expect(() => assertValidBranchName('name.')).toThrow(
+      /not a valid git branch name/,
+    );
+  });
 });
 
 describe('matchGitArgs', () => {
