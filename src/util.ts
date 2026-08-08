@@ -93,6 +93,16 @@ const DANGEROUS_REMOTE_HELPER_OPTIONS: ReadonlyArray<{
   {canonical: 'exec', minPrefix: 'e'},
 ];
 
+/**
+ * Long options that read a commit/tag message from a filesystem path.
+ * Git accepts unique abbreviations (`--fi` → `--file`); `minPrefix` is the
+ * shortest unambiguous abbreviation currently accepted for `git tag`.
+ */
+const DANGEROUS_MESSAGE_FILE_OPTIONS: ReadonlyArray<{
+  canonical: string;
+  minPrefix: string;
+}> = [{canonical: 'file', minPrefix: 'fi'}];
+
 function getLongOptionName(arg: string): string | undefined {
   if (!arg.startsWith('--') || arg === '--') return undefined;
   const body = arg.slice(2);
@@ -100,12 +110,35 @@ function getLongOptionName(arg: string): string | undefined {
   return (eq === -1 ? body : body.slice(0, eq)).toLowerCase();
 }
 
-function isDangerousRemoteHelperOption(arg: string): boolean {
+function matchesDangerousLongOption(
+  arg: string,
+  options: ReadonlyArray<{canonical: string; minPrefix: string}>,
+): boolean {
   const name = getLongOptionName(arg);
   if (!name) return false;
-  return DANGEROUS_REMOTE_HELPER_OPTIONS.some(
+  return options.some(
     ({canonical, minPrefix}) =>
       name.length >= minPrefix.length && canonical.startsWith(name),
+  );
+}
+
+function isDangerousRemoteHelperOption(arg: string): boolean {
+  return matchesDangerousLongOption(arg, DANGEROUS_REMOTE_HELPER_OPTIONS);
+}
+
+/**
+ * True for `-F`, glued forms like `-F/path`, and short-option clusters that
+ * include `F` (e.g. `-aF`). Lowercase `-f` (force) is intentionally allowed.
+ */
+function isDangerousMessageFileShortOption(arg: string): boolean {
+  if (!arg.startsWith('-') || arg.startsWith('--')) return false;
+  return /F/.test(arg.slice(1));
+}
+
+function isDangerousMessageFileOption(arg: string): boolean {
+  return (
+    matchesDangerousLongOption(arg, DANGEROUS_MESSAGE_FILE_OPTIONS) ||
+    isDangerousMessageFileShortOption(arg)
   );
 }
 
@@ -119,21 +152,22 @@ function isDangerousRemoteHelperOption(arg: string): boolean {
     -s
     --longOption 'This uses the "other" quotes'
     --foo 1234
-    --file=message.txt
-    --file2="Application 'Support'/\"message\".txt"
+    --force
+    --path="Application 'Support'/\"message\".txt"
   `) => [
     '-s',
     '--longOption',
     'This uses the "other" quotes',
     '--foo',
     '1234',
-    '--file=message.txt',
-    `--file2="Application 'Support'/\\"message\\".txt"`
+    '--force',
+    `--path="Application 'Support'/\\"message\\".txt"`
   ]
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
  * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations)
+ * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
  */
 export function matchGitArgs(string: string) {
   const parsed = parseArgsStringToArgv(string);
@@ -145,6 +179,11 @@ export function matchGitArgs(string: string) {
     if (isDangerousRemoteHelperOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
+      );
+    }
+    if (isDangerousMessageFileOption(arg)) {
+      throw new Error(
+        `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
       );
     }
   }

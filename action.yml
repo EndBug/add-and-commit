@@ -54,7 +54,7 @@ inputs:
     description: Arguments for the git rm command
     required: false
   tag:
-    description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen)
+    description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen). -F/--file and abbreviations are not allowed.
     required: false
   tag_push:
     description: Arguments for the git push --tags command (any additional argument will be added after --tags)
