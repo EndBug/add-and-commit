@@ -118,6 +118,13 @@ core.info(`Running in ${baseDir}`);
       .commit(getInput('message'), matchGitArgs(getInput('commit') || ''))
       .then(async data => {
         log(undefined, data);
+        // simple-git can resolve with an empty SHA when no commit was created
+        // (e.g. nothing left to commit). Do not report a false success.
+        if (!data.commit) {
+          throw new Error(
+            'Commit did not produce a SHA; refusing to report committed=true.',
+          );
+        }
         setOutput('committed', 'true');
         setOutput('commit_long_sha', data.commit);
         setOutput('commit_sha', data.commit.substring(0, 7));
