@@ -36,6 +36,39 @@ export function log(err: any, data?: any) {
 }
 
 /**
+ * Remote-helper overrides that make the local git client execute an arbitrary
+ * program during fetch/pull/push. Git also accepts unique abbreviations of
+ * these long options, so we reject every valid nonempty prefix of each name.
+ *
+ * `minPrefix` is the shortest unambiguous abbreviation Git currently accepts
+ * for that option (shorter prefixes are ambiguous and rejected by Git itself).
+ */
+const DANGEROUS_REMOTE_HELPER_OPTIONS: ReadonlyArray<{
+  canonical: string;
+  minPrefix: string;
+}> = [
+  {canonical: 'upload-pack', minPrefix: 'upl'},
+  {canonical: 'receive-pack', minPrefix: 'rece'},
+  {canonical: 'exec', minPrefix: 'e'},
+];
+
+function getLongOptionName(arg: string): string | undefined {
+  if (!arg.startsWith('--') || arg === '--') return undefined;
+  const body = arg.slice(2);
+  const eq = body.indexOf('=');
+  return (eq === -1 ? body : body.slice(0, eq)).toLowerCase();
+}
+
+function isDangerousRemoteHelperOption(arg: string): boolean {
+  const name = getLongOptionName(arg);
+  if (!name) return false;
+  return DANGEROUS_REMOTE_HELPER_OPTIONS.some(
+    ({canonical, minPrefix}) =>
+      name.length >= minPrefix.length && canonical.startsWith(name),
+  );
+}
+
+/**
  * Matches the given string to an array of arguments.
  * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
  * {@link https://www.npm.im/string-argv}
@@ -59,12 +92,22 @@ export function log(err: any, data?: any) {
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
+ * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations)
  */
 export function matchGitArgs(string: string) {
   const parsed = parseArgsStringToArgv(string);
   core.debug(`Git args parsed:
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`);
+
+  for (const arg of parsed) {
+    if (isDangerousRemoteHelperOption(arg)) {
+      throw new Error(
+        `Git argument '${arg}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
+      );
+    }
+  }
+
   return parsed;
 }
 
