@@ -13,7 +13,7 @@ inputs:
     description: The email of the user that will be displayed as the author of the commit
     required: false
   commit:
-    description: Additional arguments for the git commit command
+    description: Additional arguments for the git commit command. -F/--file, abbreviations (e.g. --fi), and short-option clusters containing F (e.g. -aF) are not allowed.
     required: false
   committer_name:
     description: The name of the custom committer you want to use
@@ -54,7 +54,7 @@ inputs:
     description: Arguments for the git rm command
     required: false
   tag:
-    description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen). -F/--file and abbreviations are not allowed.
+    description: Arguments for the git tag command (the tag name always needs to be the first word not preceded by a hyphen). -F/--file, abbreviations (e.g. --fi), and short-option clusters containing F (e.g. -aF) are not allowed.
     required: false
   tag_push:
     description: Arguments for the git push --tags command (any additional argument will be added after --tags)
