@@ -3,6 +3,8 @@ import * as path from 'path';
 import simpleGit, {Response} from 'simple-git';
 import {checkInputs, getInput, logOutputs, setOutput} from './io';
 import {
+  assertNoUnexpectedGitlinks,
+  findUnexpectedGitlinks,
   log,
   matchGitArgs,
   parseInputArray,
@@ -271,6 +273,9 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
         }),
     );
   }
+
+  const cachedRaw = await git.raw(['diff', '--cached', '--raw']);
+  assertNoUnexpectedGitlinks(findUnexpectedGitlinks(cachedRaw));
 
   return res;
 }

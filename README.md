@@ -112,6 +112,8 @@ The action adds files using a regular `git add` command, so you can put every ki
 The script will not stop if one of the git commands doesn't match any file. E.g.: if your command shows a "fatal: pathspec 'yourFile' did not match any files" error the action will go on, unless specified otherwise with `pathspec_error_handling`.  
 You can also use JSON or YAML arrays (e.g. `'["first", "second"]'`, `"['first', 'second']"`) to make the action run multiple `git add` commands: the action will log how your input has been parsed. Please mind that your input still needs to be a string because of how GitHub Actions works with inputs: just write your array inside the string, the action will parse it later.
 
+The action refuses to commit if `git add` would introduce a **new gitlink** (mode `160000`) — for example when a directory contains its own nested `.git` folder. Git would otherwise record that path as an embedded repository reference rather than its files, often with only a silent warning. Remove the nested `.git` directory, or unstage the path with `git rm --cached -- <path>`, before committing. Updates to **existing** submodules (already tracked as gitlinks) are still allowed.
+
 ### Deleting files
 
 The `remove` option can be used if a predetermined list of files needs to be removed. It runs the `git rm` command, so you can pass every kind of argument with it. As if with the [`add` input](#adding-files), you can also use JSON or YAML arrays to make the action run multiple `git rm` commands.
