@@ -36,6 +36,32 @@ export function log(err: any, data?: any) {
   if (err) core.error(err);
 }
 
+/** Git identity keys this action sets; safe to log (no credentials). */
+const GIT_IDENTITY_CONFIG_KEYS = [
+  'user.name',
+  'user.email',
+  'author.name',
+  'author.email',
+  'committer.name',
+  'committer.email',
+] as const;
+
+/**
+ * Picks only git identity config entries for logging.
+ * Never includes credential-bearing keys (extraheader, remote URLs, etc.).
+ */
+export function pickGitIdentityConfig(
+  config: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const key of GIT_IDENTITY_CONFIG_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(config, key)) {
+      result[key] = config[key];
+    }
+  }
+  return result;
+}
+
 /**
  * Ensures `name` is safe to pass as a single git branch/ref positional argument.
  * Rejects empty values, leading hyphens (git option injection), whitespace/control
