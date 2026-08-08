@@ -4,25 +4,50 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Verify lib/ matches source
+        id: verify-lib
+        run: |
+          if [ "$(git diff --ignore-space-at-eol --text -- lib/ | wc -l)" -gt "0" ] \
+            || [ -n "$(git ls-files --others --exclude-standard -- lib/)" ]; then
+            echo "Committed lib/ is out of sync with src/. Run npm ci && npm run build and commit lib/."
+            git diff --ignore-space-at-eol --text -- lib/
+            git ls-files --others --exclude-standard -- lib/
+            exit 1
+          fi
+      - if: ${{ failure() && steps.verify-lib.outcome == 'failure' }}
+        name: Upload expected lib/
+        uses: actions/upload-artifact@v7
+        with:
+          name: lib
+          path: lib/
 
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run test
@@ -32,8 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run lint
