@@ -103,7 +103,8 @@ What does this mean for you? It means that strings that contain a lot of nested 
 
 Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary Git transport program during fetch/pull/push.  
 Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
-Do not interpolate untrusted data (for example values from `github.event.*` or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag_push`, `tag`, or `commit` without sanitizing them first.
+Unmatched `'` / `"` quotes are also rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
+Do not interpolate untrusted data (for example values from `github.event.*`, `github.head_ref`, or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag`, `tag_push`, or `commit` without sanitizing them first. When the branch name is dynamic, prefer the default `push: true` with [`new_branch`](#creating-a-new-branch) instead of embedding the ref in a custom `push` string.
 
 ### Adding files
 
@@ -126,7 +127,7 @@ By default the action runs the following command: `git push origin ${new_branch 
 - any other string:  
   The action will use your string as the arguments for the `git push` command. Please note that nothing is used other than your arguments, and the command will result in `git push ${push input}` (no remote, no branch, no `--set-upstream`, you have to include them yourself).
 
-One way to use this is if you want to force push to a branch of your repo: you'll need to set the `push` input to, for example, `origin yourBranch --force`.
+One way to use this is if you want to force push to a trusted/static branch name in your repo: set the `push` input to, for example, `origin yourBranch --force`. Do not build that string from untrusted refs such as `github.head_ref`.
 
 ### Creating a new branch
 
@@ -135,7 +136,7 @@ If you want the action to commit in a new branch, you can use the `new_branch` i
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 
 If that's the case, you need to make sure that the branch you want to commit to is already checked out before you run the action.  
-If you're **really** sure that you want to commit to that branch, you can also force-push by setting the `push` input to something like `origin yourBranchName --set-upstream --force`.
+If you're **really** sure that you want to commit to that branch, you can also force-push by setting the `push` input to something like `origin yourBranchName --set-upstream --force` (use a trusted/static branch name, not an untrusted ref).
 
 If you want to commit files "across different branches", here are two ways to do it:
 
