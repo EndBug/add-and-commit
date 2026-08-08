@@ -4,10 +4,13 @@ on:
   release:
     types: [published, edited]
 
+permissions:
+  contents: write
+
 jobs:
   actions-tagger:
     runs-on: windows-2022
     steps:
-      - uses: Actions-R-Us/actions-tagger@v2
+      - uses: Actions-R-Us/actions-tagger@330ddfac760021349fef7ff62b372f2f691c20fb # v2.0.3
         with:
           publish_latest_tag: true
