@@ -37,7 +37,7 @@ inputs:
     description: The message for the commit
     required: false
   new_branch:
-    description: The name of the branch to create.
+    description: The name of the branch to create (must be a valid branch name; cannot start with '-').
     required: false
   pathspec_error_handling:
     description: The way the action should handle pathspec errors from the add and remove commands.

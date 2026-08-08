@@ -126,7 +126,7 @@ One way to use this is if you want to force push to a branch of your repo: you'l
 
 ### Creating a new branch
 
-If you want the action to commit in a new branch, you can use the `new_branch` input.
+If you want the action to commit in a new branch, you can use the `new_branch` input. This must be a valid git branch name (not raw git arguments): it cannot be empty, start with `-`, or contain whitespace/control characters.
 
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 

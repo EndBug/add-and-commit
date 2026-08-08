@@ -79,13 +79,13 @@ core.info(`Running in ${baseDir}`);
         );
 
       await git
-        .checkout(targetBranch)
+        .checkout(['--', targetBranch])
         .then(() => {
           log(undefined, `'${targetBranch}' branch already existed.`);
         })
         .catch(() => {
           log(undefined, `Creating '${targetBranch}' branch.`);
-          return git.checkoutLocalBranch(targetBranch, log);
+          return git.checkout(['-b', '--', targetBranch], log);
         });
     }
 
@@ -155,20 +155,28 @@ core.info(`Running in ${baseDir}`);
       core.info('> Pushing commit to repo...');
 
       if (pushOption === true) {
-        core.debug(
-          `Running: git push origin ${
-            getInput('new_branch') || ''
-          } --set-upstream`,
-        );
-        await git.push(
-          'origin',
-          getInput('new_branch'),
-          {'--set-upstream': null},
-          (err, data?) => {
-            if (data) setOutput('pushed', 'true');
-            return log(err, data);
-          },
-        );
+        const branch = getInput('new_branch');
+        if (branch) {
+          core.debug(`Running: git push --set-upstream origin -- ${branch}`);
+          await git.raw(
+            ['push', '--set-upstream', 'origin', '--', branch],
+            (err, data?) => {
+              if (data) setOutput('pushed', 'true');
+              return log(err, data);
+            },
+          );
+        } else {
+          core.debug('Running: git push origin --set-upstream');
+          await git.push(
+            'origin',
+            undefined,
+            {'--set-upstream': null},
+            (err, data?) => {
+              if (data) setOutput('pushed', 'true');
+              return log(err, data);
+            },
+          );
+        }
       } else {
         core.debug(`Running: git push ${pushOption}`);
         await git.push(

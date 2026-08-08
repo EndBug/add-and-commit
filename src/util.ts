@@ -36,6 +36,29 @@ export function log(err: any, data?: any) {
 }
 
 /**
+ * Ensures `name` is safe to pass as a single git branch/ref positional argument.
+ * Rejects empty values, leading hyphens (git option injection), and whitespace/control chars.
+ */
+export function assertValidBranchName(name: string): void {
+  if (!name || !name.trim()) {
+    throw new Error('The new_branch value is empty.');
+  }
+  if (name.startsWith('-')) {
+    throw new Error(
+      `The new_branch value '${name}' cannot start with '-' (it would be interpreted as a git option).`,
+    );
+  }
+  for (let i = 0; i < name.length; i++) {
+    const code = name.charCodeAt(i);
+    if (code <= 0x20 || code === 0x7f) {
+      throw new Error(
+        `The new_branch value '${name}' contains whitespace or control characters.`,
+      );
+    }
+  }
+}
+
+/**
  * Matches the given string to an array of arguments.
  * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
  * {@link https://www.npm.im/string-argv}
