@@ -1,5 +1,7 @@
 import {
+  assertNoUnexpectedGitlinks,
   assertValidBranchName,
+  findUnexpectedGitlinks,
   matchGitArgs,
   parseInputArray,
 } from '../src/util';
@@ -168,5 +170,68 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
+  });
+});
+
+describe('findUnexpectedGitlinks', () => {
+  it('returns empty for empty or unrelated output', () => {
+    expect(findUnexpectedGitlinks('')).toStrictEqual([]);
+    expect(
+      findUnexpectedGitlinks(
+        ':000000 100644 0000000000000000000000000000000000000000 abcdefabcdefabcdefabcdefabcdefabcdefabcd A\tREADME.md',
+      ),
+    ).toStrictEqual([]);
+  });
+
+  it('flags a newly added gitlink', () => {
+    expect(
+      findUnexpectedGitlinks(
+        ':000000 160000 0000000000000000000000000000000000000000 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 A\tevil_nested_repo',
+      ),
+    ).toStrictEqual(['evil_nested_repo']);
+  });
+
+  it('flags a mode change into a gitlink', () => {
+    expect(
+      findUnexpectedGitlinks(
+        ':100644 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 T\twas_a_file',
+      ),
+    ).toStrictEqual(['was_a_file']);
+  });
+
+  it('allows existing submodule SHA updates (160000→160000)', () => {
+    expect(
+      findUnexpectedGitlinks(
+        ':160000 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 M\tvendor/lib',
+      ),
+    ).toStrictEqual([]);
+  });
+
+  it('collects multiple unexpected gitlinks among mixed changes', () => {
+    const raw = [
+      ':000000 100644 0000000000000000000000000000000000000000 abcdefabcdefabcdefabcdefabcdefabcdefabcd A\tok.txt',
+      ':000000 160000 0000000000000000000000000000000000000000 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 A\tnested_a',
+      ':160000 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd fedcbafedcbafedcbafedcbafedcbafedcbafedc M\tok_submodule',
+      ':040000 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 T\tnested_b',
+    ].join('\n');
+    expect(findUnexpectedGitlinks(raw)).toStrictEqual(['nested_a', 'nested_b']);
+  });
+});
+
+describe('assertNoUnexpectedGitlinks', () => {
+  it('does nothing when there are no paths', () => {
+    expect(() => assertNoUnexpectedGitlinks([])).not.toThrow();
+  });
+
+  it('throws with path names and remediation hints', () => {
+    expect(() => assertNoUnexpectedGitlinks(['evil_nested_repo'])).toThrow(
+      /unexpected gitlink/,
+    );
+    expect(() => assertNoUnexpectedGitlinks(['evil_nested_repo'])).toThrow(
+      /evil_nested_repo/,
+    );
+    expect(() => assertNoUnexpectedGitlinks(['evil_nested_repo'])).toThrow(
+      /git rm --cached evil_nested_repo/,
+    );
   });
 });

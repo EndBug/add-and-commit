@@ -153,6 +153,45 @@ export function matchGitArgs(string: string) {
 }
 
 /**
+ * Parses `git diff --cached --raw` output and returns paths that would introduce
+ * a new gitlink (mode 160000) — i.e. an embedded git repository staged as if it
+ * were a submodule. Updates that stay 160000→160000 (existing submodule bumps)
+ * are allowed.
+ *
+ * Raw line shape: `:oldmode newmode oldsha newsha status\tpath`
+ */
+export function findUnexpectedGitlinks(diffCachedRaw: string): string[] {
+  const paths: string[] = [];
+  for (const line of diffCachedRaw.split('\n')) {
+    if (!line.startsWith(':')) continue;
+    const match = line.match(
+      /^:(\d{6}) (\d{6}) [0-9a-f]+ [0-9a-f]+ [A-Z]\t(.+)$/,
+    );
+    if (!match) continue;
+    const [, oldMode, newMode, filePath] = match;
+    if (newMode === '160000' && oldMode !== '160000') {
+      paths.push(filePath);
+    }
+  }
+  return paths;
+}
+
+/**
+ * Fails the action if `git add` staged any unexpected gitlinks (embedded repos).
+ */
+export function assertNoUnexpectedGitlinks(paths: string[]): void {
+  if (paths.length === 0) return;
+
+  const listed = paths.map(p => `  - ${p}`).join('\n');
+  const rmHints = paths.map(p => `  git rm --cached ${p}`).join('\n');
+  throw new Error(
+    `Refusing to commit unexpected gitlink(s) (embedded git repository staged as mode 160000):\n${listed}\n` +
+      'Git records a nested .git directory as a gitlink, not as its files. ' +
+      `Remove the nested .git directory, or unstage the path(s) with:\n${rmHints}`,
+  );
+}
+
+/**
  * Tries to parse a YAML sequence (which can be a JSON array).
  * If it fails, it returns an array containing the input value as its only element.
  */

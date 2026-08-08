@@ -2,7 +2,13 @@ import * as core from '@actions/core';
 import * as path from 'path';
 import simpleGit, {Response} from 'simple-git';
 import {checkInputs, getInput, logOutputs, setOutput} from './io';
-import {log, matchGitArgs, parseInputArray} from './util';
+import {
+  assertNoUnexpectedGitlinks,
+  findUnexpectedGitlinks,
+  log,
+  matchGitArgs,
+  parseInputArray,
+} from './util';
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '');
 const git = simpleGit({baseDir});
@@ -261,6 +267,9 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
         }),
     );
   }
+
+  const cachedRaw = await git.raw(['diff', '--cached', '--raw']);
+  assertNoUnexpectedGitlinks(findUnexpectedGitlinks(cachedRaw));
 
   return res;
 }
