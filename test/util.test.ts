@@ -169,4 +169,28 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
   });
+
+  it('rejects unmatched quotes that would inject flags via string-argv', () => {
+    expect(() => matchGitArgs("origin fix'--force --set-upstream")).toThrow(
+      /unmatched ' quote/,
+    );
+    expect(() => matchGitArgs('origin fix"--force --set-upstream')).toThrow(
+      /unmatched " quote/,
+    );
+  });
+
+  it('parses balanced quotes without treating them as injection', () => {
+    expect(matchGitArgs("origin a'b'c --set-upstream")).toStrictEqual([
+      'origin',
+      "a'b'c",
+      '--set-upstream',
+    ]);
+    expect(matchGitArgs("--longOption 'hello world'")).toStrictEqual([
+      '--longOption',
+      'hello world',
+    ]);
+    expect(
+      matchGitArgs('--longOption \'This uses the "other" quotes\''),
+    ).toStrictEqual(['--longOption', 'This uses the "other" quotes']);
+  });
 });

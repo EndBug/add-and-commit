@@ -110,6 +110,28 @@ function isDangerousRemoteHelperOption(arg: string): boolean {
 }
 
 /**
+ * Rejects unmatched `'` / `"` so `string-argv` cannot silently retokenize at an
+ * odd quote (e.g. `origin fix'--force` → `["origin","fix","--force"]`).
+ * Balanced quotes and the opposite quote type inside a quoted segment are allowed.
+ */
+function assertBalancedQuotes(input: string): void {
+  let open: "'" | '"' | null = null;
+  for (const char of input) {
+    if (char !== "'" && char !== '"') continue;
+    if (open === null) {
+      open = char;
+    } else if (open === char) {
+      open = null;
+    }
+  }
+  if (open !== null) {
+    throw new Error(
+      `Git arguments contain an unmatched ${open} quote. Unclosed quotes are rejected because they cause ambiguous argument splitting.`,
+    );
+  }
+}
+
+/**
  * Matches the given string to an array of arguments.
  * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
  * {@link https://www.npm.im/string-argv}
@@ -133,9 +155,11 @@ function isDangerousRemoteHelperOption(arg: string): boolean {
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
- * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations)
+ * @throws If the args include unmatched quotes, or a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations)
  */
 export function matchGitArgs(string: string) {
+  assertBalancedQuotes(string);
+
   const parsed = parseArgsStringToArgv(string);
   core.debug(`Git args parsed:
   - Original: ${string}
