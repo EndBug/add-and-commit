@@ -30,10 +30,85 @@ export async function getUserInfo(username?: string) {
   };
 }
 
+/**
+ * Characters that can spoof or inject into CI logs when printed raw:
+ * C0/C1 controls + DEL, and Unicode bidi/isolate format controls
+ * (Trojan Source class: RLO/LRO/PDF/RLE/LRE/RLI/LRI/FSI/PDI, LRM/RLM, ALM).
+ */
+const LOG_UNSAFE_CHARS =
+  // eslint-disable-next-line no-control-regex
+  /[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/gu;
+
+/**
+ * Replaces log-unsafe characters with visible `\uXXXX` escapes so bidi
+ * reordering and control-char injection cannot alter how paths render in logs.
+ */
+export function neutralizeLogString(s: string): string {
+  return s.replace(LOG_UNSAFE_CHARS, ch => {
+    const hex = ch.codePointAt(0)!.toString(16).padStart(4, '0');
+    return `\\u${hex}`;
+  });
+}
+
+const CIRCULAR_LOG_MARKER = '[Circular]';
+
+/**
+ * Recursively neutralizes strings in values passed to log sinks (StatusSummary,
+ * commit results, Error messages, etc.).
+ * Tracks visited arrays/objects so circular references become a marker instead
+ * of overflowing the stack.
+ */
+export function neutralizeForLog(
+  value: unknown,
+  seen: WeakSet<object> = new WeakSet(),
+): unknown {
+  if (typeof value === 'string') return neutralizeLogString(value);
+  if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null ||
+    value === undefined
+  ) {
+    return value;
+  }
+  if (value instanceof Error) {
+    const sanitized = new Error(neutralizeLogString(value.message));
+    sanitized.name = neutralizeLogString(value.name);
+    if (value.stack) {
+      sanitized.stack = neutralizeLogString(value.stack);
+    }
+    return sanitized;
+  }
+  if (Array.isArray(value)) {
+    if (seen.has(value)) return CIRCULAR_LOG_MARKER;
+    seen.add(value);
+    return value.map(item => neutralizeForLog(item, seen));
+  }
+  if (typeof value === 'object') {
+    if (seen.has(value)) return CIRCULAR_LOG_MARKER;
+    seen.add(value);
+    const out: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
+      out[neutralizeLogString(key)] = neutralizeForLog(nested, seen);
+    }
+    return out;
+  }
+  return value;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function log(err: any, data?: any) {
-  if (data) console.log(data);
-  if (err) core.error(err);
+  if (data) console.log(neutralizeForLog(data));
+  if (err) {
+    const sanitized = neutralizeForLog(err);
+    if (typeof sanitized === 'string' || sanitized instanceof Error) {
+      core.error(sanitized);
+    } else {
+      core.error(String(sanitized));
+    }
+  }
 }
 
 /** Git identity keys this action sets; safe to log (no credentials). */

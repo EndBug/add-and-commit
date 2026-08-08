@@ -3,6 +3,8 @@ import {
   assertValidBranchName,
   findUnexpectedGitlinks,
   matchGitArgs,
+  neutralizeForLog,
+  neutralizeLogString,
   parseInputArray,
   pickGitIdentityConfig,
 } from '../src/util';
@@ -374,5 +376,72 @@ describe('assertNoUnexpectedGitlinks', () => {
     expect(() => assertNoUnexpectedGitlinks(['evil_nested_repo'])).toThrow(
       /git rm --cached -- evil_nested_repo/,
     );
+  });
+});
+
+describe('neutralizeLogString', () => {
+  it('leaves normal filenames unchanged', () => {
+    expect(neutralizeLogString('src/main.ts')).toBe('src/main.ts');
+    expect(neutralizeLogString('docs/README.md')).toBe('docs/README.md');
+  });
+
+  it('escapes RLO and related bidi controls', () => {
+    const rlo = '\u202E';
+    const lro = '\u202D';
+    const rli = '\u2067';
+    expect(neutralizeLogString(`doc${rlo}txt.exe`)).toBe('doc\\u202etxt.exe');
+    expect(neutralizeLogString(`a${lro}b${rli}c`)).toBe('a\\u202db\\u2067c');
+  });
+
+  it('escapes newlines and other C0 controls', () => {
+    expect(neutralizeLogString('line1\nline2')).toBe('line1\\u000aline2');
+    expect(neutralizeLogString('a\rb')).toBe('a\\u000db');
+  });
+});
+
+describe('neutralizeForLog', () => {
+  it('recursively sanitizes StatusSummary-shaped objects', () => {
+    const rlo = '\u202E';
+    const spoofed = `doc${rlo}txt.exe`;
+    const input = {
+      conflicted: [],
+      created: [spoofed],
+      modified: ['ok.txt', spoofed],
+      files: [{path: spoofed, index: 'A', working_dir: ' '}],
+      not_added: 1,
+      isClean: () => true,
+    };
+    const result = neutralizeForLog(input) as typeof input;
+    expect(result.created).toStrictEqual(['doc\\u202etxt.exe']);
+    expect(result.modified).toStrictEqual(['ok.txt', 'doc\\u202etxt.exe']);
+    expect(result.files[0].path).toBe('doc\\u202etxt.exe');
+    expect(result.not_added).toBe(1);
+  });
+
+  it('sanitizes Error messages', () => {
+    const err = new Error('bad: file\u202Ename');
+    const result = neutralizeForLog(err) as Error;
+    expect(result).toBeInstanceOf(Error);
+    expect(result.message).toBe('bad: file\\u202ename');
+  });
+
+  it('passes through nullish and primitives', () => {
+    expect(neutralizeForLog(null)).toBeNull();
+    expect(neutralizeForLog(undefined)).toBeUndefined();
+    expect(neutralizeForLog(42)).toBe(42);
+    expect(neutralizeForLog(true)).toBe(true);
+  });
+
+  it('returns a marker for circular references', () => {
+    const obj: Record<string, unknown> = {path: 'ok.txt'};
+    obj.self = obj;
+    const arr: unknown[] = ['a'];
+    arr.push(arr);
+
+    expect(neutralizeForLog(obj)).toStrictEqual({
+      path: 'ok.txt',
+      self: '[Circular]',
+    });
+    expect(neutralizeForLog(arr)).toStrictEqual(['a', '[Circular]']);
   });
 });
