@@ -2,6 +2,7 @@ import {
   assertValidBranchName,
   matchGitArgs,
   parseInputArray,
+  pickGitIdentityConfig,
 } from '../src/util';
 
 describe('parseInputArray', () => {
@@ -168,5 +169,46 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
+  });
+});
+
+describe('pickGitIdentityConfig', () => {
+  it('keeps only identity keys', () => {
+    const picked = pickGitIdentityConfig({
+      'user.name': 'Alice',
+      'user.email': 'alice@example.com',
+      'author.name': 'Alice',
+      'author.email': 'alice@example.com',
+      'committer.name': 'Bot',
+      'committer.email': 'bot@example.com',
+      'http.https://github.com/.extraheader':
+        'AUTHORIZATION: basic dGVzdDp0b2tlbg==',
+      'credential.helper': 'store',
+      'remote.origin.url':
+        'https://x-access-token:ghp_secret@github.com/o/r.git',
+      'core.sshCommand': 'ssh -i /secrets/id_rsa',
+    });
+
+    expect(picked).toStrictEqual({
+      'user.name': 'Alice',
+      'user.email': 'alice@example.com',
+      'author.name': 'Alice',
+      'author.email': 'alice@example.com',
+      'committer.name': 'Bot',
+      'committer.email': 'bot@example.com',
+    });
+    expect(picked).not.toHaveProperty('http.https://github.com/.extraheader');
+    expect(picked).not.toHaveProperty('credential.helper');
+    expect(picked).not.toHaveProperty('remote.origin.url');
+    expect(picked).not.toHaveProperty('core.sshCommand');
+  });
+
+  it('returns an empty object when no identity keys are present', () => {
+    expect(
+      pickGitIdentityConfig({
+        'http.https://github.com/.extraheader':
+          'AUTHORIZATION: basic dGVzdDp0b2tlbg==',
+      }),
+    ).toStrictEqual({});
   });
 });
