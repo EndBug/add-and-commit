@@ -84,10 +84,14 @@ describe('matchGitArgs', () => {
   });
 
   it('rejects abbreviations of blocked options', () => {
+    expect(() => matchGitArgs('--upl=evil')).toThrow(/not allowed/);
+    expect(() => matchGitArgs('--uplo=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--upload-pac=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--upload=evil')).toThrow(/not allowed/);
+    expect(() => matchGitArgs('--rece=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--receive-pac=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
+    expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
   });
 });

@@ -38,14 +38,17 @@ export function log(err: any, data?: any) {
 /**
  * Remote-helper overrides that make the local git client execute an arbitrary
  * program during fetch/pull/push. Git also accepts unique abbreviations of
- * these long options, so we reject prefixes of the canonical names.
+ * these long options, so we reject every valid nonempty prefix of each name.
+ *
+ * `minPrefix` is the shortest unambiguous abbreviation Git currently accepts
+ * for that option (shorter prefixes are ambiguous and rejected by Git itself).
  */
 const DANGEROUS_REMOTE_HELPER_OPTIONS: ReadonlyArray<{
   canonical: string;
   minPrefix: string;
 }> = [
-  {canonical: 'upload-pack', minPrefix: 'upload'},
-  {canonical: 'receive-pack', minPrefix: 'receive'},
+  {canonical: 'upload-pack', minPrefix: 'upl'},
+  {canonical: 'receive-pack', minPrefix: 'rece'},
   {canonical: 'exec', minPrefix: 'e'},
 ];
 
