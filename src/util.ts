@@ -48,9 +48,14 @@ export function assertValidBranchName(name: string): void {
       `The new_branch value '${name}' cannot start with '-' (it would be interpreted as a git option).`,
     );
   }
-  for (let i = 0; i < name.length; i++) {
-    const code = name.charCodeAt(i);
-    if (code <= 0x20 || code === 0x7f) {
+  for (const char of name) {
+    const code = char.codePointAt(0)!;
+    if (
+      code <= 0x1f || // C0 controls
+      code === 0x7f || // DEL
+      (code >= 0x80 && code <= 0x9f) || // C1 controls
+      /\s/u.test(char) // Unicode whitespace (e.g. NBSP)
+    ) {
       throw new Error(
         `The new_branch value '${name}' contains whitespace or control characters.`,
       );

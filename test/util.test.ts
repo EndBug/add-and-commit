@@ -79,5 +79,11 @@ describe('assertValidBranchName', () => {
     expect(() => assertValidBranchName('has\nnewline')).toThrow(
       /whitespace or control/,
     );
+    expect(() => assertValidBranchName('has\u00A0nbsp')).toThrow(
+      /whitespace or control/,
+    );
+    expect(() => assertValidBranchName('has\u0085nel')).toThrow(
+      /whitespace or control/,
+    );
   });
 });

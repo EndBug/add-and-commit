@@ -79,13 +79,13 @@ core.info(`Running in ${baseDir}`);
         );
 
       await git
-        .checkout(['--', targetBranch])
+        .checkout([targetBranch])
         .then(() => {
           log(undefined, `'${targetBranch}' branch already existed.`);
         })
         .catch(() => {
           log(undefined, `Creating '${targetBranch}' branch.`);
-          return git.checkout(['-b', '--', targetBranch], log);
+          return git.checkout(['-b', targetBranch], log);
         });
     }
 
