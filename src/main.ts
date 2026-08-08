@@ -126,15 +126,21 @@ core.info(`Running in ${baseDir}`);
     } else core.info('> Not pulling from repo.');
 
     core.info('> Creating commit...');
-    await git
-      .commit(getInput('message'), matchGitArgs(getInput('commit') || ''))
-      .then(async data => {
-        log(undefined, data);
-        setOutput('committed', 'true');
-        setOutput('commit_long_sha', data.commit);
-        setOutput('commit_sha', data.commit.substring(0, 7));
-      })
-      .catch(err => core.setFailed(err));
+    const data = await git.commit(
+      getInput('message'),
+      matchGitArgs(getInput('commit') || ''),
+    );
+    log(undefined, data);
+    // simple-git can resolve with an empty SHA when no commit was created
+    // (e.g. nothing left to commit). Do not report a false success.
+    if (!data.commit) {
+      throw new Error(
+        'Commit did not produce a SHA; refusing to report committed=true.',
+      );
+    }
+    setOutput('committed', 'true');
+    setOutput('commit_long_sha', data.commit);
+    setOutput('commit_sha', data.commit.substring(0, 7));
 
     if (getInput('tag')) {
       core.info('> Tagging commit...');
