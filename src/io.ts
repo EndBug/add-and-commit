@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import {getUserInfo, parseInputArray} from './util';
+import {assertValidBranchName, getUserInfo, parseInputArray} from './util';
 
 export interface InputTypes {
   add: string;
@@ -218,6 +218,11 @@ export async function checkInputs() {
     `Commit from GitHub Actions (${process.env.GITHUB_WORKFLOW})`,
   );
   core.info(`> Using "${getInput('message')}" as commit message.`);
+  // #endregion
+
+  // #region new_branch
+  const newBranch = getInput('new_branch');
+  if (newBranch) assertValidBranchName(newBranch);
   // #endregion
 
   // #region pathspec_error_handling
