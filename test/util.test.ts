@@ -135,6 +135,13 @@ describe('matchGitArgs', () => {
       '--force',
     ]);
     expect(matchGitArgs('--set-upstream')).toStrictEqual(['--set-upstream']);
+    expect(matchGitArgs('v1.0.0 --force')).toStrictEqual(['v1.0.0', '--force']);
+    expect(matchGitArgs('-a -m "release"')).toStrictEqual([
+      '-a',
+      '-m',
+      'release',
+    ]);
+    expect(matchGitArgs('v1.0.0 -f')).toStrictEqual(['v1.0.0', '-f']);
   });
 
   it('returns an empty array for blank input', () => {
@@ -159,7 +166,7 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--exec=/bin/sh')).toThrow(/not allowed/);
   });
 
-  it('rejects abbreviations of blocked options', () => {
+  it('rejects abbreviations of blocked remote-helper options', () => {
     expect(() => matchGitArgs('--upl=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--uplo=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--upload-pac=evil')).toThrow(/not allowed/);
@@ -169,6 +176,53 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
+  });
+
+  it('rejects -F / --file message-from-file flags (PoC form)', () => {
+    expect(() =>
+      matchGitArgs('1.0.0 -F ../runner-secrets/aws-credentials.txt'),
+    ).toThrow(/not allowed/);
+    expect(() => matchGitArgs('-F ../secrets')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('--file=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('--file ../secrets')).toThrow(
+      /message from a file/,
+    );
+  });
+
+  it('rejects --file abbreviations and short-option clusters containing F', () => {
+    expect(() => matchGitArgs('--fi=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('--fil=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('-aF ../secrets')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('-Fa')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('-F../secrets')).toThrow(/message from a file/);
+  });
+
+  it('preserves -m / --message values that look like -F/--file', () => {
+    expect(matchGitArgs('-m "-F"')).toStrictEqual(['-m', '-F']);
+    expect(matchGitArgs('-m --file=/tmp/value')).toStrictEqual([
+      '-m',
+      '--file=/tmp/value',
+    ]);
+    expect(matchGitArgs('--message "-F"')).toStrictEqual(['--message', '-F']);
+    expect(matchGitArgs('-m-F')).toStrictEqual(['-m-F']);
+    expect(matchGitArgs('v1.0.0 -a -m "-F"')).toStrictEqual([
+      'v1.0.0',
+      '-a',
+      '-m',
+      '-F',
+    ]);
+  });
+
+  it('still rejects a real -F after a message value', () => {
+    expect(() => matchGitArgs('-m "ok" -F ../secrets')).toThrow(
+      /message from a file/,
+    );
   });
 });
 

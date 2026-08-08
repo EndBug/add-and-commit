@@ -102,7 +102,8 @@ Multiple options let you provide the `git` arguments that you want the action to
 What does this mean for you? It means that strings that contain a lot of nested quotes may be parsed incorrectly, and that specific ways of declaring arguments may not be supported by these libraries. If you're having issues with your argument strings you can check whether they're being parsed correctly either by [enabling debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) for your workflow runs or by testing it directly with `string-argv` ([RunKit demo](https://npm.runkit.com/string-argv)): if each argument and option is parsed correctly you'll see an array where every string is an option or value.
 
 Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary Git transport program during fetch/pull/push.  
-Do not interpolate untrusted data (for example values from `github.event.*`) into `fetch`, `pull`, `push`, or `tag_push` without sanitizing them first.
+Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
+Do not interpolate untrusted data (for example values from `github.event.*` or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag_push`, `tag`, or `commit` without sanitizing them first.
 
 ### Adding files
 
