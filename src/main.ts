@@ -2,7 +2,14 @@ import * as core from '@actions/core';
 import * as path from 'path';
 import simpleGit, {Response} from 'simple-git';
 import {checkInputs, getInput, logOutputs, setOutput} from './io';
-import {log, matchGitArgs, parseInputArray} from './util';
+import {
+  assertNoUnexpectedGitlinks,
+  findUnexpectedGitlinks,
+  log,
+  matchGitArgs,
+  parseInputArray,
+  pickGitIdentityConfig,
+} from './util';
 
 const baseDir = path.join(process.cwd(), getInput('cwd') || '');
 const git = simpleGit({baseDir});
@@ -50,10 +57,15 @@ core.info(`Running in ${baseDir}`);
       .addConfig('author.name', getInput('author_name'), undefined, log)
       .addConfig('committer.email', getInput('committer_email'), undefined, log)
       .addConfig('committer.name', getInput('committer_name'), undefined, log);
-    core.debug(
-      '> Current git config\n' +
-        JSON.stringify((await git.listConfig()).all, null, 2),
-    );
+    if (core.isDebug()) {
+      const identity = pickGitIdentityConfig((await git.listConfig()).all);
+      core.debug(
+        Object.keys(identity).length
+          ? '> Current git identity config\n' +
+              JSON.stringify(identity, null, 2)
+          : '> Git identity config set (no identity keys present in listConfig)',
+      );
+    }
 
     let fetchOption: string | boolean;
     try {
@@ -267,6 +279,9 @@ async function add(ignoreErrors: 'all' | 'pathspec' | 'none' = 'none') {
         }),
     );
   }
+
+  const cachedRaw = await git.raw(['diff', '--cached', '--raw']);
+  assertNoUnexpectedGitlinks(findUnexpectedGitlinks(cachedRaw));
 
   return res;
 }
