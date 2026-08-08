@@ -202,6 +202,28 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('-Fa')).toThrow(/message from a file/);
     expect(() => matchGitArgs('-F../secrets')).toThrow(/message from a file/);
   });
+
+  it('preserves -m / --message values that look like -F/--file', () => {
+    expect(matchGitArgs('-m "-F"')).toStrictEqual(['-m', '-F']);
+    expect(matchGitArgs('-m --file=/tmp/value')).toStrictEqual([
+      '-m',
+      '--file=/tmp/value',
+    ]);
+    expect(matchGitArgs('--message "-F"')).toStrictEqual(['--message', '-F']);
+    expect(matchGitArgs('-m-F')).toStrictEqual(['-m-F']);
+    expect(matchGitArgs('v1.0.0 -a -m "-F"')).toStrictEqual([
+      'v1.0.0',
+      '-a',
+      '-m',
+      '-F',
+    ]);
+  });
+
+  it('still rejects a real -F after a message value', () => {
+    expect(() => matchGitArgs('-m "ok" -F ../secrets')).toThrow(
+      /message from a file/,
+    );
+  });
 });
 
 describe('pickGitIdentityConfig', () => {

@@ -129,6 +129,26 @@ const DANGEROUS_MESSAGE_FILE_OPTIONS: ReadonlyArray<{
   minPrefix: string;
 }> = [{canonical: 'file', minPrefix: 'fi'}];
 
+/**
+ * Long options whose next argv token is a value, not another option.
+ * Used so literals like `-m '-F'` are not treated as a message-file flag.
+ */
+const LONG_OPTIONS_WITH_SEPARATE_ARG: ReadonlyArray<{
+  canonical: string;
+  minPrefix: string;
+}> = [
+  {canonical: 'message', minPrefix: 'mes'},
+  {canonical: 'local-user', minPrefix: 'local-'},
+  {canonical: 'cleanup', minPrefix: 'cleanup'},
+  {canonical: 'file', minPrefix: 'fi'},
+  {canonical: 'upload-pack', minPrefix: 'upl'},
+  {canonical: 'receive-pack', minPrefix: 'rece'},
+  {canonical: 'exec', minPrefix: 'e'},
+];
+
+/** Short options that take a value (glued or as the following argv token). */
+const SHORT_OPTIONS_WITH_ARG = new Set(['m', 'u', 'F']);
+
 function getLongOptionName(arg: string): string | undefined {
   if (!arg.startsWith('--') || arg === '--') return undefined;
   const body = arg.slice(2);
@@ -136,7 +156,12 @@ function getLongOptionName(arg: string): string | undefined {
   return (eq === -1 ? body : body.slice(0, eq)).toLowerCase();
 }
 
-function matchesDangerousLongOption(
+function longOptionHasInlineValue(arg: string): boolean {
+  if (!arg.startsWith('--') || arg === '--') return false;
+  return arg.slice(2).includes('=');
+}
+
+function matchesLongOptionPrefix(
   arg: string,
   options: ReadonlyArray<{canonical: string; minPrefix: string}>,
 ): boolean {
@@ -149,23 +174,56 @@ function matchesDangerousLongOption(
 }
 
 function isDangerousRemoteHelperOption(arg: string): boolean {
-  return matchesDangerousLongOption(arg, DANGEROUS_REMOTE_HELPER_OPTIONS);
+  return matchesLongOptionPrefix(arg, DANGEROUS_REMOTE_HELPER_OPTIONS);
 }
 
 /**
  * True for `-F`, glued forms like `-F/path`, and short-option clusters that
- * include `F` (e.g. `-aF`). Lowercase `-f` (force) is intentionally allowed.
+ * include `F` as an option letter (e.g. `-aF`). Values glued after an
+ * argument-taking option (e.g. `-m-F`) are not treated as flags. Lowercase
+ * `-f` (force) is intentionally allowed.
  */
 function isDangerousMessageFileShortOption(arg: string): boolean {
   if (!arg.startsWith('-') || arg.startsWith('--')) return false;
-  return /F/.test(arg.slice(1));
+  const body = arg.slice(1);
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (ch === 'F') return true;
+    if (SHORT_OPTIONS_WITH_ARG.has(ch)) {
+      // Remainder is the option's value, not further option letters.
+      return false;
+    }
+  }
+  return false;
 }
 
 function isDangerousMessageFileOption(arg: string): boolean {
   return (
-    matchesDangerousLongOption(arg, DANGEROUS_MESSAGE_FILE_OPTIONS) ||
+    matchesLongOptionPrefix(arg, DANGEROUS_MESSAGE_FILE_OPTIONS) ||
     isDangerousMessageFileShortOption(arg)
   );
+}
+
+/**
+ * Whether this token causes Git to treat the next argv element as a value
+ * (so that value must not be classified as an option).
+ */
+function consumesFollowingArgument(arg: string): boolean {
+  if (arg.startsWith('--') && arg !== '--') {
+    if (longOptionHasInlineValue(arg)) return false;
+    return matchesLongOptionPrefix(arg, LONG_OPTIONS_WITH_SEPARATE_ARG);
+  }
+  if (!arg.startsWith('-') || arg.startsWith('--')) return false;
+
+  const body = arg.slice(1);
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (SHORT_OPTIONS_WITH_ARG.has(ch)) {
+      // Glued value after the option letter → no separate following argv.
+      return i === body.length - 1;
+    }
+  }
+  return false;
 }
 
 /**
@@ -201,7 +259,13 @@ export function matchGitArgs(string: string) {
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`);
 
+  let skipNext = false;
   for (const arg of parsed) {
+    if (skipNext) {
+      skipNext = false;
+      continue;
+    }
+
     if (isDangerousRemoteHelperOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
@@ -212,6 +276,8 @@ export function matchGitArgs(string: string) {
         `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
       );
     }
+
+    skipNext = consumesFollowingArgument(arg);
   }
 
   return parsed;
