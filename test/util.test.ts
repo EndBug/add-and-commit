@@ -431,4 +431,17 @@ describe('neutralizeForLog', () => {
     expect(neutralizeForLog(42)).toBe(42);
     expect(neutralizeForLog(true)).toBe(true);
   });
+
+  it('returns a marker for circular references', () => {
+    const obj: Record<string, unknown> = {path: 'ok.txt'};
+    obj.self = obj;
+    const arr: unknown[] = ['a'];
+    arr.push(arr);
+
+    expect(neutralizeForLog(obj)).toStrictEqual({
+      path: 'ok.txt',
+      self: '[Circular]',
+    });
+    expect(neutralizeForLog(arr)).toStrictEqual(['a', '[Circular]']);
+  });
 });

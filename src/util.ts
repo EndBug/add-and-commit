@@ -50,11 +50,18 @@ export function neutralizeLogString(s: string): string {
   });
 }
 
+const CIRCULAR_LOG_MARKER = '[Circular]';
+
 /**
  * Recursively neutralizes strings in values passed to log sinks (StatusSummary,
  * commit results, Error messages, etc.).
+ * Tracks visited arrays/objects so circular references become a marker instead
+ * of overflowing the stack.
  */
-export function neutralizeForLog(value: unknown): unknown {
+export function neutralizeForLog(
+  value: unknown,
+  seen: WeakSet<object> = new WeakSet(),
+): unknown {
   if (typeof value === 'string') return neutralizeLogString(value);
   if (
     typeof value === 'number' ||
@@ -73,14 +80,18 @@ export function neutralizeForLog(value: unknown): unknown {
     return sanitized;
   }
   if (Array.isArray(value)) {
-    return value.map(neutralizeForLog);
+    if (seen.has(value)) return CIRCULAR_LOG_MARKER;
+    seen.add(value);
+    return value.map(item => neutralizeForLog(item, seen));
   }
   if (typeof value === 'object') {
+    if (seen.has(value)) return CIRCULAR_LOG_MARKER;
+    seen.add(value);
     const out: Record<string, unknown> = {};
     for (const [key, nested] of Object.entries(
       value as Record<string, unknown>,
     )) {
-      out[neutralizeLogString(key)] = neutralizeForLog(nested);
+      out[neutralizeLogString(key)] = neutralizeForLog(nested, seen);
     }
     return out;
   }
