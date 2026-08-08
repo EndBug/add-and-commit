@@ -4,6 +4,7 @@ import {
   findUnexpectedGitlinks,
   matchGitArgs,
   parseInputArray,
+  pickGitIdentityConfig,
 } from '../src/util';
 
 describe('parseInputArray', () => {
@@ -136,6 +137,13 @@ describe('matchGitArgs', () => {
       '--force',
     ]);
     expect(matchGitArgs('--set-upstream')).toStrictEqual(['--set-upstream']);
+    expect(matchGitArgs('v1.0.0 --force')).toStrictEqual(['v1.0.0', '--force']);
+    expect(matchGitArgs('-a -m "release"')).toStrictEqual([
+      '-a',
+      '-m',
+      'release',
+    ]);
+    expect(matchGitArgs('v1.0.0 -f')).toStrictEqual(['v1.0.0', '-f']);
   });
 
   it('returns an empty array for blank input', () => {
@@ -160,7 +168,7 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--exec=/bin/sh')).toThrow(/not allowed/);
   });
 
-  it('rejects abbreviations of blocked options', () => {
+  it('rejects abbreviations of blocked remote-helper options', () => {
     expect(() => matchGitArgs('--upl=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--uplo=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--upload-pac=evil')).toThrow(/not allowed/);
@@ -170,6 +178,118 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
+  });
+
+  it('rejects unmatched quotes that would inject flags via string-argv', () => {
+    expect(() => matchGitArgs("origin fix'--force --set-upstream")).toThrow(
+      /unmatched ' quote/,
+    );
+    expect(() => matchGitArgs('origin fix"--force --set-upstream')).toThrow(
+      /unmatched " quote/,
+    );
+  });
+
+  it('parses balanced quotes without treating them as injection', () => {
+    expect(matchGitArgs("origin a'b'c --set-upstream")).toStrictEqual([
+      'origin',
+      "a'b'c",
+      '--set-upstream',
+    ]);
+    expect(matchGitArgs("--longOption 'hello world'")).toStrictEqual([
+      '--longOption',
+      'hello world',
+    ]);
+    expect(
+      matchGitArgs('--longOption \'This uses the "other" quotes\''),
+    ).toStrictEqual(['--longOption', 'This uses the "other" quotes']);
+  });
+
+  it('rejects -F / --file message-from-file flags (PoC form)', () => {
+    expect(() =>
+      matchGitArgs('1.0.0 -F ../runner-secrets/aws-credentials.txt'),
+    ).toThrow(/not allowed/);
+    expect(() => matchGitArgs('-F ../secrets')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('--file=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('--file ../secrets')).toThrow(
+      /message from a file/,
+    );
+  });
+
+  it('rejects --file abbreviations and short-option clusters containing F', () => {
+    expect(() => matchGitArgs('--fi=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('--fil=../secrets')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('-aF ../secrets')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('-Fa')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('-F../secrets')).toThrow(/message from a file/);
+  });
+
+  it('preserves -m / --message values that look like -F/--file', () => {
+    expect(matchGitArgs('-m "-F"')).toStrictEqual(['-m', '-F']);
+    expect(matchGitArgs('-m --file=/tmp/value')).toStrictEqual([
+      '-m',
+      '--file=/tmp/value',
+    ]);
+    expect(matchGitArgs('--message "-F"')).toStrictEqual(['--message', '-F']);
+    expect(matchGitArgs('-m-F')).toStrictEqual(['-m-F']);
+    expect(matchGitArgs('v1.0.0 -a -m "-F"')).toStrictEqual([
+      'v1.0.0',
+      '-a',
+      '-m',
+      '-F',
+    ]);
+  });
+
+  it('still rejects a real -F after a message value', () => {
+    expect(() => matchGitArgs('-m "ok" -F ../secrets')).toThrow(
+      /message from a file/,
+    );
+  });
+});
+
+describe('pickGitIdentityConfig', () => {
+  it('keeps only identity keys', () => {
+    const picked = pickGitIdentityConfig({
+      'user.name': 'Alice',
+      'user.email': 'alice@example.com',
+      'author.name': 'Alice',
+      'author.email': 'alice@example.com',
+      'committer.name': 'Bot',
+      'committer.email': 'bot@example.com',
+      'http.https://github.com/.extraheader':
+        'AUTHORIZATION: basic dGVzdDp0b2tlbg==',
+      'credential.helper': 'store',
+      'remote.origin.url':
+        'https://x-access-token:ghp_secret@github.com/o/r.git',
+      'core.sshCommand': 'ssh -i /secrets/id_rsa',
+    });
+
+    expect(picked).toStrictEqual({
+      'user.name': 'Alice',
+      'user.email': 'alice@example.com',
+      'author.name': 'Alice',
+      'author.email': 'alice@example.com',
+      'committer.name': 'Bot',
+      'committer.email': 'bot@example.com',
+    });
+    expect(picked).not.toHaveProperty('http.https://github.com/.extraheader');
+    expect(picked).not.toHaveProperty('credential.helper');
+    expect(picked).not.toHaveProperty('remote.origin.url');
+    expect(picked).not.toHaveProperty('core.sshCommand');
+  });
+
+  it('returns an empty object when no identity keys are present', () => {
+    expect(
+      pickGitIdentityConfig({
+        'http.https://github.com/.extraheader':
+          'AUTHORIZATION: basic dGVzdDp0b2tlbg==',
+      }),
+    ).toStrictEqual({});
   });
 });
 
