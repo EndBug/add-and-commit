@@ -327,6 +327,27 @@ describe('findUnexpectedGitlinks', () => {
     ).toStrictEqual([]);
   });
 
+  it('flags rename/copy into a gitlink and uses the destination path', () => {
+    expect(
+      findUnexpectedGitlinks(
+        ':100644 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 R100\told_name\tnested_renamed',
+      ),
+    ).toStrictEqual(['nested_renamed']);
+    expect(
+      findUnexpectedGitlinks(
+        ':100644 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 C75\tsrc_file\tnested_copied',
+      ),
+    ).toStrictEqual(['nested_copied']);
+  });
+
+  it('allows rename/copy that stays a gitlink (160000→160000)', () => {
+    expect(
+      findUnexpectedGitlinks(
+        ':160000 160000 abcdefabcdefabcdefabcdefabcdefabcdefabcd 8ec20b7a40813dbf999aa0c19053ccfe3a72cdd5 R100\told_sub\tnew_sub',
+      ),
+    ).toStrictEqual([]);
+  });
+
   it('collects multiple unexpected gitlinks among mixed changes', () => {
     const raw = [
       ':000000 100644 0000000000000000000000000000000000000000 abcdefabcdefabcdefabcdefabcdefabcdefabcd A\tok.txt',
@@ -351,7 +372,7 @@ describe('assertNoUnexpectedGitlinks', () => {
       /evil_nested_repo/,
     );
     expect(() => assertNoUnexpectedGitlinks(['evil_nested_repo'])).toThrow(
-      /git rm --cached evil_nested_repo/,
+      /git rm --cached -- evil_nested_repo/,
     );
   });
 });

@@ -315,18 +315,20 @@ export function matchGitArgs(string: string) {
  * are allowed.
  *
  * Raw line shape: `:oldmode newmode oldsha newsha status\tpath`
+ * Rename/copy: `:oldmode newmode oldsha newsha status\toldpath\tnewpath`
+ * Status may include a score (e.g. `R100`, `C75`).
  */
 export function findUnexpectedGitlinks(diffCachedRaw: string): string[] {
   const paths: string[] = [];
   for (const line of diffCachedRaw.split('\n')) {
     if (!line.startsWith(':')) continue;
     const match = line.match(
-      /^:(\d{6}) (\d{6}) [0-9a-f]+ [0-9a-f]+ [A-Z]\t(.+)$/,
+      /^:(\d{6}) (\d{6}) [0-9a-f]+ [0-9a-f]+ [A-Z]\d*\t([^\t]+)(?:\t(.+))?$/,
     );
     if (!match) continue;
-    const [, oldMode, newMode, filePath] = match;
+    const [, oldMode, newMode, srcPath, dstPath] = match;
     if (newMode === '160000' && oldMode !== '160000') {
-      paths.push(filePath);
+      paths.push(dstPath ?? srcPath);
     }
   }
   return paths;
@@ -339,7 +341,7 @@ export function assertNoUnexpectedGitlinks(paths: string[]): void {
   if (paths.length === 0) return;
 
   const listed = paths.map(p => `  - ${p}`).join('\n');
-  const rmHints = paths.map(p => `  git rm --cached ${p}`).join('\n');
+  const rmHints = paths.map(p => `  git rm --cached -- ${p}`).join('\n');
   throw new Error(
     `Refusing to commit unexpected gitlink(s) (embedded git repository staged as mode 160000):\n${listed}\n` +
       'Git records a nested .git directory as a gitlink, not as its files. ' +
