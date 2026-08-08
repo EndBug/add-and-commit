@@ -6,8 +6,9 @@
     "composite": false,
     "declaration": false,
     "module": "ES2022",
-    "moduleResolution": "node",
-    "esModuleInterop": true
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "types": ["node", "jest"]
   },
   "include": [
     "src/**/*.ts",
