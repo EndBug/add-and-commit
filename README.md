@@ -55,6 +55,11 @@ Add a step like this to your workflow:
     # Default: github_actor
     default_author: github_actor
 
+    # If true, validate inputs and report what would happen without mutating the repo
+    # (no real add/rm/commit/tag/push/pull/fetch/checkout/config). Useful for tinkering.
+    # Default: false
+    dry_run: true
+
     # Arguments for the git fetch command. If set to false, the action won't fetch the repo.
     # For more info as to why fetching is usually recommended, please see the "Performance on large repos" FAQ. 
     # Default: --tags --force
@@ -162,6 +167,11 @@ If you want to commit files "across different branches", here are two ways to do
 You can use the `tag` option to enter the arguments for a `git tag` command. In order for the action to isolate the tag name from the rest of the arguments, it should be the first word not preceded by an hyphen (e.g. `-a tag-name -m "some other stuff"` is ok).  
 You can also change the arguments of the push command for tags: every argument in the `tag_push` input will be appended to the `git push --tags` command.  
 For more info on how git arguments are parsed, see [the "Git arguments" section](#git-arguments).
+
+### Dry run
+
+Set `dry_run: true` if you want the action to validate your inputs and log what it would do, without changing the repository. Staging uses `git add --dry-run` / `git rm --dry-run`; commit, tag, push, pull, fetch, checkout, and git identity config are only reported in the logs.  
+Outputs stay at their defaults (`committed`/`pushed`/`tagged`/`tag_pushed` are `'false'`, and commit SHAs are empty) because nothing was actually created.
 
 ## Outputs
 
