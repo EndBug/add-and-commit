@@ -430,9 +430,19 @@ async function assertGitlinksWithTempIndex(
     if (fs.existsSync(indexPath)) {
       fs.copyFileSync(indexPath, tmpIndex);
     } else {
-      await simpleGit({baseDir})
-        .env({...process.env, GIT_INDEX_FILE: tmpIndex})
-        .raw(['read-tree', 'HEAD']);
+      const gitSeed = simpleGit({baseDir}).env({
+        ...process.env,
+        GIT_INDEX_FILE: tmpIndex,
+      });
+      const headResolves = await git
+        .raw(['rev-parse', '--verify', 'HEAD'])
+        .then(() => true)
+        .catch(() => false);
+      if (headResolves) {
+        await gitSeed.raw(['read-tree', 'HEAD']);
+      } else {
+        await gitSeed.raw(['read-tree', '--empty']);
+      }
     }
 
     const gitTmp = simpleGit({baseDir}).env({
