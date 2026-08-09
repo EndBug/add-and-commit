@@ -10,7 +10,7 @@ export interface InputTypes {
   committer_email: string;
   cwd: string;
   default_author: 'github_actor' | 'user_info' | 'github_actions';
-  dry_run: string;
+  dry_run: boolean;
   fetch: string;
   message: string;
   new_branch: string | undefined;

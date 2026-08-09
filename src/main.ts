@@ -1,4 +1,6 @@
 import * as core from '@actions/core';
+import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import simpleGit, {Response} from 'simple-git';
 import {checkInputs, getInput, logOutputs, setOutput} from './io';
@@ -394,12 +396,82 @@ async function add(
     );
   }
 
-  if (!dryRun) {
+  if (dryRun) {
+    await assertGitlinksWithTempIndex(parsed, ignoreErrors);
+  } else {
     const cachedRaw = await git.raw(['diff', '--cached', '--raw']);
     assertNoUnexpectedGitlinks(findUnexpectedGitlinks(cachedRaw));
   }
 
   return res;
+}
+
+/**
+ * Stages `add` pathspecs into an isolated temporary index and rejects unexpected
+ * gitlinks, without touching the repository's real index.
+ */
+async function assertGitlinksWithTempIndex(
+  addArgGroups: string[],
+  ignoreErrors: 'all' | 'pathspec' | 'none',
+) {
+  const tmpIndex = path.join(
+    os.tmpdir(),
+    `add-and-commit-${process.pid}-${Date.now()}.index`,
+  );
+
+  try {
+    const indexPathRaw = (
+      await git.raw(['rev-parse', '--git-path', 'index'])
+    ).trim();
+    const indexPath = path.isAbsolute(indexPathRaw)
+      ? indexPathRaw
+      : path.join(baseDir, indexPathRaw);
+
+    if (fs.existsSync(indexPath)) {
+      fs.copyFileSync(indexPath, tmpIndex);
+    } else {
+      await simpleGit({baseDir})
+        .env({...process.env, GIT_INDEX_FILE: tmpIndex})
+        .raw(['read-tree', 'HEAD']);
+    }
+
+    const gitTmp = simpleGit({baseDir}).env({
+      ...process.env,
+      GIT_INDEX_FILE: tmpIndex,
+    });
+
+    for (const args of addArgGroups) {
+      await gitTmp
+        .add(matchGitArgs(args), (err, data) =>
+          log(ignoreErrors === 'all' ? null : err, data),
+        )
+        .catch((e: Error) => {
+          if (ignoreErrors === 'all') return;
+
+          if (
+            e.message.includes('fatal: pathspec') &&
+            e.message.includes('did not match any files')
+          ) {
+            // Pathspec outcomes were already handled by the dry-run add probes.
+            if (ignoreErrors === 'pathspec') return;
+            const peh = getInput('pathspec_error_handling');
+            if (peh === 'exitImmediately') {
+              throw new Error(
+                `Add command did not match any file: git add ${args}`,
+              );
+            }
+            return;
+          }
+          throw e;
+        });
+    }
+
+    const cachedRaw = await gitTmp.raw(['diff', '--cached', '--raw']);
+    assertNoUnexpectedGitlinks(findUnexpectedGitlinks(cachedRaw));
+  } finally {
+    fs.rmSync(tmpIndex, {force: true});
+    fs.rmSync(`${tmpIndex}.lock`, {force: true});
+  }
 }
 
 async function remove(
