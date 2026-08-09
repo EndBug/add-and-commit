@@ -553,6 +553,15 @@
       "contributions": [
         "maintenance"
       ]
+    },
+    {
+      "login": "nmattia",
+      "name": "Nicolas Mattia",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6930756?v=4",
+      "profile": "https://nmattia.com",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
