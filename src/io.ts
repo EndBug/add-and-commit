@@ -17,6 +17,7 @@ export interface InputTypes {
   pathspec_error_handling: 'ignore' | 'exitImmediately' | 'exitAtEnd';
   pull: string | undefined;
   push: string;
+  push_attempts: string;
   remove: string | undefined;
   tag: string | undefined;
   tag_push: string | undefined;
@@ -63,6 +64,26 @@ export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
   core.debug(`Setting output: ${name}=${value}`);
   outputs[name] = value;
   core.setOutput(name, value);
+}
+
+/**
+ * Parses `push_attempts` as a positive integer (≥ 1).
+ * Accepts only base-10 integer strings (optional leading `+`).
+ */
+export function parsePushAttempts(value: string): number {
+  const trimmed = value.trim();
+  if (!/^\+?\d+$/.test(trimmed)) {
+    throw new Error(
+      `'${value}' is not a valid value for push_attempts. It must be a positive integer (≥ 1).`,
+    );
+  }
+  const parsed = Number.parseInt(trimmed, 10);
+  if (!Number.isSafeInteger(parsed) || parsed < 1) {
+    throw new Error(
+      `'${value}' is not a valid value for push_attempts. It must be a positive integer (≥ 1).`,
+    );
+  }
+  return parsed;
 }
 
 export function logOutputs() {
@@ -264,6 +285,16 @@ export async function checkInputs() {
     }
 
     core.debug(`Current push option: '${value}' (parsed as ${typeof value})`);
+  }
+  // #endregion
+
+  // #region push_attempts
+  const pushAttempts = parsePushAttempts(getInput('push_attempts') || '1');
+  core.debug(`Current push_attempts option: ${pushAttempts}`);
+  if (pushAttempts > 1 && !getInput('pull')) {
+    core.warning(
+      'push_attempts is greater than 1 but pull is not set. Retries will re-run push only; without pull (e.g. --rebase), concurrent remote updates are unlikely to recover.',
+    );
   }
   // #endregion
 

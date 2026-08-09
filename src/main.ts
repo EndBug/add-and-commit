@@ -3,7 +3,13 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import simpleGit, {Response} from 'simple-git';
-import {checkInputs, getInput, logOutputs, setOutput} from './io';
+import {
+  checkInputs,
+  getInput,
+  logOutputs,
+  parsePushAttempts,
+  setOutput,
+} from './io';
 import {
   assertNoUnexpectedGitlinks,
   findUnexpectedGitlinks,
@@ -131,28 +137,7 @@ core.info(`Running in ${baseDir}`);
 
     const pullOption = getInput('pull');
     if (pullOption) {
-      core.info('> Pulling from remote...');
-      core.debug(`Current git pull arguments: ${pullOption}`);
-      await git
-        .fetch(undefined, log)
-        .pull(undefined, undefined, matchGitArgs(pullOption), log);
-
-      core.info('> Checking for conflicts...');
-      const status = await git.status(undefined, log);
-
-      if (!status.conflicted.length) {
-        core.info('> No conflicts found.');
-        core.info('> Re-staging files...');
-        if (getInput('add')) await add(ignoreErrors);
-        if (getInput('remove')) await remove(ignoreErrors);
-      } else
-        throw new Error(
-          `There are ${
-            status.conflicted.length
-          } conflicting files: ${status.conflicted
-            .map(neutralizeLogString)
-            .join(', ')}`,
-        );
+      await pullFromRemote(pullOption, {restage: true, ignoreErrors});
     } else core.info('> Not pulling from repo.');
 
     core.info('> Creating commit...');
@@ -199,43 +184,36 @@ core.info(`Running in ${baseDir}`);
       pushOption = getInput('push');
     }
     if (pushOption) {
-      // If the options is `true | string`...
-      core.info('> Pushing commit to repo...');
+      const pushAttempts = parsePushAttempts(getInput('push_attempts') || '1');
 
-      if (pushOption === true) {
-        const branch = getInput('new_branch');
-        if (branch) {
-          core.debug(`Running: git push --set-upstream origin -- ${branch}`);
-          await git.raw(
-            ['push', '--set-upstream', 'origin', '--', branch],
-            (err, data?) => {
-              if (data) setOutput('pushed', 'true');
-              return log(err, data);
-            },
+      for (let attempt = 1; attempt <= pushAttempts; attempt++) {
+        try {
+          core.info(
+            pushAttempts > 1
+              ? `> Pushing commit to repo (attempt ${attempt}/${pushAttempts})...`
+              : '> Pushing commit to repo...',
           );
-        } else {
-          core.debug('Running: git push origin --set-upstream');
-          await git.push(
-            'origin',
-            undefined,
-            {'--set-upstream': null},
-            (err, data?) => {
-              if (data) setOutput('pushed', 'true');
-              return log(err, data);
-            },
+          await pushCommit(pushOption);
+          break;
+        } catch (err) {
+          if (attempt === pushAttempts) throw err;
+
+          const message = err instanceof Error ? err.message : String(err);
+          core.warning(
+            `Push failed (attempt ${attempt}/${pushAttempts}): ${neutralizeLogString(message)}`,
           );
+
+          if (pullOption) {
+            await pullFromRemote(pullOption, {
+              restage: false,
+              ignoreErrors,
+            });
+            // Rebase rewrites the commit; refresh outputs from HEAD.
+            const head = (await git.revparse(['HEAD'])).trim();
+            setOutput('commit_long_sha', head);
+            setOutput('commit_sha', head.substring(0, 7));
+          }
         }
-      } else {
-        core.debug(`Running: git push ${pushOption}`);
-        await git.push(
-          undefined,
-          undefined,
-          matchGitArgs(pushOption),
-          (err, data?) => {
-            if (data) setOutput('pushed', 'true');
-            return log(err, data);
-          },
-        );
       }
 
       if (getInput('tag')) {
@@ -334,14 +312,24 @@ async function logDryRunRemainingSteps() {
     pushOption = getInput('push');
   }
   if (pushOption) {
+    const pushAttempts = parsePushAttempts(getInput('push_attempts') || '1');
     if (pushOption === true) {
       const branch = getInput('new_branch');
       core.info(
         branch
-          ? `> Would push commit to repo (set upstream for '${branch}').`
-          : '> Would push commit to repo.',
+          ? `> Would push commit to repo (set upstream for '${branch}')${
+              pushAttempts > 1 ? ` with up to ${pushAttempts} attempts` : ''
+            }.`
+          : `> Would push commit to repo${
+              pushAttempts > 1 ? ` with up to ${pushAttempts} attempts` : ''
+            }.`,
       );
-    } else core.info(`> Would push commit to repo with: ${pushOption}.`);
+    } else
+      core.info(
+        `> Would push commit to repo with: ${pushOption}${
+          pushAttempts > 1 ? ` (up to ${pushAttempts} attempts)` : ''
+        }.`,
+      );
 
     if (getInput('tag')) {
       core.info(
@@ -351,6 +339,78 @@ async function logDryRunRemainingSteps() {
       );
     } else core.info('> No tags to push.');
   } else core.info('> Would not push anything.');
+}
+
+async function pullFromRemote(
+  pullOption: string,
+  options: {
+    restage: boolean;
+    ignoreErrors: 'all' | 'pathspec' | 'none';
+  },
+) {
+  core.info('> Pulling from remote...');
+  core.debug(`Current git pull arguments: ${pullOption}`);
+  await git
+    .fetch(undefined, log)
+    .pull(undefined, undefined, matchGitArgs(pullOption), log);
+
+  core.info('> Checking for conflicts...');
+  const status = await git.status(undefined, log);
+
+  if (status.conflicted.length) {
+    throw new Error(
+      `There are ${
+        status.conflicted.length
+      } conflicting files: ${status.conflicted
+        .map(neutralizeLogString)
+        .join(', ')}`,
+    );
+  }
+
+  core.info('> No conflicts found.');
+  if (options.restage) {
+    core.info('> Re-staging files...');
+    if (getInput('add')) await add(options.ignoreErrors);
+    if (getInput('remove')) await remove(options.ignoreErrors);
+  }
+}
+
+async function pushCommit(pushOption: true | string) {
+  if (pushOption === true) {
+    const branch = getInput('new_branch');
+    if (branch) {
+      core.debug(`Running: git push --set-upstream origin -- ${branch}`);
+      await git.raw(
+        ['push', '--set-upstream', 'origin', '--', branch],
+        (err, data?) => {
+          if (data) setOutput('pushed', 'true');
+          return log(err, data);
+        },
+      );
+    } else {
+      core.debug('Running: git push origin --set-upstream');
+      await git.push(
+        'origin',
+        undefined,
+        {'--set-upstream': null},
+        (err, data?) => {
+          if (data) setOutput('pushed', 'true');
+          return log(err, data);
+        },
+      );
+    }
+  } else {
+    core.debug(`Running: git push ${pushOption}`);
+    await git.push(
+      undefined,
+      undefined,
+      matchGitArgs(pushOption),
+      (err, data?) => {
+        if (data) setOutput('pushed', 'true');
+        return log(err, data);
+      },
+    );
+  }
 }
 
 async function add(
