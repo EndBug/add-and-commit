@@ -10,6 +10,7 @@ export interface InputTypes {
   committer_email: string;
   cwd: string;
   default_author: 'github_actor' | 'user_info' | 'github_actions';
+  dry_run: string;
   fetch: string;
   message: string;
   new_branch: string | undefined;
@@ -123,6 +124,13 @@ export async function checkInputs() {
       )}' is not a valid value for default_author. Valid values: ${default_author_valid.join(
         ', ',
       )}`,
+    );
+  // #endregion
+
+  // #region dry_run
+  if (getInput('dry_run', true))
+    core.info(
+      '> Dry run enabled: no mutating git operations will be performed.',
     );
   // #endregion
 
