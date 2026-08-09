@@ -5,6 +5,7 @@ import {
   type Fixture,
   gitLog,
   gitRevParse,
+  initNestedGitRepo,
   listFilesAtHead,
   remoteHasRef,
   removeFile,
@@ -65,6 +66,60 @@ describe('action integration', () => {
     expect(result.outputs.pushed).toBe('false');
     expect(result.outputs.commit_long_sha || undefined).toBeUndefined();
     expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+  });
+
+  it('dry_run reports without committing or changing the tree', () => {
+    const f = fixture!;
+    writeFile(f.local, 'dry-run.txt', 'preview\n');
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Would commit',
+      dry_run: 'true',
+      push: 'true',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(result.outputs.pushed).toBe('false');
+    expect(result.outputs.commit_long_sha || undefined).toBeUndefined();
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(listFilesAtHead(f.local)).not.toContain('dry-run.txt');
+    expect(fs.existsSync(path.join(f.local, 'dry-run.txt'))).toBe(true);
+    expect(result.stdout).toMatch(/Dry run completed/i);
+  });
+
+  it('dry_run on a clean tree does not claim a commit', () => {
+    const f = fixture!;
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      dry_run: 'true',
+      push: 'true',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(result.outputs.pushed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(result.stdout).toMatch(/nothing would be committed/i);
+  });
+
+  it('dry_run still refuses unexpected gitlinks without mutating HEAD', () => {
+    const f = fixture!;
+    initNestedGitRepo(f.local, 'embedded');
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Would embed repo',
+      dry_run: 'true',
+      push: 'false',
+    });
+
+    expect(result.status).not.toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/gitlink/i);
   });
 
   it('applies custom author and committer', () => {

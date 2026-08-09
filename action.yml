@@ -29,6 +29,10 @@ inputs:
     description: How the action should fill missing author name or email.
     required: false
     default: 'github_actor'
+  dry_run:
+    description: If true, validate and report what would happen without mutating the repo (no add/commit/push/tag/etc.)
+    required: false
+    default: 'false'
   fetch:
     description: Arguments for the git fetch command (if 'false', the action won't fetch the repo)
     required: false

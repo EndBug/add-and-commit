@@ -28,10 +28,22 @@ export interface RunActionResult {
   outputs: Record<string, string>;
 }
 
+function fixtureGitEnv(
+  base: NodeJS.ProcessEnv = process.env,
+): NodeJS.ProcessEnv {
+  const env = {...base};
+  // Husky/pre-commit and other git wrappers set GIT_* (e.g. GIT_INDEX_FILE,
+  // GIT_DIR). Those must not leak into fixture repos under os.tmpdir().
+  for (const key of Object.keys(env)) {
+    if (key.startsWith('GIT_')) delete env[key];
+  }
+  return env;
+}
+
 function git(
   args: string[],
   cwd: string,
-  env: NodeJS.ProcessEnv = process.env,
+  env: NodeJS.ProcessEnv = fixtureGitEnv(),
 ): string {
   return execFileSync('git', args, {
     cwd,
@@ -154,12 +166,14 @@ export interface ActionInputs {
   committer_email?: string;
   cwd?: string;
   default_author?: string;
+  dry_run?: string;
   fetch?: string;
   message?: string;
   new_branch?: string;
   pathspec_error_handling?: string;
   pull?: string;
   push?: string;
+  push_attempts?: string;
   remove?: string;
   tag?: string;
   tag_push?: string;
@@ -201,8 +215,10 @@ export function runAction(
     cwd: '.',
     add: '.',
     default_author: 'github_actor',
+    dry_run: 'false',
     pathspec_error_handling: 'ignore',
     push: 'false',
+    push_attempts: '1',
     fetch: 'false',
     author_name: 'Integration Tester',
     author_email: 'integration@example.com',
@@ -284,4 +300,15 @@ export function writeFile(repo: string, relativePath: string, content: string) {
 
 export function removeFile(repo: string, relativePath: string) {
   fs.unlinkSync(path.join(repo, relativePath));
+}
+
+/** Create a nested git repo under `relativeDir` (used to provoke unexpected gitlinks). */
+export function initNestedGitRepo(repo: string, relativeDir: string) {
+  const full = path.join(repo, relativeDir);
+  fs.mkdirSync(full, {recursive: true});
+  fs.writeFileSync(path.join(full, 'nested.txt'), 'nested\n');
+  git(['init'], full);
+  configureFixtureRepo(full, 'Nested Repo', 'nested@example.com');
+  git(['add', 'nested.txt'], full);
+  git(['commit', '-q', '-m', 'Nested initial'], full);
 }
