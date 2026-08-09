@@ -1,0 +1,288 @@
+import {spawnSync, execFileSync} from 'node:child_process';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../..',
+);
+const ACTION_ENTRY = path.join(REPO_ROOT, 'lib', 'index.js');
+
+export interface Fixture {
+  /** Absolute path to the bare remote repository. */
+  remote: string;
+  /** Absolute path to the local clone under test. */
+  local: string;
+  /** Default branch name used by the fixture. */
+  defaultBranch: string;
+  /** Remove the fixture root directory. */
+  cleanup: () => void;
+}
+
+export interface RunActionResult {
+  status: number | null;
+  stdout: string;
+  stderr: string;
+  outputs: Record<string, string>;
+}
+
+function git(
+  args: string[],
+  cwd: string,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  return execFileSync('git', args, {
+    cwd,
+    env,
+    encoding: 'utf8',
+  }).trim();
+}
+
+/** Local-only identity + disable signing so fixtures work when the host has gpgsign. */
+function configureFixtureRepo(repo: string, name: string, email: string) {
+  git(['config', 'user.name', name], repo);
+  git(['config', 'user.email', email], repo);
+  git(['config', 'commit.gpgsign', 'false'], repo);
+  git(['config', 'tag.gpgsign', 'false'], repo);
+}
+
+/**
+ * Create an isolated bare remote + local clone under os.tmpdir().
+ * origin always points at the local bare path (never a network URL).
+ */
+export function createFixture(): Fixture {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aac-int-'));
+  const remote = path.join(root, 'remote.git');
+  const seed = path.join(root, 'seed');
+  const local = path.join(root, 'local');
+
+  fs.mkdirSync(remote);
+  git(['init', '--bare'], remote);
+
+  // Determine default branch without touching global config.
+  const defaultBranch =
+    git(['config', '--get', 'init.defaultBranch'], REPO_ROOT) || 'main';
+
+  git(['clone', '-q', remote, seed], root);
+  // Ensure the seed repo uses a known branch name and local identity only.
+  try {
+    git(['checkout', '-b', defaultBranch], seed);
+  } catch {
+    // Already on defaultBranch.
+  }
+  configureFixtureRepo(seed, 'Fixture Seed', 'seed@example.com');
+
+  fs.writeFileSync(path.join(seed, 'README.md'), '# fixture\n');
+  git(['add', 'README.md'], seed);
+  git(['commit', '-q', '-m', 'Initial commit'], seed);
+  git(['push', '-q', '-u', 'origin', 'HEAD'], seed);
+
+  git(['clone', '-q', remote, local], root);
+  configureFixtureRepo(local, 'Fixture Local', 'local@example.com');
+
+  const originUrl = git(['remote', 'get-url', 'origin'], local);
+  assertLocalOrigin(originUrl, remote);
+
+  return {
+    remote,
+    local,
+    defaultBranch,
+    cleanup: () => {
+      fs.rmSync(root, {recursive: true, force: true});
+    },
+  };
+}
+
+/** Reject network / GitHub remotes — push tests must stay on the local bare path. */
+export function assertLocalOrigin(originUrl: string, expectedRemote: string) {
+  const normalized = originUrl.replace(/\/$/, '');
+  const expected = expectedRemote.replace(/\/$/, '');
+  if (normalized !== expected) {
+    throw new Error(
+      'Fixture origin must be the local bare path.\n' +
+        `  expected: ${expected}\n` +
+        `  actual:   ${originUrl}`,
+    );
+  }
+  if (/^https?:\/\//i.test(originUrl) || /github\.com/i.test(originUrl)) {
+    throw new Error(`Refusing non-local origin URL: ${originUrl}`);
+  }
+}
+
+function parseGitHubOutput(filePath: string): Record<string, string> {
+  if (!fs.existsSync(filePath)) return {};
+  const content = fs.readFileSync(filePath, 'utf8');
+  const outputs: Record<string, string> = {};
+  let i = 0;
+  const lines = content.split('\n');
+
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line) {
+      i++;
+      continue;
+    }
+    const heredoc = line.match(/^([^=]+)<<(.+)$/);
+    if (heredoc) {
+      const [, name, delimiter] = heredoc;
+      const valueLines: string[] = [];
+      i++;
+      while (i < lines.length && lines[i] !== delimiter) {
+        valueLines.push(lines[i]);
+        i++;
+      }
+      outputs[name] = valueLines.join('\n');
+      i++; // skip delimiter
+      continue;
+    }
+    const eq = line.indexOf('=');
+    if (eq !== -1) {
+      outputs[line.slice(0, eq)] = line.slice(eq + 1);
+    }
+    i++;
+  }
+  return outputs;
+}
+
+export interface ActionInputs {
+  add?: string;
+  author_name?: string;
+  author_email?: string;
+  commit?: string;
+  committer_name?: string;
+  committer_email?: string;
+  cwd?: string;
+  default_author?: string;
+  fetch?: string;
+  message?: string;
+  new_branch?: string;
+  pathspec_error_handling?: string;
+  pull?: string;
+  push?: string;
+  remove?: string;
+  tag?: string;
+  tag_push?: string;
+}
+
+/**
+ * Spawn the shipped action (lib/index.js) with an allowlisted environment.
+ *
+ * The action resolves the working tree as `path.join(process.cwd(), cwdInput)`.
+ * On modern Node, `path.join` does not treat an absolute second segment as a
+ * new root, so we spawn with `process.cwd()` set to the fixture and pass
+ * `cwd: '.'` rather than an absolute path.
+ */
+export function runAction(
+  fixture: Fixture,
+  inputs: ActionInputs = {},
+): RunActionResult {
+  assertLocalOrigin(
+    git(['remote', 'get-url', 'origin'], fixture.local),
+    fixture.remote,
+  );
+
+  if (!fs.existsSync(ACTION_ENTRY)) {
+    throw new Error(
+      `Missing ${ACTION_ENTRY}. Build the action (npm run build) before running integration tests.`,
+    );
+  }
+
+  const outputFile = path.join(
+    path.dirname(fixture.local),
+    `github_output_${process.pid}_${Date.now()}`,
+  );
+  fs.writeFileSync(outputFile, '');
+
+  const restInputs = {...inputs};
+  delete restInputs.cwd;
+  const merged: Record<string, string> = {
+    // Mirror action.yml defaults that matter when spawning lib/ directly.
+    cwd: '.',
+    add: '.',
+    default_author: 'github_actor',
+    pathspec_error_handling: 'ignore',
+    push: 'false',
+    fetch: 'false',
+    author_name: 'Integration Tester',
+    author_email: 'integration@example.com',
+    message: 'Integration test commit',
+    ...restInputs,
+  };
+
+  const env: NodeJS.ProcessEnv = {
+    PATH: process.env.PATH,
+    HOME: process.env.HOME,
+    TMPDIR: process.env.TMPDIR ?? os.tmpdir(),
+    LANG: process.env.LANG,
+    GITHUB_ACTOR: 'integration-tester',
+    GITHUB_WORKFLOW: 'integration-test',
+    GITHUB_OUTPUT: outputFile,
+    // Avoid picking up a real event payload if present in the parent env.
+    GITHUB_EVENT_PATH: '',
+    GITHUB_EVENT_NAME: 'push',
+    GITHUB_REF: `refs/heads/${fixture.defaultBranch}`,
+  };
+
+  for (const [key, value] of Object.entries(merged)) {
+    if (value !== undefined) {
+      env[`INPUT_${key.toUpperCase()}`] = value;
+    }
+  }
+
+  const result = spawnSync(process.execPath, [ACTION_ENTRY], {
+    // Workspace = fixture clone; action cwd input stays relative ('.').
+    cwd: fixture.local,
+    env,
+    encoding: 'utf8',
+    // Action can take a bit when doing push/tag; keep a generous limit.
+    timeout: 60_000,
+  });
+
+  const outputs = parseGitHubOutput(outputFile);
+  try {
+    fs.unlinkSync(outputFile);
+  } catch {
+    // ignore
+  }
+
+  return {
+    status: result.status,
+    stdout: result.stdout ?? '',
+    stderr: result.stderr ?? '',
+    outputs,
+  };
+}
+
+export function gitLog(repo: string, format: string, ref = 'HEAD'): string {
+  return git(['log', '-1', `--format=${format}`, ref], repo);
+}
+
+export function gitRevParse(repo: string, ref: string): string {
+  return git(['rev-parse', ref], repo);
+}
+
+export function remoteHasRef(remote: string, ref: string): boolean {
+  try {
+    git(['rev-parse', '--verify', ref], remote);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function listFilesAtHead(repo: string): string[] {
+  const out = git(['ls-tree', '-r', '--name-only', 'HEAD'], repo);
+  return out ? out.split('\n') : [];
+}
+
+export function writeFile(repo: string, relativePath: string, content: string) {
+  const full = path.join(repo, relativePath);
+  fs.mkdirSync(path.dirname(full), {recursive: true});
+  fs.writeFileSync(full, content);
+}
+
+export function removeFile(repo: string, relativePath: string) {
+  fs.unlinkSync(path.join(repo, relativePath));
+}
