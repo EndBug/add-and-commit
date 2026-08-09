@@ -59,14 +59,13 @@ export function createFixture(): Fixture {
   const local = path.join(root, 'local');
 
   fs.mkdirSync(remote);
-  git(['init', '--bare'], remote);
-
-  // Determine default branch without touching global config.
-  const defaultBranch =
-    git(['config', '--get', 'init.defaultBranch'], REPO_ROOT) || 'main';
+  // Pin branch name in the fixture; do not read host init.defaultBranch
+  // (unset on GitHub-hosted runners → git config --get exits 1).
+  const defaultBranch = 'main';
+  git(['init', '--bare', '-b', defaultBranch], remote);
 
   git(['clone', '-q', remote, seed], root);
-  // Ensure the seed repo uses a known branch name and local identity only.
+  // Empty bare clone may leave HEAD detached; create the seed branch explicitly.
   try {
     git(['checkout', '-b', defaultBranch], seed);
   } catch {
