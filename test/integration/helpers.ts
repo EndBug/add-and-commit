@@ -301,3 +301,14 @@ export function writeFile(repo: string, relativePath: string, content: string) {
 export function removeFile(repo: string, relativePath: string) {
   fs.unlinkSync(path.join(repo, relativePath));
 }
+
+/** Create a nested git repo under `relativeDir` (used to provoke unexpected gitlinks). */
+export function initNestedGitRepo(repo: string, relativeDir: string) {
+  const full = path.join(repo, relativeDir);
+  fs.mkdirSync(full, {recursive: true});
+  fs.writeFileSync(path.join(full, 'nested.txt'), 'nested\n');
+  git(['init'], full);
+  configureFixtureRepo(full, 'Nested Repo', 'nested@example.com');
+  git(['add', 'nested.txt'], full);
+  git(['commit', '-q', '-m', 'Nested initial'], full);
+}
