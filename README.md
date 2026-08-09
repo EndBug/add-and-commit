@@ -83,6 +83,10 @@ Add a step like this to your workflow:
     # Default: true
     push: false
 
+    # Max times to try pushing. If pull is set, the action re-pulls between failed attempts.
+    # Default: 1
+    push_attempts: 3
+
     # The arguments for the `git rm` command (see the paragraph below for more info)
     # Default: ''
     remove: './dir/old_file.js'
@@ -130,6 +134,14 @@ By default the action runs the following command: `git push origin ${new_branch 
   The action will use your string as the arguments for the `git push` command. Please note that nothing is used other than your arguments, and the command will result in `git push ${push input}` (no remote, no branch, no `--set-upstream`, you have to include them yourself).
 
 One way to use this is if you want to force push to a trusted/static branch name in your repo: set the `push` input to, for example, `origin yourBranch --force`. Do not build that string from untrusted refs such as `github.head_ref`.
+
+If multiple jobs may push to the same branch (for example a matrix), set `push_attempts` to try the push more than once. When `pull` is set, each failed attempt re-runs that pull (e.g. `--rebase --autostash`) before pushing again, so a commit that lost a race can catch up to the remote tip. Without `pull`, retries only re-run push. The default is `1` (no retries). A typical concurrent setup looks like:
+
+```yaml
+with:
+  pull: '--rebase --autostash'
+  push_attempts: 3
+```
 
 ### Creating a new branch
 
