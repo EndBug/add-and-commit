@@ -123,6 +123,23 @@ describe('action integration', () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/gitlink/i);
   });
 
+  it('rejects remote-helper overrides after -u in fetch args', () => {
+    const f = fixture!;
+    writeFile(f.local, 'fetch-args.txt', 'changed\n');
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Should not fetch with blocked args',
+      fetch: '-u --upl=evil',
+      push: 'false',
+    });
+
+    expect(result.status).not.toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/not allowed/);
+  });
+
   it('applies custom author and committer', () => {
     const f = fixture!;
     writeFile(f.local, 'id.txt', 'id\n');
@@ -338,5 +355,58 @@ describe('action integration', () => {
     expect(listFilesAtHead(f.local)).not.toContain('dry-pull.txt');
     expect(result.stdout).toMatch(/> Would pull from remote\./);
     expect(result.stdout).not.toMatch(/with: true/);
+  });
+
+  it('commits when cwd is an absolute path and process.cwd differs', () => {
+    const f = fixture!;
+    writeFile(f.local, 'abs-cwd.txt', 'absolute\n');
+    const before = gitRevParse(f.local, 'HEAD');
+    // Spawn from the fixture parent so process.cwd() !== the git work tree.
+    const spawnCwd = path.dirname(f.local);
+
+    const result = runAction(
+      f,
+      {
+        message: 'Absolute cwd commit',
+        cwd: f.local,
+        push: 'false',
+      },
+      {spawnCwd},
+    );
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.stdout).toMatch(
+      new RegExp(`Running in ${f.local.replace(/\\/g, '\\\\')}`),
+    );
+    const after = gitRevParse(f.local, 'HEAD');
+    expect(after).not.toBe(before);
+    expect(after).toBe(result.outputs.commit_long_sha);
+    expect(listFilesAtHead(f.local)).toContain('abs-cwd.txt');
+  });
+
+  it('fails clearly when cwd does not exist without dumping the bundle', () => {
+    const f = fixture!;
+    const missing = path.join(
+      path.dirname(f.local),
+      `missing-cwd-${process.pid}-${Date.now()}`,
+    );
+
+    const result = runAction(
+      f,
+      {
+        cwd: missing,
+        push: 'false',
+      },
+      {spawnCwd: path.dirname(f.local)},
+    );
+
+    expect(result.status).not.toBe(0);
+    const combined = `${result.stdout}\n${result.stderr}`;
+    expect(combined).toMatch(/not an existing directory/);
+    expect(combined).toContain(missing);
+    // Uncaught throws from the minified bundle dump the whole line of source.
+    expect(combined).not.toMatch(/function isObject/);
+    expect(combined.length).toBeLessThan(50_000);
   });
 });

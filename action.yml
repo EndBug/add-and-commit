@@ -22,7 +22,7 @@ inputs:
     description: The email of the custom committer you want to use
     required: false
   cwd:
-    description: The directory where your repository is located. You should use actions/checkout first to set it up
+    description: The directory where your repository is located (relative to the runner workspace, or an absolute path). You should use actions/checkout first to set it up. In with:, use ${{ github.workspace }} — $GITHUB_WORKSPACE is not expanded.
     required: false
     default: '.'
   default_author:
@@ -67,6 +67,11 @@ inputs:
   tag_push:
     description: Arguments for the git push --tags command (any additional argument will be added after --tags)
     required: false
+
+  allow_unsafe_git_protocols:
+    description: 'If true, disables the transport protocol allowlist (https/http/ssh/file/git) and allows scheme:: remote-helper URLs in git argument inputs. Keep false unless you need a custom remote helper and fully trust those inputs.'
+    required: false
+    default: 'false'
 
   # Input not required from the user
   github_token:
