@@ -481,6 +481,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://nmattia.com"><img src="https://avatars.githubusercontent.com/u/6930756?v=4?s=100" width="100px;" alt="Nicolas Mattia"/><br /><sub><b>Nicolas Mattia</b></sub></a><br /><a href="#ideas-nmattia" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://jcbhmr.com/"><img src="https://avatars.githubusercontent.com/u/61068799?v=4?s=100" width="100px;" alt="Jacob Hummer"/><br /><sub><b>Jacob Hummer</b></sub></a><br /><a href="#ideas-jcbhmr" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://ko-fi.com/beet_keeper"><img src="https://avatars.githubusercontent.com/u/1880412?v=4?s=100" width="100px;" alt="Ross Spencer"/><br /><sub><b>Ross Spencer</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Aross-spencer" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://louisabraham.github.io/"><img src="https://avatars.githubusercontent.com/u/13174805?v=4?s=100" width="100px;" alt="Louis Abraham"/><br /><sub><b>Louis Abraham</b></sub></a><br /><a href="#ideas-louisabraham" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
