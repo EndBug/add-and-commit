@@ -7,6 +7,7 @@ import {
   checkInputs,
   getInput,
   logOutputs,
+  parseBoolOrGitArgs,
   parsePushAttempts,
   setOutput,
 } from './io';
@@ -159,7 +160,7 @@ core.info(`Running in ${baseDir}`);
         });
     }
 
-    const pullOption = getInput('pull');
+    const pullOption = parseBoolOrGitArgs('pull');
     if (pullOption) {
       await pullFromRemote(pullOption, {restage: true, ignoreErrors});
     } else core.info('> Not pulling from repo.');
@@ -311,9 +312,14 @@ async function logDryRunRemainingSteps() {
       );
   }
 
-  const pullOption = getInput('pull');
-  if (pullOption) core.info(`> Would pull from remote with: ${pullOption}.`);
-  else core.info('> Would not pull from repo.');
+  const pullOption = parseBoolOrGitArgs('pull');
+  if (pullOption) {
+    core.info(
+      `> Would pull from remote${
+        pullOption === true ? '' : ` with: ${pullOption}`
+      }.`,
+    );
+  } else core.info('> Would not pull from repo.');
 
   core.info(
     `> Would create commit with message: "${getInput('message')}"${
@@ -366,17 +372,18 @@ async function logDryRunRemainingSteps() {
 }
 
 async function pullFromRemote(
-  pullOption: string,
+  pullOption: true | string,
   options: {
     restage: boolean;
     ignoreErrors: 'all' | 'pathspec' | 'none';
   },
 ) {
   core.info('> Pulling from remote...');
-  core.debug(`Current git pull arguments: ${pullOption}`);
+  const args = pullOption === true ? '' : pullOption;
+  core.debug(`Current git pull arguments: ${args}`);
   await git
     .fetch(undefined, log)
-    .pull(undefined, undefined, parseGitArgs(pullOption), log);
+    .pull(undefined, undefined, parseGitArgs(args), log);
 
   core.info('> Checking for conflicts...');
   const status = await git.status(undefined, log);

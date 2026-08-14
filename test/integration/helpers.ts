@@ -58,6 +58,10 @@ function configureFixtureRepo(repo: string, name: string, email: string) {
   git(['config', 'user.email', email], repo);
   git(['config', 'commit.gpgsign', 'false'], repo);
   git(['config', 'tag.gpgsign', 'false'], repo);
+  // Host pull.* config must not leak into fixtures (rebase without --autostash
+  // would fail once the action has staged local changes).
+  git(['config', 'pull.rebase', 'false'], repo);
+  git(['config', 'pull.ff', 'true'], repo);
 }
 
 /**
@@ -295,6 +299,31 @@ export function writeFile(repo: string, relativePath: string, content: string) {
   const full = path.join(repo, relativePath);
   fs.mkdirSync(path.dirname(full), {recursive: true});
   fs.writeFileSync(full, content);
+}
+
+/**
+ * Clone the bare remote into a sibling worktree, commit a file, and push.
+ * Returns the new remote HEAD SHA. Does not touch `fixture.local`.
+ */
+export function commitAndPushToRemote(
+  fixture: Fixture,
+  relativePath: string,
+  content: string,
+  message: string,
+): string {
+  const parent = path.dirname(fixture.local);
+  const work = fs.mkdtempSync(path.join(parent, 'remote-work-'));
+  try {
+    git(['clone', '-q', fixture.remote, '.'], work);
+    configureFixtureRepo(work, 'Remote Writer', 'remote@example.com');
+    writeFile(work, relativePath, content);
+    git(['add', '--', relativePath], work);
+    git(['commit', '-q', '-m', message], work);
+    git(['push', '-q', 'origin', 'HEAD'], work);
+    return git(['rev-parse', 'HEAD'], work);
+  } finally {
+    fs.rmSync(work, {recursive: true, force: true});
+  }
 }
 
 export function removeFile(repo: string, relativePath: string) {

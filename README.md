@@ -87,9 +87,11 @@ Add a step like this to your workflow:
     # Default: ignore
     pathspec_error_handling: ignore
 
-    # Arguments for the git pull command. By default, the action does not pull.
+    # Whether to pull from the remote. Set to true to run git pull with no extra
+    # args, false (or omit) to skip, or a string for git pull arguments
+    # (e.g. '--rebase --autostash').
     # Default: ''
-    pull: '--rebase --autostash ...'
+    pull: true
 
     # Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (see the paragraph below for more info)
     # Default: true
@@ -153,7 +155,7 @@ By default the action runs the following command: `git push origin ${new_branch 
 
 One way to use this is if you want to force push to a trusted/static branch name in your repo: set the `push` input to, for example, `origin yourBranch --force`. Do not build that string from untrusted refs such as `github.head_ref`.
 
-If multiple jobs may push to the same branch (for example a matrix), set `push_attempts` to try the push more than once. When `pull` is set, each failed attempt re-runs that pull (e.g. `--rebase --autostash`) before pushing again, so a commit that lost a race can catch up to the remote tip. Without `pull`, retries only re-run push. The default is `1` (no retries). A typical concurrent setup looks like:
+If multiple jobs may push to the same branch (for example a matrix), set `push_attempts` to try the push more than once. When `pull` is set (`true` for a default `git pull`, or a string such as `--rebase --autostash`), each failed attempt re-runs that pull before pushing again, so a commit that lost a race can catch up to the remote tip. Without `pull`, retries only re-run push. The default is `1` (no retries). A typical concurrent setup looks like:
 
 ```yaml
 with:

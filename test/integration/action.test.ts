@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
+  commitAndPushToRemote,
   createFixture,
   type Fixture,
   gitLog,
@@ -270,6 +271,90 @@ describe('action integration', () => {
     expect(files).not.toContain('skip-me.txt');
     // Untracked file should still be on disk.
     expect(fs.existsSync(path.join(f.local, 'skip-me.txt'))).toBe(true);
+  });
+
+  it('pull: true incorporates remote commits before committing', () => {
+    const f = fixture!;
+    commitAndPushToRemote(f, 'from-remote.txt', 'remote\n', 'Remote change');
+    writeFile(f.local, 'from-local.txt', 'local\n');
+
+    const result = runAction(f, {
+      message: 'Local change',
+      pull: 'true',
+      push: 'false',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.stdout).toMatch(/> Pulling from remote/);
+    expect(result.stdout).not.toMatch(/Not pulling from repo/);
+
+    const files = listFilesAtHead(f.local);
+    expect(files).toContain('from-remote.txt');
+    expect(files).toContain('from-local.txt');
+  });
+
+  it.each([
+    {pull: 'false', label: 'false'},
+    {pull: undefined, label: 'omitted'},
+  ])('skips pull when pull is $label', ({pull}) => {
+    const f = fixture!;
+    commitAndPushToRemote(f, 'from-remote.txt', 'remote\n', 'Remote change');
+    writeFile(f.local, 'from-local.txt', 'local\n');
+
+    const result = runAction(f, {
+      message: 'Local change only',
+      ...(pull !== undefined ? {pull} : {}),
+      push: 'false',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.stdout).toMatch(/Not pulling from repo/);
+
+    const files = listFilesAtHead(f.local);
+    expect(files).toContain('from-local.txt');
+    expect(files).not.toContain('from-remote.txt');
+  });
+
+  it('pull with custom git args still pulls', () => {
+    const f = fixture!;
+    commitAndPushToRemote(f, 'from-remote.txt', 'remote\n', 'Remote change');
+    writeFile(f.local, 'from-local.txt', 'local\n');
+
+    const result = runAction(f, {
+      message: 'Local change',
+      pull: '--rebase --autostash',
+      push: 'false',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.stdout).toMatch(/> Pulling from remote/);
+
+    const files = listFilesAtHead(f.local);
+    expect(files).toContain('from-remote.txt');
+    expect(files).toContain('from-local.txt');
+  });
+
+  it('dry_run with pull: true reports a default pull without mutating', () => {
+    const f = fixture!;
+    writeFile(f.local, 'dry-pull.txt', 'preview\n');
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Would commit',
+      dry_run: 'true',
+      pull: 'true',
+      push: 'false',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(listFilesAtHead(f.local)).not.toContain('dry-pull.txt');
+    expect(result.stdout).toMatch(/> Would pull from remote\./);
+    expect(result.stdout).not.toMatch(/with: true/);
   });
 
   it('commits when cwd is an absolute path and process.cwd differs', () => {
