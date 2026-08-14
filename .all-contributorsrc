@@ -571,6 +571,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "ross-spencer",
+      "name": "Ross Spencer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1880412?v=4",
+      "profile": "https://ko-fi.com/beet_keeper",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

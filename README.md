@@ -480,6 +480,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://codereaper.com/"><img src="https://avatars.githubusercontent.com/u/144055?v=4?s=100" width="100px;" alt="Jakob Jensen"/><br /><sub><b>Jakob Jensen</b></sub></a><br /><a href="#maintenance-CodeReaper" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://nmattia.com"><img src="https://avatars.githubusercontent.com/u/6930756?v=4?s=100" width="100px;" alt="Nicolas Mattia"/><br /><sub><b>Nicolas Mattia</b></sub></a><br /><a href="#ideas-nmattia" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://jcbhmr.com/"><img src="https://avatars.githubusercontent.com/u/61068799?v=4?s=100" width="100px;" alt="Jacob Hummer"/><br /><sub><b>Jacob Hummer</b></sub></a><br /><a href="#ideas-jcbhmr" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://ko-fi.com/beet_keeper"><img src="https://avatars.githubusercontent.com/u/1880412?v=4?s=100" width="100px;" alt="Ross Spencer"/><br /><sub><b>Ross Spencer</b></sub></a><br /><a href="https://github.com/EndBug/add-and-commit/issues?q=author%3Aross-spencer" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
