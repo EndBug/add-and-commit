@@ -159,6 +159,7 @@ function parseGitHubOutput(filePath: string): Record<string, string> {
 
 export interface ActionInputs {
   add?: string;
+  allow_unsafe_git_protocols?: string;
   author_name?: string;
   author_email?: string;
   commit?: string;
@@ -214,6 +215,7 @@ export function runAction(
     // Mirror action.yml defaults that matter when spawning lib/ directly.
     cwd: '.',
     add: '.',
+    allow_unsafe_git_protocols: 'false',
     default_author: 'github_actor',
     dry_run: 'false',
     pathspec_error_handling: 'ignore',

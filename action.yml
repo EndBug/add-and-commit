@@ -68,6 +68,11 @@ inputs:
     description: Arguments for the git push --tags command (any additional argument will be added after --tags)
     required: false
 
+  allow_unsafe_git_protocols:
+    description: 'If true, disables the transport protocol allowlist (https/http/ssh/file/git) and allows scheme:: remote-helper URLs in git argument inputs. Keep false unless you need a custom remote helper and fully trust those inputs.'
+    required: false
+    default: 'false'
+
   # Input not required from the user
   github_token:
     description: The token used to make requests to the GitHub API. It's NOT used to make commits and should not be changed.

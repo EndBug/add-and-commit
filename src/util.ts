@@ -330,6 +330,24 @@ function assertBalancedQuotes(input: string): void {
 }
 
 /**
+ * Git remote-helper URL form (`ext::command`, `hg::…`, etc.).
+ * @see https://git-scm.com/docs/gitremote-helpers
+ */
+const REMOTE_HELPER_URL = /^[A-Za-z0-9+.-]+::/;
+
+function isRemoteHelperUrl(arg: string): boolean {
+  return REMOTE_HELPER_URL.test(arg);
+}
+
+export type MatchGitArgsOptions = {
+  /**
+   * When true, allow `scheme::` remote-helper URL tokens.
+   * Does not disable `--upload-pack` / `-F` denylists.
+   */
+  allowUnsafeGitProtocols?: boolean;
+};
+
+/**
  * Matches the given string to an array of arguments.
  * The parsing is made by `string-argv`: if your way of using argument is not supported, the issue is theirs!
  * {@link https://www.npm.im/string-argv}
@@ -356,14 +374,20 @@ function assertBalancedQuotes(input: string): void {
  * @throws If the args include unmatched quotes
  * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations) on any token, including values after `-u` / `-m`
  * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
+ * @throws If the args include a `scheme::` remote-helper URL (unless `allowUnsafeGitProtocols`)
  */
-export function matchGitArgs(string: string) {
+export function matchGitArgs(
+  string: string,
+  options: MatchGitArgsOptions = {},
+) {
   assertBalancedQuotes(string);
 
   const parsed = parseArgsStringToArgv(string);
   core.debug(`Git args parsed:
   - Original: ${string}
   - Parsed: ${JSON.stringify(parsed)}`);
+
+  const allowUnsafe = options.allowUnsafeGitProtocols === true;
 
   let skipNext = false;
   for (const arg of parsed) {
@@ -383,6 +407,11 @@ export function matchGitArgs(string: string) {
     if (isDangerousMessageFileOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
+      );
+    }
+    if (!allowUnsafe && isRemoteHelperUrl(arg)) {
+      throw new Error(
+        `Git argument '${arg}' is not allowed: remote-helper URLs (scheme::…) can execute arbitrary commands on the runner. Set allow_unsafe_git_protocols to true only if you fully trust this input.`,
       );
     }
 
