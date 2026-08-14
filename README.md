@@ -117,7 +117,7 @@ What does this mean for you? It means that strings that contain a lot of nested 
 
 Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary Git transport program during fetch/pull/push.  
 Remote-helper URL forms (`ext::…` and other `scheme::` tokens) are rejected for the same reason.  
-Git child processes are also limited to the `https`, `http`, `ssh`, `file`, and `git` transports (`GIT_ALLOW_PROTOCOL`) unless you set [`allow_unsafe_git_protocols`](#allow_unsafe_git_protocols) to `true` (only for trusted custom remotes/helpers).  
+Git child processes are also limited to the `https`, `http`, `ssh`, `file`, and `git` transports (`GIT_ALLOW_PROTOCOL`) unless you set [`allow_unsafe_git_protocols`](#allow-unsafe-git-protocols) to `true` (only for trusted custom remotes/helpers).  
 Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
 Unmatched `'` / `"` quotes are also rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
 Do not interpolate untrusted data (for example values from `github.event.*`, `github.head_ref`, or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag`, `tag_push`, or `commit` without sanitizing them first. When the branch name is dynamic, prefer the default `push: true` with [`new_branch`](#creating-a-new-branch) instead of embedding the ref in a custom `push` string.

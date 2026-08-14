@@ -69,7 +69,7 @@ inputs:
     required: false
 
   allow_unsafe_git_protocols:
-    description: If true, disables the transport protocol allowlist (https/http/ssh/file/git) and allows scheme:: remote-helper URLs in git argument inputs. Keep false unless you need a custom remote helper and fully trust those inputs.
+    description: 'If true, disables the transport protocol allowlist (https/http/ssh/file/git) and allows scheme:: remote-helper URLs in git argument inputs. Keep false unless you need a custom remote helper and fully trust those inputs.'
     required: false
     default: 'false'
 
