@@ -221,8 +221,14 @@ const LONG_OPTIONS_WITH_SEPARATE_ARG: ReadonlyArray<{
   {canonical: 'exec', minPrefix: 'e'},
 ];
 
-/** Short options that take a value (glued or as the following argv token). */
-const SHORT_OPTIONS_WITH_ARG = new Set(['m', 'u', 'F']);
+/**
+ * Short options that take a value (glued or as the following argv token).
+ * `-u` is intentionally omitted: it only takes a key-id for `git tag`, while
+ * `git fetch` (`--update-head-ok`) and `git push` (`--set-upstream`) treat it
+ * as a flag. Tag signing still uses `--local-user` in
+ * `LONG_OPTIONS_WITH_SEPARATE_ARG`.
+ */
+const SHORT_OPTIONS_WITH_ARG = new Set(['m', 'F']);
 
 function getLongOptionName(arg: string): string | undefined {
   if (!arg.startsWith('--') || arg === '--') return undefined;
@@ -348,7 +354,7 @@ function assertBalancedQuotes(input: string): void {
  * ```
  * @returns An array, if there's no match it'll be empty
  * @throws If the args include unmatched quotes
- * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations)
+ * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations) on any token, including values after `-u` / `-m`
  * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
  */
 export function matchGitArgs(string: string) {
@@ -361,16 +367,19 @@ export function matchGitArgs(string: string) {
 
   let skipNext = false;
   for (const arg of parsed) {
-    if (skipNext) {
-      skipNext = false;
-      continue;
-    }
-
+    // Remote-helper overrides are rejected on every token, including values
+    // after `-m` / `--message`. `-u` must not skip `--upl=` / `--upload-pack`.
     if (isDangerousRemoteHelperOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
       );
     }
+
+    if (skipNext) {
+      skipNext = false;
+      continue;
+    }
+
     if (isDangerousMessageFileOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
