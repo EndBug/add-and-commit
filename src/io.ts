@@ -67,6 +67,20 @@ export function setOutput<T extends output>(name: T, value: OutputTypes[T]) {
 }
 
 /**
+ * Parses an input that can be a boolean (`true`/`false`) or a git-args string.
+ * Empty / unset values are returned as an empty string (falsy).
+ */
+export function parseBoolOrGitArgs(
+  name: 'fetch' | 'push' | 'pull',
+): string | boolean {
+  try {
+    return getInput(name, true);
+  } catch {
+    return getInput(name) || '';
+  }
+}
+
+/**
  * Parses `push_attempts` as a positive integer (≥ 1).
  * Accepts only base-10 integer strings (optional leading `+`).
  */
@@ -271,6 +285,13 @@ export async function checkInputs() {
     core.warning(
       "`NO-PULL` is a legacy option for the `pull` input. If you don't want the action to pull the repo, simply remove this input.",
     );
+
+  const pullOption = parseBoolOrGitArgs('pull');
+  if (getInput('pull')) {
+    core.debug(
+      `Current pull option: '${pullOption}' (parsed as ${typeof pullOption})`,
+    );
+  }
   // #endregion
 
   // #region push
@@ -291,7 +312,7 @@ export async function checkInputs() {
   // #region push_attempts
   const pushAttempts = parsePushAttempts(getInput('push_attempts') || '1');
   core.debug(`Current push_attempts option: ${pushAttempts}`);
-  if (pushAttempts > 1 && !getInput('pull')) {
+  if (pushAttempts > 1 && !pullOption) {
     core.warning(
       'push_attempts is greater than 1 but pull is not set. Retries will re-run push only; without pull (e.g. --rebase), concurrent remote updates are unlikely to recover.',
     );

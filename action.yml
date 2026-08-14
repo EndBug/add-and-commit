@@ -48,7 +48,7 @@ inputs:
     required: false
     default: ignore
   pull:
-    description: Arguments for the git pull command. By default, the action does not pull.
+    description: Whether to pull from the remote. true runs git pull with no extra args; false or omit skips pull; any other string is passed as git pull arguments. By default, the action does not pull.
     required: false
   push:
     description: Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (more info in the README)
