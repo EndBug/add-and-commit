@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import simpleGit, {Response} from 'simple-git';
+import simpleGit, {Response, SimpleGit} from 'simple-git';
 import {
   checkInputs,
   getInput,
@@ -12,21 +12,27 @@ import {
 } from './io';
 import {
   assertNoUnexpectedGitlinks,
+  assertWorkingDirectory,
   findUnexpectedGitlinks,
   log,
   matchGitArgs,
   neutralizeLogString,
   parseInputArray,
   pickGitIdentityConfig,
+  resolveBaseDir,
 } from './util';
 
-const baseDir = path.join(process.cwd(), getInput('cwd') || '');
-const git = simpleGit({baseDir});
+const cwdInput = getInput('cwd') || '';
+const baseDir = resolveBaseDir(cwdInput);
+let git!: SimpleGit;
 
 const exitErrors: Error[] = [];
 
 core.info(`Running in ${baseDir}`);
 (async () => {
+  assertWorkingDirectory(baseDir, cwdInput);
+  git = simpleGit({baseDir});
+
   await checkInputs();
 
   const dryRun = getInput('dry_run', true);

@@ -45,6 +45,8 @@ Add a step like this to your workflow:
     committer_email: mail@example.com
 
     # The local path to the directory where your repository is located. You should use actions/checkout first to set it up.
+    # Relative to the runner workspace, or an absolute path (e.g. ${{ github.workspace }}/path).
+    # Note: $GITHUB_WORKSPACE is not expanded in with: — use ${{ github.workspace }} instead.
     # Default: '.'
     cwd: './path/to/the/repo'
 

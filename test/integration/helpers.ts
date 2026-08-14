@@ -182,14 +182,14 @@ export interface ActionInputs {
 /**
  * Spawn the shipped action (lib/index.js) with an allowlisted environment.
  *
- * The action resolves the working tree as `path.join(process.cwd(), cwdInput)`.
- * On modern Node, `path.join` does not treat an absolute second segment as a
- * new root, so we spawn with `process.cwd()` set to the fixture and pass
- * `cwd: '.'` rather than an absolute path.
+ * By default the child process runs with `process.cwd()` = the fixture clone
+ * and `cwd: '.'`. Pass an absolute `inputs.cwd` with `options.spawnCwd` set to
+ * another directory to exercise absolute-path resolution.
  */
 export function runAction(
   fixture: Fixture,
   inputs: ActionInputs = {},
+  options: {spawnCwd?: string} = {},
 ): RunActionResult {
   assertLocalOrigin(
     git(['remote', 'get-url', 'origin'], fixture.local),
@@ -208,8 +208,6 @@ export function runAction(
   );
   fs.writeFileSync(outputFile, '');
 
-  const restInputs = {...inputs};
-  delete restInputs.cwd;
   const merged: Record<string, string> = {
     // Mirror action.yml defaults that matter when spawning lib/ directly.
     cwd: '.',
@@ -223,7 +221,7 @@ export function runAction(
     author_name: 'Integration Tester',
     author_email: 'integration@example.com',
     message: 'Integration test commit',
-    ...restInputs,
+    ...inputs,
   };
 
   const env: NodeJS.ProcessEnv = {
@@ -247,8 +245,7 @@ export function runAction(
   }
 
   const result = spawnSync(process.execPath, [ACTION_ENTRY], {
-    // Workspace = fixture clone; action cwd input stays relative ('.').
-    cwd: fixture.local,
+    cwd: options.spawnCwd ?? fixture.local,
     env,
     encoding: 'utf8',
     // Action can take a bit when doing push/tag; keep a generous limit.

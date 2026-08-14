@@ -4,7 +4,33 @@ import * as YAML from 'js-yaml';
 import {getOctokit} from '@actions/github';
 import {execFileSync} from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 import {getInput} from './io';
+
+/**
+ * Resolves the action working directory from the `cwd` input.
+ * Absolute paths are kept as-is; relative paths are resolved against `from`
+ * (default: `process.cwd()`). Empty input is treated as `'.'`.
+ */
+export function resolveBaseDir(
+  cwdInput: string,
+  from: string = process.cwd(),
+): string {
+  return path.resolve(from, cwdInput || '.');
+}
+
+/**
+ * Ensures `dir` exists and is a directory before constructing simple-git.
+ */
+export function assertWorkingDirectory(dir: string, cwdInput: string): void {
+  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+    throw new Error(
+      `The cwd input '${cwdInput || '.'}' resolved to '${dir}', which is not an existing directory. ` +
+        'Use a path relative to the runner workspace, or an absolute path that exists ' +
+        '(e.g. ${{ github.workspace }}/path — note that $GITHUB_WORKSPACE is not expanded in with:).',
+    );
+  }
+}
 
 function getOctokitClient() {
   const token = getInput('github_token');
