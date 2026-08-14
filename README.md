@@ -62,6 +62,11 @@ Add a step like this to your workflow:
     # Default: false
     dry_run: true
 
+    # If true, allow custom git transports / scheme:: remote-helper URLs in argument inputs.
+    # Keep false unless you need a custom remote helper and fully trust those inputs.
+    # Default: false
+    allow_unsafe_git_protocols: false
+
     # Arguments for the git fetch command. If set to false, the action won't fetch the repo.
     # For more info as to why fetching is usually recommended, please see the "Performance on large repos" FAQ. 
     # Default: --tags --force
@@ -112,10 +117,16 @@ Add a step like this to your workflow:
 Multiple options let you provide the `git` arguments that you want the action to use. It's important to note that these arguments **are not actually used with a CLI command**, but they are parsed by a package called [`string-argv`](https://npm.im/string-argv), and then used with [`simple-git`](https://npm.im/simple-git).  
 What does this mean for you? It means that strings that contain a lot of nested quotes may be parsed incorrectly, and that specific ways of declaring arguments may not be supported by these libraries. If you're having issues with your argument strings you can check whether they're being parsed correctly either by [enabling debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) for your workflow runs or by testing it directly with `string-argv` ([RunKit demo](https://npm.runkit.com/string-argv)): if each argument and option is parsed correctly you'll see an array where every string is an option or value.
 
-Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected: they can make git run an arbitrary Git transport program during fetch/pull/push.  
+Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbreviations of those) are rejected on every token, including values after `-u` / `-m`: they can make git run an arbitrary Git transport program during fetch/pull/push.  
+Remote-helper URL forms (`ext::…` and other `scheme::` tokens) are rejected for the same reason.  
+Git child processes are also limited to the `https`, `http`, `ssh`, `file`, and `git` transports (`GIT_ALLOW_PROTOCOL`) unless you set [`allow_unsafe_git_protocols`](#allow-unsafe-git-protocols) to `true` (only for trusted custom remotes/helpers).  
 Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
 Unmatched `'` / `"` quotes are also rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
 Do not interpolate untrusted data (for example values from `github.event.*`, `github.head_ref`, or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag`, `tag_push`, or `commit` without sanitizing them first. When the branch name is dynamic, prefer the default `push: true` with [`new_branch`](#creating-a-new-branch) instead of embedding the ref in a custom `push` string.
+
+### Allow unsafe git protocols
+
+Set `allow_unsafe_git_protocols: true` only if you need a custom remote helper or a transport outside the default allowlist (`https`, `http`, `ssh`, `file`, `git`). This disables both the `GIT_ALLOW_PROTOCOL` restriction and the rejection of `scheme::` tokens in git argument inputs. It does **not** re-enable blocked options such as `--upload-pack` or `-F`/`--file`. Treat this like a break-glass setting: only enable it with fully trusted, non-interpolated argument strings.
 
 ### Adding files
 

@@ -122,6 +122,23 @@ describe('action integration', () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/gitlink/i);
   });
 
+  it('rejects remote-helper overrides after -u in fetch args', () => {
+    const f = fixture!;
+    writeFile(f.local, 'fetch-args.txt', 'changed\n');
+    const before = gitRevParse(f.local, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Should not fetch with blocked args',
+      fetch: '-u --upl=evil',
+      push: 'false',
+    });
+
+    expect(result.status).not.toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/not allowed/);
+  });
+
   it('applies custom author and committer', () => {
     const f = fixture!;
     writeFile(f.local, 'id.txt', 'id\n');

@@ -26,6 +26,22 @@ const cwdInput = getInput('cwd') || '';
 const baseDir = resolveBaseDir(cwdInput);
 let git!: SimpleGit;
 
+/** Env for git child processes; restricts transports unless opt-out is set. */
+function gitChildEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {...process.env, ...extra};
+  if (!getInput('allow_unsafe_git_protocols', true)) {
+    env.GIT_ALLOW_PROTOCOL = 'https:http:ssh:file:git';
+    env.GIT_PROTOCOL_FROM_USER = '0';
+  }
+  return env;
+}
+
+function parseGitArgs(string: string) {
+  return matchGitArgs(string, {
+    allowUnsafeGitProtocols: getInput('allow_unsafe_git_protocols', true),
+  });
+}
+
 const exitErrors: Error[] = [];
 
 core.info(`Running in ${baseDir}`);
@@ -34,6 +50,8 @@ core.info(`Running in ${baseDir}`);
   git = simpleGit({baseDir});
 
   await checkInputs();
+
+  git.env(gitChildEnv());
 
   const dryRun = getInput('dry_run', true);
 
@@ -69,7 +87,7 @@ core.info(`Running in ${baseDir}`);
 
   core.info('> Checking for uncommitted changes in the git working tree...');
   const changedFiles = (await git.diffSummary(['--cached'])).files.length;
-  const allowEmpty = matchGitArgs(getInput('commit') || '').includes(
+  const allowEmpty = parseGitArgs(getInput('commit') || '').includes(
     '--allow-empty',
   );
   // continue if there are any changes or if the allow-empty commit argument is included
@@ -116,7 +134,7 @@ core.info(`Running in ${baseDir}`);
     if (fetchOption) {
       core.info('> Fetching repo...');
       await git.fetch(
-        matchGitArgs(fetchOption === true ? '' : fetchOption),
+        parseGitArgs(fetchOption === true ? '' : fetchOption),
         log,
       );
     } else core.info('> Not fetching repo.');
@@ -149,7 +167,7 @@ core.info(`Running in ${baseDir}`);
     core.info('> Creating commit...');
     const data = await git.commit(
       getInput('message'),
-      matchGitArgs(getInput('commit') || ''),
+      parseGitArgs(getInput('commit') || ''),
     );
     log(undefined, data);
     // simple-git can resolve with an empty SHA when no commit was created
@@ -172,7 +190,7 @@ core.info(`Running in ${baseDir}`);
         );
 
       await git
-        .tag(matchGitArgs(getInput('tag') || ''), (err, data?) => {
+        .tag(parseGitArgs(getInput('tag') || ''), (err, data?) => {
           if (data) setOutput('tagged', 'true');
           return log(err, data);
         })
@@ -226,7 +244,7 @@ core.info(`Running in ${baseDir}`);
         core.info('> Pushing tags to repo...');
 
         await git
-          .pushTags('origin', matchGitArgs(getInput('tag_push') || ''))
+          .pushTags('origin', parseGitArgs(getInput('tag_push') || ''))
           .then(data => {
             setOutput('tag_pushed', 'true');
             return log(null, data);
@@ -358,7 +376,7 @@ async function pullFromRemote(
   core.debug(`Current git pull arguments: ${pullOption}`);
   await git
     .fetch(undefined, log)
-    .pull(undefined, undefined, matchGitArgs(pullOption), log);
+    .pull(undefined, undefined, parseGitArgs(pullOption), log);
 
   core.info('> Checking for conflicts...');
   const status = await git.status(undefined, log);
@@ -410,7 +428,7 @@ async function pushCommit(pushOption: true | string) {
     await git.push(
       undefined,
       undefined,
-      matchGitArgs(pushOption),
+      parseGitArgs(pushOption),
       (err, data?) => {
         if (data) setOutput('pushed', 'true');
         return log(err, data);
@@ -431,8 +449,8 @@ async function add(
 
   for (const args of parsed) {
     const gitArgs = dryRun
-      ? ['--dry-run', ...matchGitArgs(args)]
-      : matchGitArgs(args);
+      ? ['--dry-run', ...parseGitArgs(args)]
+      : parseGitArgs(args);
     res.push(
       // Push the result of every git command (which are executed in order) to the array
       // If any of them fails, the whole function will return a Promise rejection
@@ -496,10 +514,9 @@ async function assertGitlinksWithTempIndex(
     if (fs.existsSync(indexPath)) {
       fs.copyFileSync(indexPath, tmpIndex);
     } else {
-      const gitSeed = simpleGit({baseDir}).env({
-        ...process.env,
-        GIT_INDEX_FILE: tmpIndex,
-      });
+      const gitSeed = simpleGit({baseDir}).env(
+        gitChildEnv({GIT_INDEX_FILE: tmpIndex}),
+      );
       const headResolves = await git
         .raw(['rev-parse', '--verify', 'HEAD'])
         .then(() => true)
@@ -511,14 +528,13 @@ async function assertGitlinksWithTempIndex(
       }
     }
 
-    const gitTmp = simpleGit({baseDir}).env({
-      ...process.env,
-      GIT_INDEX_FILE: tmpIndex,
-    });
+    const gitTmp = simpleGit({baseDir}).env(
+      gitChildEnv({GIT_INDEX_FILE: tmpIndex}),
+    );
 
     for (const args of addArgGroups) {
       await gitTmp
-        .add(matchGitArgs(args), (err, data) =>
+        .add(parseGitArgs(args), (err, data) =>
           log(ignoreErrors === 'all' ? null : err, data),
         )
         .catch((e: Error) => {
@@ -562,8 +578,8 @@ async function remove(
 
   for (const args of parsed) {
     const gitArgs = dryRun
-      ? ['--dry-run', ...matchGitArgs(args)]
-      : matchGitArgs(args);
+      ? ['--dry-run', ...parseGitArgs(args)]
+      : parseGitArgs(args);
     res.push(
       // Push the result of every git command (which are executed in order) to the array
       // If any of them fails, the whole function will return a Promise rejection

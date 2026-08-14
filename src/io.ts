@@ -3,6 +3,7 @@ import {assertValidBranchName, getUserInfo, parseInputArray} from './util';
 
 export interface InputTypes {
   add: string;
+  allow_unsafe_git_protocols: boolean;
   author_name: string;
   author_email: string;
   commit: string | undefined;
@@ -152,6 +153,13 @@ export async function checkInputs() {
   if (getInput('dry_run', true))
     core.info(
       '> Dry run enabled: no mutating git operations will be performed.',
+    );
+  // #endregion
+
+  // #region allow_unsafe_git_protocols
+  if (getInput('allow_unsafe_git_protocols', true))
+    core.warning(
+      'allow_unsafe_git_protocols is enabled: transport allowlist and scheme:: remote-helper URL checks are disabled. Only use this with fully trusted git argument inputs.',
     );
   // #endregion
 
