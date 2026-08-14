@@ -252,6 +252,48 @@ describe('matchGitArgs', () => {
       /message from a file/,
     );
   });
+
+  it('rejects scheme:: remote-helper URL tokens (PoC form)', () => {
+    expect(() => matchGitArgs('ext::sh -c touch\\ /tmp/pwned')).toThrow(
+      /remote-helper URLs/,
+    );
+    expect(() => matchGitArgs('ext::touch /tmp/pwned')).toThrow(
+      /allow_unsafe_git_protocols/,
+    );
+    expect(() => matchGitArgs('evil::anything')).toThrow(/remote-helper URLs/);
+    expect(() => matchGitArgs('origin evil::x --force')).toThrow(
+      /remote-helper URLs/,
+    );
+    expect(() => matchGitArgs("'ext::sh -c touch /tmp/pwned'")).toThrow(
+      /remote-helper URLs/,
+    );
+  });
+
+  it('allows scheme:: tokens when allowUnsafeGitProtocols is true', () => {
+    expect(
+      matchGitArgs('ext::sh -c true', {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['ext::sh', '-c', 'true']);
+    expect(
+      matchGitArgs('evil::anything', {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['evil::anything']);
+    expect(
+      matchGitArgs("'ext::sh -c true'", {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['ext::sh -c true']);
+  });
+
+  it('still rejects --upload-pack when allowUnsafeGitProtocols is true', () => {
+    expect(() =>
+      matchGitArgs('--upload-pack=/bin/sh', {allowUnsafeGitProtocols: true}),
+    ).toThrow(/not allowed/);
+  });
+
+  it('allows :: inside option values via skipNext', () => {
+    expect(matchGitArgs('-m "foo::bar"')).toStrictEqual(['-m', 'foo::bar']);
+    expect(matchGitArgs('--message foo::bar')).toStrictEqual([
+      '--message',
+      'foo::bar',
+    ]);
+  });
 });
 
 describe('pickGitIdentityConfig', () => {
