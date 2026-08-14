@@ -146,6 +146,11 @@ describe('matchGitArgs', () => {
       'release',
     ]);
     expect(matchGitArgs('v1.0.0 -f')).toStrictEqual(['v1.0.0', '-f']);
+    expect(matchGitArgs('v1.0.0 -u ABCDEF')).toStrictEqual([
+      'v1.0.0',
+      '-u',
+      'ABCDEF',
+    ]);
   });
 
   it('returns an empty array for blank input', () => {
@@ -180,6 +185,16 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('--receive=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--e=evil')).toThrow(/not allowed/);
     expect(() => matchGitArgs('--exe=evil')).toThrow(/not allowed/);
+  });
+
+  it('rejects remote-helper overrides after -u (fetch/push flag, not a value option)', () => {
+    expect(() => matchGitArgs('-u --upl=evil')).toThrow(/not allowed/);
+    expect(() => matchGitArgs('-u --upload-pack=evil')).toThrow(/not allowed/);
+  });
+
+  it('rejects remote-helper overrides after -m / --message', () => {
+    expect(() => matchGitArgs('-m --upl=evil')).toThrow(/not allowed/);
+    expect(() => matchGitArgs('--message --exec=evil')).toThrow(/not allowed/);
   });
 
   it('rejects unmatched quotes that would inject flags via string-argv', () => {
