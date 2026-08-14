@@ -1,13 +1,73 @@
 import {
   assertNoUnexpectedGitlinks,
   assertValidBranchName,
+  assertWorkingDirectory,
   findUnexpectedGitlinks,
   matchGitArgs,
   neutralizeForLog,
   neutralizeLogString,
   parseInputArray,
   pickGitIdentityConfig,
+  resolveBaseDir,
 } from '../src/util';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+
+describe('resolveBaseDir', () => {
+  const from = path.join(path.sep, 'home', 'runner', 'work', 'repo', 'repo');
+
+  it('resolves relative paths against from', () => {
+    expect(resolveBaseDir('./my-checkout', from)).toBe(
+      path.join(from, 'my-checkout'),
+    );
+    expect(resolveBaseDir('subdir', from)).toBe(path.join(from, 'subdir'));
+  });
+
+  it('keeps absolute paths', () => {
+    const abs = path.join(from, 'my-checkout-path');
+    expect(resolveBaseDir(abs, from)).toBe(abs);
+    expect(resolveBaseDir(abs, path.join(from, 'other'))).toBe(abs);
+  });
+
+  it('treats empty and "." as from', () => {
+    expect(resolveBaseDir('', from)).toBe(from);
+    expect(resolveBaseDir('.', from)).toBe(from);
+  });
+});
+
+describe('assertWorkingDirectory', () => {
+  it('accepts an existing directory', () => {
+    expect(() =>
+      assertWorkingDirectory(os.tmpdir(), os.tmpdir()),
+    ).not.toThrow();
+  });
+
+  it('rejects a missing path', () => {
+    const missing = path.join(
+      os.tmpdir(),
+      `aac-missing-${process.pid}-${Date.now()}`,
+    );
+    expect(() => assertWorkingDirectory(missing, missing)).toThrow(
+      /not an existing directory/,
+    );
+  });
+
+  it('rejects a file path', () => {
+    const file = path.join(
+      os.tmpdir(),
+      `aac-file-${process.pid}-${Date.now()}.txt`,
+    );
+    fs.writeFileSync(file, 'x');
+    try {
+      expect(() => assertWorkingDirectory(file, file)).toThrow(
+        /not an existing directory/,
+      );
+    } finally {
+      fs.unlinkSync(file);
+    }
+  });
+});
 
 describe('parseInputArray', () => {
   beforeAll(() => {
