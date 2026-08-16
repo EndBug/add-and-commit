@@ -231,6 +231,20 @@ const DANGEROUS_MESSAGE_FILE_OPTIONS: ReadonlyArray<{
 }> = [{canonical: 'file', minPrefix: 'fi'}];
 
 /**
+ * Long options that make Git read pathspecs from a filesystem path.
+ * Git accepts unique abbreviations (`--pathspec-fr` → `--pathspec-from-file`);
+ * `minPrefix` is the shortest unambiguous abbreviation currently accepted.
+ * `--pathspec-file-nul` is blocked with them (it changes how that file is parsed).
+ */
+const DANGEROUS_PATHSPEC_FILE_OPTIONS: ReadonlyArray<{
+  canonical: string;
+  minPrefix: string;
+}> = [
+  {canonical: 'pathspec-from-file', minPrefix: 'pathspec-fr'},
+  {canonical: 'pathspec-file-nul', minPrefix: 'pathspec-fi'},
+];
+
+/**
  * Long options whose next argv token is a value, not another option.
  * Used so literals like `-m '-F'` are not treated as a message-file flag.
  */
@@ -242,6 +256,7 @@ const LONG_OPTIONS_WITH_SEPARATE_ARG: ReadonlyArray<{
   {canonical: 'local-user', minPrefix: 'local-'},
   {canonical: 'cleanup', minPrefix: 'cleanup'},
   {canonical: 'file', minPrefix: 'fi'},
+  {canonical: 'pathspec-from-file', minPrefix: 'pathspec-fr'},
   {canonical: 'upload-pack', minPrefix: 'upl'},
   {canonical: 'receive-pack', minPrefix: 'rece'},
   {canonical: 'exec', minPrefix: 'e'},
@@ -311,6 +326,10 @@ function isDangerousMessageFileOption(arg: string): boolean {
   );
 }
 
+function isDangerousPathspecFileOption(arg: string): boolean {
+  return matchesLongOptionPrefix(arg, DANGEROUS_PATHSPEC_FILE_OPTIONS);
+}
+
 /**
  * Whether this token causes Git to treat the next argv element as a value
  * (so that value must not be classified as an option).
@@ -368,7 +387,7 @@ function isRemoteHelperUrl(arg: string): boolean {
 export type MatchGitArgsOptions = {
   /**
    * When true, allow `scheme::` remote-helper URL tokens.
-   * Does not disable `--upload-pack` / `-F` denylists.
+   * Does not disable `--upload-pack` / `-F` / `--pathspec-from-file` denylists.
    */
   allowUnsafeGitProtocols?: boolean;
 };
@@ -400,6 +419,7 @@ export type MatchGitArgsOptions = {
  * @throws If the args include unmatched quotes
  * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations) on any token, including values after `-u` / `-m`
  * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
+ * @throws If the args include a blocked pathspec-from-file flag (`--pathspec-from-file`, `--pathspec-file-nul`, or abbreviations)
  * @throws If the args include a `scheme::` remote-helper URL (unless `allowUnsafeGitProtocols`)
  */
 export function matchGitArgs(
@@ -433,6 +453,11 @@ export function matchGitArgs(
     if (isDangerousMessageFileOption(arg)) {
       throw new Error(
         `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
+      );
+    }
+    if (isDangerousPathspecFileOption(arg)) {
+      throw new Error(
+        `Git argument '${arg}' is not allowed: reading pathspecs from a file (--pathspec-from-file/--pathspec-file-nul) can leak runner filesystem contents into logs.`,
       );
     }
     if (!allowUnsafe && isRemoteHelperUrl(arg)) {
