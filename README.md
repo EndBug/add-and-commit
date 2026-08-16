@@ -123,7 +123,8 @@ Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbrev
 Remote-helper URL forms (`ext::…` and other `scheme::` tokens) are rejected for the same reason.  
 Git child processes are also limited to the `https`, `http`, `ssh`, `file`, and `git` transports (`GIT_ALLOW_PROTOCOL`) unless you set [`allow_unsafe_git_protocols`](#allow-unsafe-git-protocols) to `true` (only for trusted custom remotes/helpers).  
 Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
-Unmatched `'` / `"` quotes are also rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
+Unmatched `'` / `"` quotes are rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
+A closing quote glued to the following text is also rejected, even when quotes are balanced: `string-argv` treats a token that starts with a quote as ending at the closer, so `'main'--force` would become `main` plus `--force`. Put a space after the closer (`origin 'main' --force`) or omit the quotes. Quotes after the first character of a word are kept (`--message='hello'`).  
 Do not interpolate untrusted data (for example values from `github.event.*`, `github.head_ref`, or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag`, `tag_push`, or `commit` without sanitizing them first. When the branch name is dynamic, prefer the default `push: true` with [`new_branch`](#creating-a-new-branch) instead of embedding the ref in a custom `push` string.
 
 ### Allow unsafe git protocols

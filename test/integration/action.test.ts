@@ -140,6 +140,25 @@ describe('action integration', () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/not allowed/);
   });
 
+  it('rejects glued quotes that would inject --force into push', () => {
+    const f = fixture!;
+    writeFile(f.local, 'glued-quotes.txt', 'changed\n');
+    const beforeRemote = gitRevParse(f.remote, 'HEAD');
+
+    const result = runAction(f, {
+      message: 'Should not push with glued quotes',
+      fetch: 'false',
+      push: "origin 'main'--force --set-upstream",
+    });
+
+    expect(result.status).not.toBe(0);
+    expect(result.outputs.pushed).toBe('false');
+    expect(gitRevParse(f.remote, 'HEAD')).toBe(beforeRemote);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+  });
+
   it('applies custom author and committer', () => {
     const f = fixture!;
     writeFile(f.local, 'id.txt', 'id\n');

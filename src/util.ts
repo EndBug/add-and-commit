@@ -334,18 +334,32 @@ function consumesFollowingArgument(arg: string): boolean {
 }
 
 /**
- * Rejects unmatched `'` / `"` so `string-argv` cannot silently retokenize at an
- * odd quote (e.g. `origin fix'--force` → `["origin","fix","--force"]`).
- * Balanced quotes and the opposite quote type inside a quoted segment are allowed.
+ * Rejects quote forms that `string-argv` would retokenize into extra argv words.
+ *
+ * Unmatched `'` / `"` (e.g. `origin fix'--force` → `["origin","fix","--force"]`).
+ * A closing quote glued to following text: `string-argv` treats a token that
+ * starts with a quote as ending at the closer, so `'main'--force` becomes
+ * `["main","--force"]` even though the quotes are balanced.
+ *
+ * The opposite quote type inside a quoted segment is allowed. A closer may only
+ * be followed by whitespace or end of string (`origin 'main' --force`,
+ * `--message='hello'`).
  */
-function assertBalancedQuotes(input: string): void {
+function assertSafeQuotes(input: string): void {
   let open: "'" | '"' | null = null;
-  for (const char of input) {
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
     if (char !== "'" && char !== '"') continue;
     if (open === null) {
       open = char;
     } else if (open === char) {
       open = null;
+      const next = input[i + 1];
+      if (next !== undefined && !/\s/.test(next)) {
+        throw new Error(
+          'Git arguments contain a quoted segment immediately followed by non-whitespace. string-argv would split that into extra arguments (for example a quoted name glued to --force).',
+        );
+      }
     }
   }
   if (open !== null) {
@@ -397,7 +411,7 @@ export type MatchGitArgsOptions = {
  * matchGitArgs('      ') => [ ]
  * ```
  * @returns An array, if there's no match it'll be empty
- * @throws If the args include unmatched quotes
+ * @throws If the args include unmatched quotes, or a closing quote glued to following text
  * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations) on any token, including values after `-u` / `-m`
  * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
  * @throws If the args include a `scheme::` remote-helper URL (unless `allowUnsafeGitProtocols`)
@@ -406,7 +420,7 @@ export function matchGitArgs(
   string: string,
   options: MatchGitArgsOptions = {},
 ) {
-  assertBalancedQuotes(string);
+  assertSafeQuotes(string);
 
   const parsed = parseArgsStringToArgv(string);
   core.debug(`Git args parsed:
