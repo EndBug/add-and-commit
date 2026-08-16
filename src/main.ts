@@ -21,6 +21,7 @@ import {
   parseInputArray,
   pickGitIdentityConfig,
   resolveBaseDir,
+  safeInfo,
 } from './util';
 
 const cwdInput = getInput('cwd') || '';
@@ -45,7 +46,7 @@ function parseGitArgs(string: string) {
 
 const exitErrors: Error[] = [];
 
-core.info(`Running in ${baseDir}`);
+safeInfo(`Running in ${baseDir}`);
 (async () => {
   assertWorkingDirectory(baseDir, cwdInput);
   git = simpleGit({baseDir});
@@ -57,7 +58,7 @@ core.info(`Running in ${baseDir}`);
   const dryRun = getInput('dry_run', true);
 
   core.startGroup('Internal logs');
-  core.info(dryRun ? '> Staging files (dry run)...' : '> Staging files...');
+  safeInfo(dryRun ? '> Staging files (dry run)...' : '> Staging files...');
 
   const ignoreErrors =
     getInput('pathspec_error_handling') === 'ignore' ? 'pathspec' : 'none';
@@ -65,16 +66,16 @@ core.info(`Running in ${baseDir}`);
   let wouldStageChanges = false;
 
   if (getInput('add')) {
-    core.info(dryRun ? '> Adding files (dry run)...' : '> Adding files...');
+    safeInfo(dryRun ? '> Adding files (dry run)...' : '> Adding files...');
     const addResults = await add(ignoreErrors, dryRun);
     if (dryRun)
       wouldStageChanges =
         wouldStageChanges ||
         addResults.some(r => typeof r === 'string' && r.trim().length > 0);
-  } else core.info('> No files to add.');
+  } else safeInfo('> No files to add.');
 
   if (getInput('remove')) {
-    core.info(dryRun ? '> Removing files (dry run)...' : '> Removing files...');
+    safeInfo(dryRun ? '> Removing files (dry run)...' : '> Removing files...');
     const removeResults = await remove(ignoreErrors, dryRun);
     if (dryRun)
       wouldStageChanges =
@@ -84,16 +85,16 @@ core.info(`Running in ${baseDir}`);
           const text = typeof r === 'string' ? r : String(r);
           return text.trim().length > 0;
         });
-  } else core.info('> No files to remove.');
+  } else safeInfo('> No files to remove.');
 
-  core.info('> Checking for uncommitted changes in the git working tree...');
+  safeInfo('> Checking for uncommitted changes in the git working tree...');
   const changedFiles = (await git.diffSummary(['--cached'])).files.length;
   const allowEmpty = parseGitArgs(getInput('commit') || '').includes(
     '--allow-empty',
   );
   // continue if there are any changes or if the allow-empty commit argument is included
   if (changedFiles > 0 || wouldStageChanges || allowEmpty) {
-    core.info(
+    safeInfo(
       dryRun
         ? `> Dry run: would proceed (${changedFiles} already staged` +
             `${wouldStageChanges ? ', staging probes reported changes' : ''}` +
@@ -105,7 +106,7 @@ core.info(`Running in ${baseDir}`);
     if (dryRun) {
       await logDryRunRemainingSteps();
       core.endGroup();
-      core.info('> Dry run completed. No changes were made.');
+      safeInfo('> Dry run completed. No changes were made.');
       return;
     }
 
@@ -133,16 +134,16 @@ core.info(`Running in ${baseDir}`);
       fetchOption = getInput('fetch');
     }
     if (fetchOption) {
-      core.info('> Fetching repo...');
+      safeInfo('> Fetching repo...');
       await git.fetch(
         parseGitArgs(fetchOption === true ? '' : fetchOption),
         log,
       );
-    } else core.info('> Not fetching repo.');
+    } else safeInfo('> Not fetching repo.');
 
     const targetBranch = getInput('new_branch');
     if (targetBranch) {
-      core.info('> Checking-out branch...');
+      safeInfo('> Checking-out branch...');
 
       if (!fetchOption)
         core.warning(
@@ -163,9 +164,9 @@ core.info(`Running in ${baseDir}`);
     const pullOption = parseBoolOrGitArgs('pull');
     if (pullOption) {
       await pullFromRemote(pullOption, {restage: true, ignoreErrors});
-    } else core.info('> Not pulling from repo.');
+    } else safeInfo('> Not pulling from repo.');
 
-    core.info('> Creating commit...');
+    safeInfo('> Creating commit...');
     const data = await git.commit(
       getInput('message'),
       parseGitArgs(getInput('commit') || ''),
@@ -183,7 +184,7 @@ core.info(`Running in ${baseDir}`);
     setOutput('commit_sha', data.commit.substring(0, 7));
 
     if (getInput('tag')) {
-      core.info('> Tagging commit...');
+      safeInfo('> Tagging commit...');
 
       if (!fetchOption)
         core.warning(
@@ -200,7 +201,7 @@ core.info(`Running in ${baseDir}`);
           return log(null, data);
         })
         .catch(err => core.setFailed(err));
-    } else core.info('> No tag info provided.');
+    } else safeInfo('> No tag info provided.');
 
     let pushOption: string | boolean;
     try {
@@ -213,7 +214,7 @@ core.info(`Running in ${baseDir}`);
 
       for (let attempt = 1; attempt <= pushAttempts; attempt++) {
         try {
-          core.info(
+          safeInfo(
             pushAttempts > 1
               ? `> Pushing commit to repo (attempt ${attempt}/${pushAttempts})...`
               : '> Pushing commit to repo...',
@@ -242,7 +243,7 @@ core.info(`Running in ${baseDir}`);
       }
 
       if (getInput('tag')) {
-        core.info('> Pushing tags to repo...');
+        safeInfo('> Pushing tags to repo...');
 
         await git
           .pushTags('origin', parseGitArgs(getInput('tag_push') || ''))
@@ -251,14 +252,14 @@ core.info(`Running in ${baseDir}`);
             return log(null, data);
           })
           .catch(err => core.setFailed(err));
-      } else core.info('> No tags to push.');
-    } else core.info('> Not pushing anything.');
+      } else safeInfo('> No tags to push.');
+    } else safeInfo('> Not pushing anything.');
 
     core.endGroup();
-    core.info('> Task completed.');
+    safeInfo('> Task completed.');
   } else {
     core.endGroup();
-    core.info(
+    safeInfo(
       dryRun
         ? '> Dry run: working tree clean. Nothing would be committed.'
         : '> Working tree clean. Nothing to commit.',
@@ -281,7 +282,7 @@ core.info(`Running in ${baseDir}`);
   });
 
 async function logDryRunRemainingSteps() {
-  core.info(
+  safeInfo(
     `> Would set git identity: ${getInput('author_name')} <${getInput(
       'author_email',
     )}> (committer: ${getInput('committer_name')} <${getInput(
@@ -296,16 +297,16 @@ async function logDryRunRemainingSteps() {
     fetchOption = getInput('fetch');
   }
   if (fetchOption) {
-    core.info(
+    safeInfo(
       `> Would fetch repo${
         fetchOption === true ? '' : ` with: ${fetchOption}`
       }.`,
     );
-  } else core.info('> Would not fetch repo.');
+  } else safeInfo('> Would not fetch repo.');
 
   const targetBranch = getInput('new_branch');
   if (targetBranch) {
-    core.info(`> Would check out branch '${targetBranch}'.`);
+    safeInfo(`> Would check out branch '${targetBranch}'.`);
     if (!fetchOption)
       core.warning(
         'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.',
@@ -314,26 +315,26 @@ async function logDryRunRemainingSteps() {
 
   const pullOption = parseBoolOrGitArgs('pull');
   if (pullOption) {
-    core.info(
+    safeInfo(
       `> Would pull from remote${
         pullOption === true ? '' : ` with: ${pullOption}`
       }.`,
     );
-  } else core.info('> Would not pull from repo.');
+  } else safeInfo('> Would not pull from repo.');
 
-  core.info(
+  safeInfo(
     `> Would create commit with message: "${getInput('message')}"${
       getInput('commit') ? ` (extra args: ${getInput('commit')})` : ''
     }.`,
   );
 
   if (getInput('tag')) {
-    core.info(`> Would tag commit with: ${getInput('tag')}.`);
+    safeInfo(`> Would tag commit with: ${getInput('tag')}.`);
     if (!fetchOption)
       core.warning(
         'Creating a tag without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.',
       );
-  } else core.info('> No tag info provided.');
+  } else safeInfo('> No tag info provided.');
 
   let pushOption: string | boolean;
   try {
@@ -345,7 +346,7 @@ async function logDryRunRemainingSteps() {
     const pushAttempts = parsePushAttempts(getInput('push_attempts') || '1');
     if (pushOption === true) {
       const branch = getInput('new_branch');
-      core.info(
+      safeInfo(
         branch
           ? `> Would push commit to repo (set upstream for '${branch}')${
               pushAttempts > 1 ? ` with up to ${pushAttempts} attempts` : ''
@@ -355,20 +356,20 @@ async function logDryRunRemainingSteps() {
             }.`,
       );
     } else
-      core.info(
+      safeInfo(
         `> Would push commit to repo with: ${pushOption}${
           pushAttempts > 1 ? ` (up to ${pushAttempts} attempts)` : ''
         }.`,
       );
 
     if (getInput('tag')) {
-      core.info(
+      safeInfo(
         `> Would push tags to repo${
           getInput('tag_push') ? ` with: ${getInput('tag_push')}` : ''
         }.`,
       );
-    } else core.info('> No tags to push.');
-  } else core.info('> Would not push anything.');
+    } else safeInfo('> No tags to push.');
+  } else safeInfo('> Would not push anything.');
 }
 
 async function pullFromRemote(
@@ -378,14 +379,14 @@ async function pullFromRemote(
     ignoreErrors: 'all' | 'pathspec' | 'none';
   },
 ) {
-  core.info('> Pulling from remote...');
+  safeInfo('> Pulling from remote...');
   const args = pullOption === true ? '' : pullOption;
   core.debug(`Current git pull arguments: ${args}`);
   await git
     .fetch(undefined, log)
     .pull(undefined, undefined, parseGitArgs(args), log);
 
-  core.info('> Checking for conflicts...');
+  safeInfo('> Checking for conflicts...');
   const status = await git.status(undefined, log);
 
   if (status.conflicted.length) {
@@ -398,9 +399,9 @@ async function pullFromRemote(
     );
   }
 
-  core.info('> No conflicts found.');
+  safeInfo('> No conflicts found.');
   if (options.restage) {
-    core.info('> Re-staging files...');
+    safeInfo('> Re-staging files...');
     if (getInput('add')) await add(options.ignoreErrors);
     if (getInput('remove')) await remove(options.ignoreErrors);
   }
@@ -478,7 +479,7 @@ async function add(
 
             const peh = getInput('pathspec_error_handling'),
               err = new Error(
-                `Add command did not match any file: git add ${args}`,
+                `Add command did not match any file: git add ${neutralizeLogString(args)}`,
               );
             if (peh === 'exitImmediately') throw err;
             if (peh === 'exitAtEnd') exitErrors.push(err);
@@ -556,7 +557,7 @@ async function assertGitlinksWithTempIndex(
             const peh = getInput('pathspec_error_handling');
             if (peh === 'exitImmediately') {
               throw new Error(
-                `Add command did not match any file: git add ${args}`,
+                `Add command did not match any file: git add ${neutralizeLogString(args)}`,
               );
             }
             return;
@@ -605,7 +606,7 @@ async function remove(
 
             const peh = getInput('pathspec_error_handling'),
               err = new Error(
-                `Remove command did not match any file:\n  git rm ${args}`,
+                `Remove command did not match any file:\n  git rm ${neutralizeLogString(args)}`,
               );
             if (peh === 'exitImmediately') throw err;
             if (peh === 'exitAtEnd') exitErrors.push(err);
