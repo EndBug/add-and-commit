@@ -434,4 +434,124 @@ describe('action integration', () => {
     expect(combined).not.toMatch(/function isObject/);
     expect(combined.length).toBeLessThan(50_000);
   });
+
+  describe('rejects --pathspec-from-file / --pathspec-file-nul', () => {
+    const MARKER_A = 'AAC_POC_SECRET_7f9c2e';
+    const MARKER_B = 'AAC_SECOND_LINE_91a4d8';
+
+    function writeDummyOutsideClone(f: Fixture): string {
+      const dummyPath = path.join(
+        path.dirname(f.local),
+        `pathspec-dummy-${process.pid}.txt`,
+      );
+      fs.writeFileSync(dummyPath, `${MARKER_A}\n${MARKER_B}\n`);
+      return dummyPath;
+    }
+
+    function pathspecFromFileArgs(dummyPath: string): string {
+      return `--pathspec-from-file=${dummyPath} --pathspec-file-nul`;
+    }
+
+    function expectBlockedWithoutDisclosure(
+      result: ReturnType<typeof runAction>,
+    ) {
+      const combined = `${result.stdout}\n${result.stderr}`;
+      expect(result.status).not.toBe(0);
+      expect(result.outputs.committed).toBe('false');
+      expect(combined).toMatch(/not allowed/);
+      expect(combined).not.toContain(MARKER_A);
+      expect(combined).not.toContain(MARKER_B);
+    }
+
+    it('rejects add with pathspec_error_handling exitImmediately', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        add: pathspecFromFileArgs(dummyPath),
+        pathspec_error_handling: 'exitImmediately',
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+
+    it('rejects add with default pathspec_error_handling ignore', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        add: pathspecFromFileArgs(dummyPath),
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+
+    it('rejects add during dry_run at parse, not git add --dry-run', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        add: pathspecFromFileArgs(dummyPath),
+        dry_run: 'true',
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+      const combined = `${result.stdout}\n${result.stderr}`;
+      expect(combined).not.toMatch(/fatal: pathspec/);
+      expect(combined).not.toMatch(/Dry run completed/i);
+    });
+
+    it('rejects remove with the same options', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        add: '',
+        remove: pathspecFromFileArgs(dummyPath),
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+
+    it('rejects commit with the same options', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      writeFile(f.local, 'commit-args.txt', 'changed\n');
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        commit: pathspecFromFileArgs(dummyPath),
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+
+    it('rejects a YAML array element with the same options', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        add: JSON.stringify([pathspecFromFileArgs(dummyPath)]),
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+  });
 });
