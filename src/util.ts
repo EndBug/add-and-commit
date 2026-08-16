@@ -334,16 +334,18 @@ function consumesFollowingArgument(arg: string): boolean {
 }
 
 /**
- * Rejects quote forms that `string-argv` would retokenize into extra argv words.
+ * Conservative argument-boundary check for quotes before `string-argv` runs.
+ * Not every rejected form would become extra argv words.
  *
- * Unmatched `'` / `"` (e.g. `origin fix'--force` → `["origin","fix","--force"]`).
- * A closing quote glued to following text: `string-argv` treats a token that
- * starts with a quote as ending at the closer, so `'main'--force` becomes
- * `["main","--force"]` even though the quotes are balanced.
+ * Unmatched `'` / `"` are rejected (e.g. `origin fix'--force`).
+ * A quoted segment is accepted only when its closing quote is followed by
+ * whitespace or end of input (`origin 'main' --force`, `--message='hello'`).
+ * Interior glued quotes such as `a'b'c` are rejected even though `string-argv`
+ * would keep that as one token. A start-quoted token with text after the closer
+ * (`'main'--force`) is also rejected; that form would split into extra argv
+ * words.
  *
- * The opposite quote type inside a quoted segment is allowed. A closer may only
- * be followed by whitespace or end of string (`origin 'main' --force`,
- * `--message='hello'`).
+ * The opposite quote type inside a quoted segment is allowed.
  */
 function assertSafeQuotes(input: string): void {
   let open: "'" | '"' | null = null;
