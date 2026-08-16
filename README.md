@@ -123,12 +123,13 @@ Remote-helper overrides (`--upload-pack`, `--receive-pack`, `--exec`, and abbrev
 Remote-helper URL forms (`ext::…` and other `scheme::` tokens) are rejected for the same reason.  
 Git child processes are also limited to the `https`, `http`, `ssh`, `file`, and `git` transports (`GIT_ALLOW_PROTOCOL`) unless you set [`allow_unsafe_git_protocols`](#allow-unsafe-git-protocols) to `true` (only for trusted custom remotes/helpers).  
 Message-from-file flags (`-F`, `--file`, abbreviations such as `--fi`, and short-option clusters that include `F` such as `-aF`) are rejected: they can embed arbitrary runner filesystem contents into a tag or commit message and, with a push, into the repository history.  
+Pathspec-from-file flags (`--pathspec-from-file`, `--pathspec-file-nul`, and abbreviations such as `--pathspec-fr` / `--pathspec-fi`) are rejected on `add`, `remove`, and `commit`: they can read an arbitrary runner file and leak its contents into the action log.  
 Unmatched `'` / `"` quotes are also rejected: `string-argv` can otherwise split on an odd quote and turn part of a value into extra flags (for example a branch name like `fix'--force` becoming `fix` plus `--force`).  
 Do not interpolate untrusted data (for example values from `github.event.*`, `github.head_ref`, or repository content that contributors can edit) into `fetch`, `pull`, `push`, `tag`, `tag_push`, or `commit` without sanitizing them first. When the branch name is dynamic, prefer the default `push: true` with [`new_branch`](#creating-a-new-branch) instead of embedding the ref in a custom `push` string.
 
 ### Allow unsafe git protocols
 
-Set `allow_unsafe_git_protocols: true` only if you need a custom remote helper or a transport outside the default allowlist (`https`, `http`, `ssh`, `file`, `git`). This disables both the `GIT_ALLOW_PROTOCOL` restriction and the rejection of `scheme::` tokens in git argument inputs. It does **not** re-enable blocked options such as `--upload-pack` or `-F`/`--file`. Treat this like a break-glass setting: only enable it with fully trusted, non-interpolated argument strings.
+Set `allow_unsafe_git_protocols: true` only if you need a custom remote helper or a transport outside the default allowlist (`https`, `http`, `ssh`, `file`, `git`). This disables both the `GIT_ALLOW_PROTOCOL` restriction and the rejection of `scheme::` tokens in git argument inputs. It does **not** re-enable blocked options such as `--upload-pack`, `-F`/`--file`, or `--pathspec-from-file`/`--pathspec-file-nul`. Treat this like a break-glass setting: only enable it with fully trusted, non-interpolated argument strings.
 
 ### Adding files
 
