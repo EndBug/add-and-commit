@@ -354,6 +354,67 @@ describe('matchGitArgs', () => {
     );
   });
 
+  it('rejects --pathspec-from-file inline and separate-arg forms', () => {
+    expect(() => matchGitArgs('--pathspec-from-file=/path')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() => matchGitArgs('--pathspec-from-file /path')).toThrow(
+      /pathspecs from a file/,
+    );
+  });
+
+  it('rejects --pathspec-file-nul alone and combined with --pathspec-from-file', () => {
+    expect(() => matchGitArgs('--pathspec-file-nul')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() =>
+      matchGitArgs('--pathspec-from-file=/path --pathspec-file-nul'),
+    ).toThrow(/pathspecs from a file/);
+  });
+
+  it('rejects --pathspec-from-file and --pathspec-file-nul abbreviations', () => {
+    expect(() => matchGitArgs('--pathspec-fr=/path')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() => matchGitArgs('--pathspec-from=/path')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() => matchGitArgs('--pathspec-fi')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() => matchGitArgs('--pathspec-file')).toThrow(
+      /pathspecs from a file/,
+    );
+  });
+
+  it('preserves -m / --message values that look like --pathspec-from-file', () => {
+    expect(matchGitArgs('-m "--pathspec-from-file=/x"')).toStrictEqual([
+      '-m',
+      '--pathspec-from-file=/x',
+    ]);
+    expect(matchGitArgs('--message --pathspec-from-file=/x')).toStrictEqual([
+      '--message',
+      '--pathspec-from-file=/x',
+    ]);
+  });
+
+  it('still rejects a real --pathspec-from-file after a message value', () => {
+    expect(() => matchGitArgs('-m "ok" --pathspec-from-file=/x')).toThrow(
+      /pathspecs from a file/,
+    );
+  });
+
+  it('still rejects --pathspec-from-file when allowUnsafeGitProtocols is true', () => {
+    expect(() =>
+      matchGitArgs('--pathspec-from-file=/path', {
+        allowUnsafeGitProtocols: true,
+      }),
+    ).toThrow(/pathspecs from a file/);
+    expect(() =>
+      matchGitArgs('--pathspec-file-nul', {allowUnsafeGitProtocols: true}),
+    ).toThrow(/pathspecs from a file/);
+  });
+
   it('rejects scheme:: remote-helper URL tokens (PoC form)', () => {
     expect(() => matchGitArgs('ext::sh -c touch\\ /tmp/pwned')).toThrow(
       /remote-helper URLs/,
@@ -539,6 +600,16 @@ describe('neutralizeLogString', () => {
   it('escapes newlines and other C0 controls', () => {
     expect(neutralizeLogString('line1\nline2')).toBe('line1\\u000aline2');
     expect(neutralizeLogString('a\rb')).toBe('a\\u000db');
+  });
+
+  it('escapes line and paragraph separators', () => {
+    expect(neutralizeLogString('a\u2028b\u2029c')).toBe('a\\u2028b\\u2029c');
+  });
+
+  it('collapses a workflow-command payload onto one escaped line', () => {
+    expect(neutralizeLogString('Normal title\n::stop-commands::7a3f9c1e')).toBe(
+      'Normal title\\u000a::stop-commands::7a3f9c1e',
+    );
   });
 });
 
