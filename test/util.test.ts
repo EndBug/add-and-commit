@@ -266,10 +266,33 @@ describe('matchGitArgs', () => {
     );
   });
 
-  it('parses balanced quotes without treating them as injection', () => {
-    expect(matchGitArgs("origin a'b'c --set-upstream")).toStrictEqual([
+  it('rejects a closing quote glued to following text (string-argv would split it)', () => {
+    expect(() => matchGitArgs("origin 'main'--force --set-upstream")).toThrow(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+    expect(() => matchGitArgs('origin "main"--force --set-upstream')).toThrow(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+    expect(() => matchGitArgs("origin ''--force")).toThrow(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+    expect(() => matchGitArgs('origin \'foo\'"--force"')).toThrow(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+    expect(() => matchGitArgs("origin a'b'c --set-upstream")).toThrow(
+      /quoted segment immediately followed by non-whitespace/,
+    );
+  });
+
+  it('parses balanced quotes that wrap a whole argument', () => {
+    expect(matchGitArgs("origin 'main' --set-upstream")).toStrictEqual([
       'origin',
-      "a'b'c",
+      'main',
+      '--set-upstream',
+    ]);
+    expect(matchGitArgs("origin 'a b c' --set-upstream")).toStrictEqual([
+      'origin',
+      'a b c',
       '--set-upstream',
     ]);
     expect(matchGitArgs("--longOption 'hello world'")).toStrictEqual([
@@ -279,6 +302,9 @@ describe('matchGitArgs', () => {
     expect(
       matchGitArgs('--longOption \'This uses the "other" quotes\''),
     ).toStrictEqual(['--longOption', 'This uses the "other" quotes']);
+    expect(matchGitArgs("--message='hello'")).toStrictEqual([
+      "--message='hello'",
+    ]);
   });
 
   it('rejects -F / --file message-from-file flags (PoC form)', () => {
