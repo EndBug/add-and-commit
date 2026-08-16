@@ -385,6 +385,31 @@ describe('action integration', () => {
     expect(listFilesAtHead(f.local)).toContain('abs-cwd.txt');
   });
 
+  it('neutralizes workflow-command payloads in logs without rewriting the commit', () => {
+    const f = fixture!;
+    writeFile(f.local, 'payload.txt', 'x\n');
+    const payload = 'Normal title\n::stop-commands::7a3f9c1e';
+
+    const result = runAction(f, {
+      message: payload,
+      push: 'false',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.stdout).toContain(
+      'Normal title\\u000a::stop-commands::7a3f9c1e',
+    );
+    expect(result.stdout.split(/\r?\n/)).not.toContain(
+      '::stop-commands::7a3f9c1e',
+    );
+    expect(result.stdout).not.toMatch(/^::stop-commands::/m);
+    // The commit keeps the raw newline; only the log is neutralized.
+    // %s joins a multi-line subject with spaces; %B is the raw message.
+    expect(gitLog(f.local, '%B')).toBe(payload);
+    expect(gitLog(f.local, '%B')).not.toContain('\\u000a');
+  });
+
   it('fails clearly when cwd does not exist without dumping the bundle', () => {
     const f = fixture!;
     const missing = path.join(

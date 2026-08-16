@@ -25,7 +25,7 @@ export function resolveBaseDir(
 export function assertWorkingDirectory(dir: string, cwdInput: string): void {
   if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
     throw new Error(
-      `The cwd input '${cwdInput || '.'}' resolved to '${dir}', which is not an existing directory. ` +
+      `The cwd input '${neutralizeLogString(cwdInput || '.')}' resolved to '${neutralizeLogString(dir)}', which is not an existing directory. ` +
         'Use a path relative to the runner workspace, or an absolute path that exists ' +
         '(e.g. ${{ github.workspace }}/path — note that $GITHUB_WORKSPACE is not expanded in with:).',
     );
@@ -58,12 +58,13 @@ export async function getUserInfo(username?: string) {
 
 /**
  * Characters that can spoof or inject into CI logs when printed raw:
- * C0/C1 controls + DEL, and Unicode bidi/isolate format controls
- * (Trojan Source class: RLO/LRO/PDF/RLE/LRE/RLI/LRI/FSI/PDI, LRM/RLM, ALM).
+ * C0/C1 controls + DEL, Unicode line/paragraph separators (U+2028/U+2029),
+ * and Unicode bidi/isolate format controls (Trojan Source class:
+ * RLO/LRO/PDF/RLE/LRE/RLI/LRI/FSI/PDI, LRM/RLM, ALM).
  */
 const LOG_UNSAFE_CHARS =
   // eslint-disable-next-line no-control-regex
-  /[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/gu;
+  /[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u2028-\u202E\u2066-\u2069]/gu;
 
 /**
  * Replaces log-unsafe characters with visible `\uXXXX` escapes so bidi
@@ -74,6 +75,17 @@ export function neutralizeLogString(s: string): string {
     const hex = ch.codePointAt(0)!.toString(16).padStart(4, '0');
     return `\\u${hex}`;
   });
+}
+
+/**
+ * `core.info` writes straight to stdout with no escaping, so the Actions
+ * runner would treat a newline followed by `::command::` as a workflow
+ * command. Neutralize first so user-controlled strings cannot inject that.
+ */
+export function safeInfo(message: string): void {
+  // Direct core.info is forbidden elsewhere (no-restricted-syntax).
+  // eslint-disable-next-line no-restricted-syntax
+  core.info(neutralizeLogString(message));
 }
 
 const CIRCULAR_LOG_MARKER = '[Circular]';
@@ -174,7 +186,7 @@ export function assertValidBranchName(name: string): void {
   }
   if (name.startsWith('-')) {
     throw new Error(
-      `The new_branch value '${name}' cannot start with '-' (it would be interpreted as a git option).`,
+      `The new_branch value '${neutralizeLogString(name)}' cannot start with '-' (it would be interpreted as a git option).`,
     );
   }
   for (const char of name) {
@@ -186,7 +198,7 @@ export function assertValidBranchName(name: string): void {
       /\s/u.test(char) // Unicode whitespace (e.g. NBSP)
     ) {
       throw new Error(
-        `The new_branch value '${name}' contains whitespace or control characters.`,
+        `The new_branch value '${neutralizeLogString(name)}' contains whitespace or control characters.`,
       );
     }
   }
@@ -198,7 +210,7 @@ export function assertValidBranchName(name: string): void {
     });
   } catch {
     throw new Error(
-      `The new_branch value '${name}' is not a valid git branch name.`,
+      `The new_branch value '${neutralizeLogString(name)}' is not a valid git branch name.`,
     );
   }
 }
@@ -441,7 +453,7 @@ export function matchGitArgs(
     // after `-m` / `--message`. `-u` must not skip `--upl=` / `--upload-pack`.
     if (isDangerousRemoteHelperOption(arg)) {
       throw new Error(
-        `Git argument '${arg}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
+        `Git argument '${neutralizeLogString(arg)}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
       );
     }
 
@@ -452,17 +464,17 @@ export function matchGitArgs(
 
     if (isDangerousMessageFileOption(arg)) {
       throw new Error(
-        `Git argument '${arg}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
+        `Git argument '${neutralizeLogString(arg)}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
       );
     }
     if (isDangerousPathspecFileOption(arg)) {
       throw new Error(
-        `Git argument '${arg}' is not allowed: reading pathspecs from a file (--pathspec-from-file/--pathspec-file-nul) can leak runner filesystem contents into logs.`,
+        `Git argument '${neutralizeLogString(arg)}' is not allowed: reading pathspecs from a file (--pathspec-from-file/--pathspec-file-nul) can leak runner filesystem contents into logs.`,
       );
     }
     if (!allowUnsafe && isRemoteHelperUrl(arg)) {
       throw new Error(
-        `Git argument '${arg}' is not allowed: remote-helper URLs (scheme::…) can execute arbitrary commands on the runner. Set allow_unsafe_git_protocols to true only if you fully trust this input.`,
+        `Git argument '${neutralizeLogString(arg)}' is not allowed: remote-helper URLs (scheme::…) can execute arbitrary commands on the runner. Set allow_unsafe_git_protocols to true only if you fully trust this input.`,
       );
     }
 
@@ -504,8 +516,10 @@ export function findUnexpectedGitlinks(diffCachedRaw: string): string[] {
 export function assertNoUnexpectedGitlinks(paths: string[]): void {
   if (paths.length === 0) return;
 
-  const listed = paths.map(p => `  - ${p}`).join('\n');
-  const rmHints = paths.map(p => `  git rm --cached -- ${p}`).join('\n');
+  const listed = paths.map(p => `  - ${neutralizeLogString(p)}`).join('\n');
+  const rmHints = paths
+    .map(p => `  git rm --cached -- ${neutralizeLogString(p)}`)
+    .join('\n');
   throw new Error(
     `Refusing to commit unexpected gitlink(s) (embedded git repository staged as mode 160000):\n${listed}\n` +
       'Git records a nested .git directory as a gitlink, not as its files. ' +
@@ -536,12 +550,12 @@ export function readJSON(filePath: string) {
   try {
     fileContent = fs.readFileSync(filePath, {encoding: 'utf8'});
   } catch {
-    throw `Couldn't read file. File path: ${filePath}`;
+    throw `Couldn't read file. File path: ${neutralizeLogString(filePath)}`;
   }
 
   try {
     return JSON.parse(fileContent);
   } catch {
-    throw `Couldn't parse file to JSON. File path: ${filePath}`;
+    throw `Couldn't parse file to JSON. File path: ${neutralizeLogString(filePath)}`;
   }
 }

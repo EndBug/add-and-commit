@@ -575,6 +575,16 @@ describe('neutralizeLogString', () => {
     expect(neutralizeLogString('line1\nline2')).toBe('line1\\u000aline2');
     expect(neutralizeLogString('a\rb')).toBe('a\\u000db');
   });
+
+  it('escapes line and paragraph separators', () => {
+    expect(neutralizeLogString('a\u2028b\u2029c')).toBe('a\\u2028b\\u2029c');
+  });
+
+  it('collapses a workflow-command payload onto one escaped line', () => {
+    expect(neutralizeLogString('Normal title\n::stop-commands::7a3f9c1e')).toBe(
+      'Normal title\\u000a::stop-commands::7a3f9c1e',
+    );
+  });
 });
 
 describe('neutralizeForLog', () => {
