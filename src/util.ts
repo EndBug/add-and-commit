@@ -257,29 +257,11 @@ const DANGEROUS_PATHSPEC_FILE_OPTIONS: ReadonlyArray<{
 ];
 
 /**
- * Long options whose next argv token is a value, not another option.
- * Used so literals like `-m '-F'` are not treated as a message-file flag.
- */
-const LONG_OPTIONS_WITH_SEPARATE_ARG: ReadonlyArray<{
-  canonical: string;
-  minPrefix: string;
-}> = [
-  {canonical: 'message', minPrefix: 'mes'},
-  {canonical: 'local-user', minPrefix: 'local-'},
-  {canonical: 'cleanup', minPrefix: 'cleanup'},
-  {canonical: 'file', minPrefix: 'fi'},
-  {canonical: 'pathspec-from-file', minPrefix: 'pathspec-fr'},
-  {canonical: 'upload-pack', minPrefix: 'upl'},
-  {canonical: 'receive-pack', minPrefix: 'rece'},
-  {canonical: 'exec', minPrefix: 'e'},
-];
-
-/**
  * Short options that take a value (glued or as the following argv token).
+ * Used so glued values after `-m` (e.g. `-m-F`) are not treated as `-F`.
  * `-u` is intentionally omitted: it only takes a key-id for `git tag`, while
  * `git fetch` (`--update-head-ok`) and `git push` (`--set-upstream`) treat it
- * as a flag. Tag signing still uses `--local-user` in
- * `LONG_OPTIONS_WITH_SEPARATE_ARG`.
+ * as a flag.
  */
 const SHORT_OPTIONS_WITH_ARG = new Set(['m', 'F']);
 
@@ -288,11 +270,6 @@ function getLongOptionName(arg: string): string | undefined {
   const body = arg.slice(2);
   const eq = body.indexOf('=');
   return (eq === -1 ? body : body.slice(0, eq)).toLowerCase();
-}
-
-function longOptionHasInlineValue(arg: string): boolean {
-  if (!arg.startsWith('--') || arg === '--') return false;
-  return arg.slice(2).includes('=');
 }
 
 function matchesLongOptionPrefix(
@@ -340,28 +317,6 @@ function isDangerousMessageFileOption(arg: string): boolean {
 
 function isDangerousPathspecFileOption(arg: string): boolean {
   return matchesLongOptionPrefix(arg, DANGEROUS_PATHSPEC_FILE_OPTIONS);
-}
-
-/**
- * Whether this token causes Git to treat the next argv element as a value
- * (so that value must not be classified as an option).
- */
-function consumesFollowingArgument(arg: string): boolean {
-  if (arg.startsWith('--') && arg !== '--') {
-    if (longOptionHasInlineValue(arg)) return false;
-    return matchesLongOptionPrefix(arg, LONG_OPTIONS_WITH_SEPARATE_ARG);
-  }
-  if (!arg.startsWith('-') || arg.startsWith('--')) return false;
-
-  const body = arg.slice(1);
-  for (let i = 0; i < body.length; i++) {
-    const ch = body[i];
-    if (SHORT_OPTIONS_WITH_ARG.has(ch)) {
-      // Glued value after the option letter → no separate following argv.
-      return i === body.length - 1;
-    }
-  }
-  return false;
 }
 
 /**
@@ -446,9 +401,9 @@ export type MatchGitArgsOptions = {
  * @returns An array, if there's no match it'll be empty
  * @throws If the args include unmatched quotes, or a closing quote glued to following text
  * @throws If the args include a blocked remote-helper override (`--upload-pack`, `--receive-pack`, `--exec`, or abbreviations) on any token, including values after `-u` / `-m`
- * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`)
- * @throws If the args include a blocked pathspec-from-file flag (`--pathspec-from-file`, `--pathspec-file-nul`, or abbreviations)
- * @throws If the args include a `scheme::` remote-helper URL (unless `allowUnsafeGitProtocols`)
+ * @throws If the args include a blocked message-from-file flag (`-F`, `--file`, abbreviations, or short-option clusters containing `F`) on any token, including values after `-m` / `--message`
+ * @throws If the args include a blocked pathspec-from-file flag (`--pathspec-from-file`, `--pathspec-file-nul`, or abbreviations) on any token, including values after `-m` / `--message`
+ * @throws If the args include a `scheme::` remote-helper URL on any token (unless `allowUnsafeGitProtocols`)
  */
 export function matchGitArgs(
   string: string,
@@ -463,21 +418,15 @@ export function matchGitArgs(
 
   const allowUnsafe = options.allowUnsafeGitProtocols === true;
 
-  let skipNext = false;
+  // All denylists run on every token. Skipping the next argv after a guessed
+  // value-taking option (e.g. treating `-Sm` as `-m`) disagrees with Git's
+  // cluster parser and smuggles `--pathspec-from-file` / `scheme::` through.
   for (const arg of parsed) {
-    // Remote-helper overrides are rejected on every token, including values
-    // after `-m` / `--message`. `-u` must not skip `--upl=` / `--upload-pack`.
     if (isDangerousRemoteHelperOption(arg)) {
       throw new Error(
         `Git argument '${neutralizeLogString(arg)}' is not allowed: overriding the remote helper (--upload-pack, --receive-pack, --exec) can execute arbitrary commands on the runner.`,
       );
     }
-
-    if (skipNext) {
-      skipNext = false;
-      continue;
-    }
-
     if (isDangerousMessageFileOption(arg)) {
       throw new Error(
         `Git argument '${neutralizeLogString(arg)}' is not allowed: reading a tag/commit message from a file (-F/--file) can exfiltrate runner filesystem contents into git history.`,
@@ -493,8 +442,6 @@ export function matchGitArgs(
         `Git argument '${neutralizeLogString(arg)}' is not allowed: remote-helper URLs (scheme::…) can execute arbitrary commands on the runner. Set allow_unsafe_git_protocols to true only if you fully trust this input.`,
       );
     }
-
-    skipNext = consumesFollowingArgument(arg);
   }
 
   return parsed;

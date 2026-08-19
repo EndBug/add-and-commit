@@ -559,6 +559,21 @@ describe('action integration', () => {
       expect(gitRevParse(f.local, 'HEAD')).toBe(before);
     });
 
+    it('rejects commit when a short-option cluster precedes the same options', () => {
+      const f = fixture!;
+      const dummyPath = writeDummyOutsideClone(f);
+      writeFile(f.local, 'commit-cluster-args.txt', 'changed\n');
+      const before = gitRevParse(f.local, 'HEAD');
+
+      const result = runAction(f, {
+        commit: `-Sm --pathspec-from-file=${dummyPath} -Sm --pathspec-file-nul`,
+        push: 'false',
+      });
+
+      expectBlockedWithoutDisclosure(result);
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    });
+
     it('rejects a YAML array element with the same options', () => {
       const f = fixture!;
       const dummyPath = writeDummyOutsideClone(f);

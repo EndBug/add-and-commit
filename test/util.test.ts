@@ -332,20 +332,19 @@ describe('matchGitArgs', () => {
     expect(() => matchGitArgs('-F../secrets')).toThrow(/message from a file/);
   });
 
-  it('preserves -m / --message values that look like -F/--file', () => {
-    expect(matchGitArgs('-m "-F"')).toStrictEqual(['-m', '-F']);
-    expect(matchGitArgs('-m --file=/tmp/value')).toStrictEqual([
-      '-m',
-      '--file=/tmp/value',
-    ]);
-    expect(matchGitArgs('--message "-F"')).toStrictEqual(['--message', '-F']);
+  it('rejects -F / --file even when they follow -m / --message', () => {
+    expect(() => matchGitArgs('-m "-F"')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('-m --file=/tmp/value')).toThrow(
+      /message from a file/,
+    );
+    expect(() => matchGitArgs('--message "-F"')).toThrow(/message from a file/);
+    expect(() => matchGitArgs('v1.0.0 -a -m "-F"')).toThrow(
+      /message from a file/,
+    );
+  });
+
+  it('treats -m-F as a glued message value, not a file flag', () => {
     expect(matchGitArgs('-m-F')).toStrictEqual(['-m-F']);
-    expect(matchGitArgs('v1.0.0 -a -m "-F"')).toStrictEqual([
-      'v1.0.0',
-      '-a',
-      '-m',
-      '-F',
-    ]);
   });
 
   it('still rejects a real -F after a message value', () => {
@@ -387,19 +386,26 @@ describe('matchGitArgs', () => {
     );
   });
 
-  it('preserves -m / --message values that look like --pathspec-from-file', () => {
-    expect(matchGitArgs('-m "--pathspec-from-file=/x"')).toStrictEqual([
-      '-m',
-      '--pathspec-from-file=/x',
-    ]);
-    expect(matchGitArgs('--message --pathspec-from-file=/x')).toStrictEqual([
-      '--message',
-      '--pathspec-from-file=/x',
-    ]);
+  it('rejects --pathspec-from-file even when it follows -m / --message', () => {
+    expect(() => matchGitArgs('-m "--pathspec-from-file=/x"')).toThrow(
+      /pathspecs from a file/,
+    );
+    expect(() => matchGitArgs('--message --pathspec-from-file=/x')).toThrow(
+      /pathspecs from a file/,
+    );
   });
 
   it('still rejects a real --pathspec-from-file after a message value', () => {
     expect(() => matchGitArgs('-m "ok" --pathspec-from-file=/x')).toThrow(
+      /pathspecs from a file/,
+    );
+  });
+
+  it('rejects --pathspec-from-file after a short-option cluster whose last letter is m', () => {
+    expect(() =>
+      matchGitArgs('-Sm --pathspec-from-file=/x -Sm --pathspec-file-nul'),
+    ).toThrow(/pathspecs from a file/);
+    expect(() => matchGitArgs('-tm --pathspec-from-file=/x')).toThrow(
       /pathspecs from a file/,
     );
   });
@@ -449,12 +455,30 @@ describe('matchGitArgs', () => {
     ).toThrow(/not allowed/);
   });
 
-  it('allows :: inside option values via skipNext', () => {
-    expect(matchGitArgs('-m "foo::bar"')).toStrictEqual(['-m', 'foo::bar']);
-    expect(matchGitArgs('--message foo::bar')).toStrictEqual([
-      '--message',
-      'foo::bar',
-    ]);
+  it('rejects scheme:: even when it follows -m / --message', () => {
+    expect(() => matchGitArgs('-m "foo::bar"')).toThrow(/remote-helper URLs/);
+    expect(() => matchGitArgs('--message foo::bar')).toThrow(
+      /remote-helper URLs/,
+    );
+  });
+
+  it('rejects scheme:: after a short-option cluster that used to skip the next token', () => {
+    expect(() => matchGitArgs('-Sm ext::sh')).toThrow(/remote-helper URLs/);
+    expect(() => matchGitArgs('-om ext::sh origin')).toThrow(
+      /remote-helper URLs/,
+    );
+  });
+
+  it('allows scheme:: after -m when allowUnsafeGitProtocols is true', () => {
+    expect(
+      matchGitArgs('-m "foo::bar"', {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['-m', 'foo::bar']);
+    expect(
+      matchGitArgs('--message foo::bar', {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['--message', 'foo::bar']);
+    expect(
+      matchGitArgs('-Sm ext::sh', {allowUnsafeGitProtocols: true}),
+    ).toStrictEqual(['-Sm', 'ext::sh']);
   });
 });
 
