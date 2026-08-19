@@ -22,7 +22,7 @@ inputs:
     description: The email of the custom committer you want to use
     required: false
   cwd:
-    description: The directory where your repository is located (relative to the runner workspace, or an absolute path). You should use actions/checkout first to set it up. In with:, use ${{ github.workspace }} — $GITHUB_WORKSPACE is not expanded.
+    description: The directory where your repository is located (relative to the runner workspace, or an absolute path). You should use actions/checkout first to set it up. In with:, use the github.workspace context (see README) — $GITHUB_WORKSPACE is not expanded.
     required: false
     default: '.'
   default_author:
