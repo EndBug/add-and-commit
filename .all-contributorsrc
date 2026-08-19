@@ -589,6 +589,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "dzcode",
+      "name": "Dan Ziring",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9089037?v=4",
+      "profile": "https://github.com/dzcode",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
