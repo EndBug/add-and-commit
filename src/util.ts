@@ -394,7 +394,7 @@ export type MatchGitArgsOptions = {
     '--foo',
     '1234',
     '--force',
-    `--path="Application 'Support'/\\"message\\".txt"`
+    `--path=Application 'Support'/message.txt`
   ]
  * matchGitArgs('      ') => [ ]
  * ```

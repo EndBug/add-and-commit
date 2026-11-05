@@ -303,7 +303,7 @@ describe('matchGitArgs', () => {
       matchGitArgs('--longOption \'This uses the "other" quotes\''),
     ).toStrictEqual(['--longOption', 'This uses the "other" quotes']);
     expect(matchGitArgs("--message='hello'")).toStrictEqual([
-      "--message='hello'",
+      '--message=hello',
     ]);
   });
 
