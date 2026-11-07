@@ -17,7 +17,7 @@
   "dependencies": {
     "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
-    "js-yaml": "^5.4.3",
+    "js-yaml": "^5.5.0",
     "simple-git": "^4.0.2",
     "string-argv": "^0.3.2"
   },
@@ -28,7 +28,7 @@
     "@vercel/ncc": "^0.45.0",
     "all-contributors-cli": "^6.26.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-prettier": "^5.5.7",
     "gts": "^6.0.2",
     "husky": "^9.1.7",
     "jest": "^30.5.1",
