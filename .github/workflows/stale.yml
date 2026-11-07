@@ -17,6 +17,7 @@ jobs:
       - name: Exempt Dependabot pull requests
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
 
