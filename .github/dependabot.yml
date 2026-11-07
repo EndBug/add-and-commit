@@ -14,6 +14,7 @@ updates:
       include: 'scope'
     labels:
       - 'type: chore'
+      - 'bot: dependabot'
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -24,3 +25,4 @@ updates:
       prefix: ci
     labels:
       - 'type: chore'
+      - 'bot: dependabot'

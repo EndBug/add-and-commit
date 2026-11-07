@@ -4,6 +4,54 @@ on:
     - cron: '00 5,17 * * *'
   workflow_dispatch:
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   stale:
-    uses: EndBug/workflows/.github/workflows/stale.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      # The shared EndBug/workflows stale workflow has no inputs, so this job
+      # inlines the same rules and skips pull requests from Dependabot.
+      - name: Exempt Dependabot pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          gh label create "bot: dependabot" \
+            --color 0366d6 \
+            --description "Dependabot pull requests; not marked as stale" \
+            --force
+
+          prs=$(gh pr list --state open --limit 200 --json number,author,labels --jq '.[] | select(.author.login == "dependabot[bot]") | {number, labels: [.labels[].name]}')
+          while IFS= read -r pr; do
+            [ -z "$pr" ] && continue
+            number=$(jq -r '.number' <<<"$pr")
+            gh pr edit "$number" --add-label "bot: dependabot"
+            if jq -e '.labels | index("status: stale") != null' <<<"$pr" >/dev/null; then
+              gh pr edit "$number" --remove-label "status: stale"
+            fi
+            if jq -e '.labels | index("stale") != null' <<<"$pr" >/dev/null; then
+              gh pr edit "$number" --remove-label "stale"
+            fi
+          done <<<"$prs"
+
+      - uses: actions/stale@v7
+        with:
+          days-before-stale: 20
+          days-before-close: 5
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+          stale-pr-message: >
+            This PR has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+          stale-issue-label: 'status: stale'
+          stale-pr-label: 'status: stale'
+          exempt-issue-labels: 'pinned,security,status: pinned,type: security'
+          exempt-pr-labels: 'pinned,security,status: pinned,type: security,bot: dependabot'
