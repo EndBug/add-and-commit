@@ -39,7 +39,7 @@ jobs:
             fi
           done <<<"$prs"
 
-      - uses: actions/stale@v7
+      - uses: actions/stale@v11
         with:
           days-before-stale: 20
           days-before-close: 5
