@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import simpleGit, {Response, SimpleGit} from 'simple-git';
+import {simpleGit, Response, SimpleGit} from 'simple-git';
 import {
   checkInputs,
   getInput,
@@ -29,13 +29,30 @@ const baseDir = resolveBaseDir(cwdInput);
 let git!: SimpleGit;
 
 /** Env for git child processes; restricts transports unless opt-out is set. */
-function gitChildEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = {...process.env, ...extra};
+function gitChildEnv(
+  extra: Partial<Pick<NodeJS.ProcessEnv, 'GIT_INDEX_FILE'>> = {},
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {...process.env};
+  for (const key of Object.keys(env)) {
+    if (key.startsWith('GIT_')) delete env[key];
+  }
   if (!getInput('allow_unsafe_git_protocols', true)) {
     env.GIT_ALLOW_PROTOCOL = 'https:http:ssh:file:git';
     env.GIT_PROTOCOL_FROM_USER = '0';
   }
+  if (extra.GIT_INDEX_FILE) env.GIT_INDEX_FILE = extra.GIT_INDEX_FILE;
   return env;
+}
+
+function createGit() {
+  return simpleGit({
+    baseDir,
+    allowEnvironment: [
+      'GIT_ALLOW_PROTOCOL',
+      'GIT_PROTOCOL_FROM_USER',
+      'GIT_INDEX_FILE',
+    ],
+  });
 }
 
 function parseGitArgs(string: string) {
@@ -49,7 +66,7 @@ const exitErrors: Error[] = [];
 safeInfo(`Running in ${baseDir}`);
 (async () => {
   assertWorkingDirectory(baseDir, cwdInput);
-  git = simpleGit({baseDir});
+  git = createGit();
 
   await checkInputs();
 
@@ -522,9 +539,7 @@ async function assertGitlinksWithTempIndex(
     if (fs.existsSync(indexPath)) {
       fs.copyFileSync(indexPath, tmpIndex);
     } else {
-      const gitSeed = simpleGit({baseDir}).env(
-        gitChildEnv({GIT_INDEX_FILE: tmpIndex}),
-      );
+      const gitSeed = createGit().env(gitChildEnv({GIT_INDEX_FILE: tmpIndex}));
       const headResolves = await git
         .raw(['rev-parse', '--verify', 'HEAD'])
         .then(() => true)
@@ -536,9 +551,7 @@ async function assertGitlinksWithTempIndex(
       }
     }
 
-    const gitTmp = simpleGit({baseDir}).env(
-      gitChildEnv({GIT_INDEX_FILE: tmpIndex}),
-    );
+    const gitTmp = createGit().env(gitChildEnv({GIT_INDEX_FILE: tmpIndex}));
 
     for (const args of addArgGroups) {
       await gitTmp

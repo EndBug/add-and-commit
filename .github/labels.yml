@@ -8,6 +8,11 @@
   description: 'Extra attention is needed'
   aliases: []
 
+- name: 'bot: dependabot'
+  color: 0366d6
+  description: 'Dependabot pull requests; not marked as stale'
+  aliases: []
+
 - name: 'status: pending'
   color: c5def5
   description: 'More info is needed before deciding what to do'
