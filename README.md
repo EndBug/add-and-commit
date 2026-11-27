@@ -90,7 +90,7 @@ Add a step like this to your workflow:
     # Whether to pull from the remote. Set to true to run git pull with no extra
     # args, false (or omit) to skip, or a string for git pull arguments
     # (e.g. '--rebase --autostash').
-    # The initial pull is skipped if new_branch creates a branch.
+    # A new branch without an upstream skips implicit pulls (see below).
     # Default: ''
     pull: true
 
@@ -172,7 +172,11 @@ with:
 
 If you want the action to commit in a new branch, you can use the `new_branch` input. This must be a valid git branch name (not raw git arguments): it cannot be empty, start with `-`, contain whitespace/control characters, or fail `git check-ref-format --branch` (for example `feature..name`, `name@{x}`, `name~1`, or a name ending with `.`).
 
-When the action creates the branch, it skips the initial `pull` because there is no upstream branch to pull from yet. If it checks out an existing branch (including one discovered by `fetch`), the configured `pull` still runs. Pulls between failed push attempts are unchanged.
+When the action creates a branch without an upstream, it skips `pull: true` and recognized options-only pulls, including `--rebase --autostash`. Existing branches (including ones discovered by `fetch`) and newly created branches that inherit an upstream still pull normally.
+
+An explicit pull target, such as `pull: '--rebase --autostash origin my-branch'`, is always honored, even when the local branch was just created. Other custom syntax is also passed unchanged to Git. Automatic skipping recognizes only `--rebase` (including `=false`, `=true`, `=merges`, `=interactive`), `--autostash`, `--ff`, their `--no-` forms, `--ff-only`, `--quiet`, `--verbose`, `-q`, `-v`, and `-r`. Git reports errors for other options or missing targets as usual.
+
+With `push: true`, pull enabled, and multiple `push_attempts`, a new branch without an upstream checks `origin` before each retry: if the destination branch is absent, it retries the push without pulling; if present, it pulls that branch using the configured pull options first. Lookup and merge failures still stop the action. For a custom `push` command, supply an explicit `pull` remote and branch if retries need to integrate remote changes; the action does not guess that command's destination.
 
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 

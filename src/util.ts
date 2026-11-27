@@ -367,6 +367,32 @@ function isRemoteHelperUrl(arg: string): boolean {
   return REMOTE_HELPER_URL.test(arg);
 }
 
+// These options cannot consume a separate repository/ref argument. Keep this
+// recognition conservative: explicit targets and unfamiliar syntax must go to
+// Git unchanged, rather than being silently skipped or reinterpreted here.
+const IMPLICIT_PULL_FLAGS = new Set([
+  '--rebase',
+  '--no-rebase',
+  '--autostash',
+  '--no-autostash',
+  '--ff',
+  '--no-ff',
+  '--ff-only',
+  '--quiet',
+  '--verbose',
+  '-q',
+  '-v',
+  '-r',
+]);
+
+export function usesImplicitPullTarget(args: readonly string[]): boolean {
+  return args.every(
+    arg =>
+      IMPLICIT_PULL_FLAGS.has(arg) ||
+      /^--rebase=(false|true|merges|interactive)$/.test(arg),
+  );
+}
+
 export type MatchGitArgsOptions = {
   /**
    * When true, allow `scheme::` remote-helper URL tokens.

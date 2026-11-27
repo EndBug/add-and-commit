@@ -22,6 +22,7 @@ import {
   pickGitIdentityConfig,
   resolveBaseDir,
   safeInfo,
+  usesImplicitPullTarget,
 } from './util';
 
 const cwdInput = getInput('cwd') || '';
@@ -182,10 +183,13 @@ safeInfo(`Running in ${baseDir}`);
     }
 
     const pullOption = parseBoolOrGitArgs('pull');
-    if (pullOption && branchCreated) {
-      safeInfo('> Skipping initial pull because a new branch was created.');
-    } else if (pullOption) {
-      await pullFromRemote(pullOption, {restage: true, ignoreErrors});
+    const pullArgs = parseGitArgs(pullOption === true ? '' : pullOption || '');
+    if (pullOption) {
+      await pullFromRemote(pullArgs, {
+        restage: true,
+        ignoreErrors,
+        createdBranch: branchCreated ? targetBranch : undefined,
+      });
     } else safeInfo('> Not pulling from repo.');
 
     safeInfo('> Creating commit...');
@@ -252,9 +256,11 @@ safeInfo(`Running in ${baseDir}`);
           );
 
           if (pullOption) {
-            await pullFromRemote(pullOption, {
+            await pullFromRemote(pullArgs, {
               restage: false,
               ignoreErrors,
+              createdBranch: branchCreated ? targetBranch : undefined,
+              retryFromOrigin: pushOption === true,
             });
             // Rebase rewrites the commit; refresh outputs from HEAD.
             const head = (await git.revparse(['HEAD'])).trim();
@@ -337,9 +343,12 @@ async function logDryRunRemainingSteps() {
 
   const pullOption = parseBoolOrGitArgs('pull');
   if (pullOption) {
+    const pullArgs = parseGitArgs(pullOption === true ? '' : pullOption);
     safeInfo(
       `> Would pull from remote${
-        targetBranch ? ' unless a new branch is created' : ''
+        targetBranch && usesImplicitPullTarget(pullArgs)
+          ? ' unless a new branch is created without an upstream'
+          : ''
       }${pullOption === true ? '' : ` with: ${pullOption}`}.`,
     );
   } else safeInfo('> Would not pull from repo.');
@@ -395,18 +404,46 @@ async function logDryRunRemainingSteps() {
 }
 
 async function pullFromRemote(
-  pullOption: true | string,
+  args: string[],
   options: {
     restage: boolean;
     ignoreErrors: 'all' | 'pathspec' | 'none';
+    createdBranch?: string;
+    retryFromOrigin?: boolean;
   },
 ) {
+  if (options.createdBranch && usesImplicitPullTarget(args)) {
+    // A configured pull target may have no local tracking-ref mapping when
+    // remote.fetch is narrow. Let Git resolve it rather than treating it as absent.
+    const upstream = await git.getConfig(
+      `branch.${options.createdBranch}.merge`,
+    );
+    if (upstream.value === null) {
+      // Only the default push owns origin/<new_branch>. Custom push commands
+      // need an explicit pull target; do not guess their remote or refspec.
+      if (!options.retryFromOrigin) {
+        safeInfo('> Skipping pull because the new branch has no upstream.');
+        return;
+      }
+      const remoteRef = `refs/heads/${options.createdBranch}`;
+      const remoteBranch = await git.listRemote([
+        '--heads',
+        'origin',
+        remoteRef,
+      ]);
+      if (!remoteBranch.trim()) {
+        safeInfo(
+          '> Skipping pull because the new branch is not on origin yet.',
+        );
+        return;
+      }
+      args = [...args, 'origin', remoteRef];
+    }
+  }
+
   safeInfo('> Pulling from remote...');
-  const args = pullOption === true ? '' : pullOption;
-  core.debug(`Current git pull arguments: ${args}`);
-  await git
-    .fetch(undefined, log)
-    .pull(undefined, undefined, parseGitArgs(args), log);
+  core.debug(`Current git pull arguments: ${args.join(' ')}`);
+  await git.fetch(undefined, log).pull(undefined, undefined, args, log);
 
   safeInfo('> Checking for conflicts...');
   const status = await git.status(undefined, log);
