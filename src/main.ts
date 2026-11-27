@@ -159,6 +159,7 @@ safeInfo(`Running in ${baseDir}`);
     } else safeInfo('> Not fetching repo.');
 
     const targetBranch = getInput('new_branch');
+    let branchCreated = false;
     if (targetBranch) {
       safeInfo('> Checking-out branch...');
 
@@ -167,19 +168,23 @@ safeInfo(`Running in ${baseDir}`);
           'Creating a new branch without fetching the repo first could result in an error when pushing to GitHub. Refer to the action README for more info about this topic.',
         );
 
-      await git
+      branchCreated = await git
         .checkout([targetBranch])
         .then(() => {
           log(undefined, `'${targetBranch}' branch already existed.`);
+          return false;
         })
-        .catch(() => {
+        .catch(async () => {
           log(undefined, `Creating '${targetBranch}' branch.`);
-          return git.checkout(['-b', targetBranch], log);
+          await git.checkout(['-b', targetBranch], log);
+          return true;
         });
     }
 
     const pullOption = parseBoolOrGitArgs('pull');
-    if (pullOption) {
+    if (pullOption && branchCreated) {
+      safeInfo('> Skipping initial pull because a new branch was created.');
+    } else if (pullOption) {
       await pullFromRemote(pullOption, {restage: true, ignoreErrors});
     } else safeInfo('> Not pulling from repo.');
 
@@ -334,8 +339,8 @@ async function logDryRunRemainingSteps() {
   if (pullOption) {
     safeInfo(
       `> Would pull from remote${
-        pullOption === true ? '' : ` with: ${pullOption}`
-      }.`,
+        targetBranch ? ' unless a new branch is created' : ''
+      }${pullOption === true ? '' : ` with: ${pullOption}`}.`,
     );
   } else safeInfo('> Would not pull from repo.');
 

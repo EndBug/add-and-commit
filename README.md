@@ -90,6 +90,7 @@ Add a step like this to your workflow:
     # Whether to pull from the remote. Set to true to run git pull with no extra
     # args, false (or omit) to skip, or a string for git pull arguments
     # (e.g. '--rebase --autostash').
+    # The initial pull is skipped if new_branch creates a branch.
     # Default: ''
     pull: true
 
@@ -170,6 +171,8 @@ with:
 ### Creating a new branch
 
 If you want the action to commit in a new branch, you can use the `new_branch` input. This must be a valid git branch name (not raw git arguments): it cannot be empty, start with `-`, contain whitespace/control characters, or fail `git check-ref-format --branch` (for example `feature..name`, `name@{x}`, `name~1`, or a name ending with `.`).
+
+When the action creates the branch, it skips the initial `pull` because there is no upstream branch to pull from yet. If it checks out an existing branch (including one discovered by `fetch`), the configured `pull` still runs. Pulls between failed push attempts are unchanged.
 
 Please note that if the branch exists, the action will still try push to it, but it's possible that the push will be rejected by the remote as non-straightforward.
 
