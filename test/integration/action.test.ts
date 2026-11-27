@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
@@ -223,30 +224,299 @@ describe('action integration', () => {
     expect(remoteHead).toBe(result.outputs.commit_long_sha);
   });
 
-  it('creates a new branch and pushes it to the remote', () => {
+  it.each(['false', 'true', '--rebase --autostash'])(
+    'creates a new branch and pushes it with pull: %s',
+    pull => {
+      const f = fixture!;
+      writeFile(f.local, 'branch.txt', 'branch me\n');
+
+      const result = runAction(f, {
+        message: 'Commit on new branch',
+        new_branch: 'integration-new-branch',
+        pull,
+        push: 'true',
+        fetch: 'false',
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.outputs.committed).toBe('true');
+      expect(result.outputs.pushed).toBe('true');
+
+      expect(remoteHasRef(f.remote, 'refs/heads/integration-new-branch')).toBe(
+        true,
+      );
+      const remoteBranchSha = gitRevParse(
+        f.remote,
+        'refs/heads/integration-new-branch',
+      );
+      expect(remoteBranchSha).toBe(result.outputs.commit_long_sha);
+      expect(listFilesAtHead(f.local)).toContain('branch.txt');
+    },
+  );
+
+  describe('new branch push retries', () => {
+    function rejectFirstPush(f: Fixture, firstPushCommands: string[] = []) {
+      fs.writeFileSync(
+        path.join(f.remote, 'hooks', 'pre-receive'),
+        [
+          '#!/bin/sh',
+          'set -eu',
+          'while read old new ref; do',
+          '  printf "%s %s\\n" "$new" "${GIT_PUSH_OPTION_0-}" >> hooks/push-attempts',
+          'done',
+          'if [ ! -f hooks/rejected-first-push ]; then',
+          '  : > hooks/rejected-first-push',
+          ...firstPushCommands,
+          '  echo "Rejecting first push for retry regression" >&2',
+          '  exit 1',
+          'fi',
+          '',
+        ].join('\n'),
+        {mode: 0o755},
+      );
+      return path.join(f.remote, 'hooks', 'push-attempts');
+    }
+
+    it.each(['true', '--rebase --autostash'])(
+      'retries a rejected first push without an upstream with pull: %s',
+      pull => {
+        const f = fixture!;
+        const branch = 'integration-retry-branch';
+        const attemptsPath = rejectFirstPush(f);
+        writeFile(f.local, 'retry.txt', 'retry me\n');
+
+        const result = runAction(f, {
+          message: 'Commit on retry branch',
+          new_branch: branch,
+          fetch: 'false',
+          pull,
+          push: 'true',
+          push_attempts: '2',
+        });
+
+        expect(result.status).toBe(0);
+        expect(result.outputs.committed).toBe('true');
+        expect(result.outputs.pushed).toBe('true');
+        const attemptedCommits = fs
+          .readFileSync(attemptsPath, 'utf8')
+          .trim()
+          .split('\n')
+          .map(line => line.split(' ')[0]);
+        expect(attemptedCommits).toEqual([
+          result.outputs.commit_long_sha,
+          result.outputs.commit_long_sha,
+        ]);
+        expect(gitRevParse(f.remote, `refs/heads/${branch}`)).toBe(
+          result.outputs.commit_long_sha,
+        );
+        expect(listFilesAtHead(f.local)).toContain('retry.txt');
+      },
+    );
+
+    it.each(['true', '--rebase --autostash'])(
+      'integrates a concurrently created remote branch before retrying the default push with pull: %s',
+      pull => {
+        const f = fixture!;
+        const branch = 'integration-concurrent-branch';
+        const remoteHead = commitAndPushToRemote(
+          f,
+          'from-remote.txt',
+          'remote\n',
+          'Concurrent remote change',
+        );
+        const attemptsPath = rejectFirstPush(f, [
+          // The competing commit is already in the bare repo. Ref updates cannot
+          // run inside receive-pack's incoming-object quarantine.
+          '  unset GIT_QUARANTINE_PATH GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES',
+          `  git update-ref refs/heads/${branch} ${remoteHead}`,
+        ]);
+        writeFile(f.local, 'from-local.txt', 'local\n');
+
+        const result = runAction(f, {
+          message: 'Local change on concurrent branch',
+          new_branch: branch,
+          fetch: 'false',
+          pull,
+          push: 'true',
+          push_attempts: '2',
+        });
+
+        expect(result.status).toBe(0);
+        expect(result.outputs.committed).toBe('true');
+        expect(result.outputs.pushed).toBe('true');
+        const attempts = fs
+          .readFileSync(attemptsPath, 'utf8')
+          .trim()
+          .split('\n')
+          .map(line => line.split(' '));
+        expect(attempts).toHaveLength(2);
+        expect(attempts[0][0]).not.toBe(attempts[1][0]);
+        expect(attempts[1][0]).toBe(result.outputs.commit_long_sha);
+        expect(gitRevParse(f.remote, `refs/heads/${branch}`)).toBe(
+          result.outputs.commit_long_sha,
+        );
+        execFileSync('git', [
+          '--git-dir',
+          path.join(f.local, '.git'),
+          'merge-base',
+          '--is-ancestor',
+          remoteHead,
+          'HEAD',
+        ]);
+        const files = listFilesAtHead(f.local);
+        expect(files).toContain('from-remote.txt');
+        expect(files).toContain('from-local.txt');
+      },
+    );
+
+    it('preserves explicit alternate pull and push destinations across a retry', () => {
+      const f = fixture!;
+      const localBranch = 'integration-local-branch';
+      const remoteBranch = 'alternate-target';
+      const initial = gitRevParse(f.remote, 'HEAD');
+      const remoteHead = commitAndPushToRemote(
+        f,
+        'from-remote.txt',
+        'remote\n',
+        'Concurrent alternate remote change',
+      );
+      execFileSync('git', [
+        '--git-dir',
+        f.remote,
+        'branch',
+        remoteBranch,
+        initial,
+      ]);
+      execFileSync('git', [
+        '--git-dir',
+        path.join(f.local, '.git'),
+        'remote',
+        'add',
+        'upstream',
+        f.remote,
+      ]);
+      execFileSync('git', [
+        '--git-dir',
+        f.remote,
+        'config',
+        'receive.advertisePushOptions',
+        'true',
+      ]);
+      const attemptsPath = rejectFirstPush(f, [
+        '  unset GIT_QUARANTINE_PATH GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES',
+        `  git update-ref refs/heads/${remoteBranch} ${remoteHead}`,
+      ]);
+      writeFile(f.local, 'from-local.txt', 'local\n');
+
+      const result = runAction(f, {
+        message: 'Local change for alternate target',
+        new_branch: localBranch,
+        fetch: 'false',
+        pull: `--rebase --autostash upstream ${remoteBranch}`,
+        push: `--push-option=retry-marker --set-upstream upstream HEAD:refs/heads/${remoteBranch}`,
+        push_attempts: '2',
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.outputs.committed).toBe('true');
+      expect(result.outputs.pushed).toBe('true');
+      const attempts = fs
+        .readFileSync(attemptsPath, 'utf8')
+        .trim()
+        .split('\n')
+        .map(line => line.split(' '));
+      expect(attempts).toHaveLength(2);
+      expect(attempts.map(([, option]) => option)).toEqual([
+        'retry-marker',
+        'retry-marker',
+      ]);
+      expect(attempts[0][0]).not.toBe(attempts[1][0]);
+      expect(attempts[1][0]).toBe(result.outputs.commit_long_sha);
+      expect(gitRevParse(f.remote, `refs/heads/${remoteBranch}`)).toBe(
+        result.outputs.commit_long_sha,
+      );
+      expect(remoteHasRef(f.remote, `refs/heads/${localBranch}`)).toBe(false);
+      expect(gitLog(f.local, '%P')).toBe(remoteHead);
+      const files = listFilesAtHead(f.local);
+      expect(files).toContain('from-remote.txt');
+      expect(files).toContain('from-local.txt');
+    });
+  });
+
+  it('validates blocked pull arguments even when new_branch has no upstream', () => {
     const f = fixture!;
-    writeFile(f.local, 'branch.txt', 'branch me\n');
+    const before = gitRevParse(f.local, 'HEAD');
+    writeFile(f.local, 'blocked-pull.txt', 'changed\n');
 
     const result = runAction(f, {
-      message: 'Commit on new branch',
-      new_branch: 'integration-new-branch',
-      push: 'true',
+      new_branch: 'blocked-pull-branch',
       fetch: 'false',
+      pull: '--upload-pack=blocked-helper',
+      push: 'false',
     });
 
-    expect(result.status).toBe(0);
-    expect(result.outputs.committed).toBe('true');
-    expect(result.outputs.pushed).toBe('true');
-
-    expect(remoteHasRef(f.remote, 'refs/heads/integration-new-branch')).toBe(
-      true,
-    );
-    const remoteBranchSha = gitRevParse(
-      f.remote,
-      'refs/heads/integration-new-branch',
-    );
-    expect(remoteBranchSha).toBe(result.outputs.commit_long_sha);
+    expect(result.status).not.toBe(0);
+    expect(result.outputs.committed).toBe('false');
+    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/not allowed/);
   });
+
+  it.each([
+    {narrowFetch: false, label: 'standard fetch mapping'},
+    {narrowFetch: true, label: 'fetch mapping that omits the merge branch'},
+  ])(
+    'pulls when a newly created branch inherits an upstream with $label',
+    ({narrowFetch}) => {
+      const f = fixture!;
+      const remoteHead = commitAndPushToRemote(
+        f,
+        'from-remote.txt',
+        'remote\n',
+        'Remote change',
+      );
+      execFileSync('git', [
+        '--git-dir',
+        path.join(f.local, '.git'),
+        'config',
+        'branch.autoSetupMerge',
+        'inherit',
+      ]);
+      if (narrowFetch) {
+        execFileSync('git', [
+          '--git-dir',
+          f.remote,
+          'branch',
+          'fetch-only',
+          gitRevParse(f.local, 'HEAD'),
+        ]);
+        execFileSync('git', [
+          '--git-dir',
+          path.join(f.local, '.git'),
+          'config',
+          'remote.origin.fetch',
+          '+refs/heads/fetch-only:refs/remotes/origin/fetch-only',
+        ]);
+      }
+      writeFile(f.local, 'from-local.txt', 'local\n');
+
+      const result = runAction(f, {
+        new_branch: 'inherited-upstream-branch',
+        fetch: 'false',
+        pull: '--rebase --autostash',
+        push: 'false',
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.outputs.committed).toBe('true');
+      if (!narrowFetch) {
+        expect(gitRevParse(f.local, '@{upstream}')).toBe(remoteHead);
+      }
+      expect(gitLog(f.local, '%P')).toBe(remoteHead);
+      const files = listFilesAtHead(f.local);
+      expect(files).toContain('from-remote.txt');
+      expect(files).toContain('from-local.txt');
+    },
+  );
 
   it('removes files with the remove input', () => {
     const f = fixture!;
@@ -292,13 +562,17 @@ describe('action integration', () => {
     expect(fs.existsSync(path.join(f.local, 'skip-me.txt'))).toBe(true);
   });
 
-  it('pull: true incorporates remote commits before committing', () => {
+  it.each([
+    {selectBranch: false, label: 'on the current branch'},
+    {selectBranch: true, label: 'on an existing local new_branch'},
+  ])('pull: true incorporates remote commits $label', ({selectBranch}) => {
     const f = fixture!;
     commitAndPushToRemote(f, 'from-remote.txt', 'remote\n', 'Remote change');
     writeFile(f.local, 'from-local.txt', 'local\n');
 
     const result = runAction(f, {
       message: 'Local change',
+      ...(selectBranch ? {new_branch: f.defaultBranch} : {}),
       pull: 'true',
       push: 'false',
     });
@@ -308,6 +582,47 @@ describe('action integration', () => {
     expect(result.stdout).toMatch(/> Pulling from remote/);
     expect(result.stdout).not.toMatch(/Not pulling from repo/);
 
+    const files = listFilesAtHead(f.local);
+    expect(files).toContain('from-remote.txt');
+    expect(files).toContain('from-local.txt');
+  });
+
+  it.each([
+    {fetch: 'true', label: 'a fetched remote branch'},
+    {fetch: 'false', label: 'an explicit unfetched remote branch'},
+  ])('pulls from $label before pushing a new_branch', ({fetch}) => {
+    const f = fixture!;
+    const branch = 'integration-remote-branch';
+    const remoteHead = commitAndPushToRemote(
+      f,
+      'from-remote.txt',
+      'remote\n',
+      'Remote change',
+    );
+    execFileSync('git', ['--git-dir', f.remote, 'branch', branch, remoteHead]);
+    expect(remoteHasRef(f.local, `refs/heads/${branch}`)).toBe(false);
+    expect(remoteHasRef(f.local, `refs/remotes/origin/${branch}`)).toBe(false);
+    writeFile(f.local, 'from-local.txt', 'local\n');
+
+    const result = runAction(f, {
+      message: 'Local change on remote branch',
+      new_branch: branch,
+      fetch,
+      pull: fetch === 'true' ? 'true' : `--rebase --autostash origin ${branch}`,
+      push: 'true',
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.outputs.committed).toBe('true');
+    expect(result.outputs.pushed).toBe('true');
+    expect(result.stdout).toMatch(/> Pulling from remote/);
+    expect(gitLog(f.local, '%P')).toBe(remoteHead);
+    expect(gitRevParse(f.remote, `refs/heads/${branch}`)).toBe(
+      result.outputs.commit_long_sha,
+    );
+    expect(gitRevParse(f.local, `refs/heads/${branch}`)).toBe(
+      result.outputs.commit_long_sha,
+    );
     const files = listFilesAtHead(f.local);
     expect(files).toContain('from-remote.txt');
     expect(files).toContain('from-local.txt');
@@ -356,25 +671,49 @@ describe('action integration', () => {
     expect(files).toContain('from-local.txt');
   });
 
-  it('dry_run with pull: true reports a default pull without mutating', () => {
-    const f = fixture!;
-    writeFile(f.local, 'dry-pull.txt', 'preview\n');
-    const before = gitRevParse(f.local, 'HEAD');
+  it.each([
+    {newBranch: undefined, label: 'the current branch'},
+    {newBranch: 'dry-run-branch', label: 'a new_branch'},
+  ])(
+    'dry_run reports pull behavior for $label without mutating',
+    ({newBranch}) => {
+      const f = fixture!;
+      writeFile(f.local, 'dry-pull.txt', 'preview\n');
+      const before = gitRevParse(f.local, 'HEAD');
+      const beforeRemote = gitRevParse(f.remote, 'HEAD');
+      const indexPath = path.join(f.local, '.git', 'index');
+      const beforeIndex = fs.readFileSync(indexPath);
 
-    const result = runAction(f, {
-      message: 'Would commit',
-      dry_run: 'true',
-      pull: 'true',
-      push: 'false',
-    });
+      const result = runAction(f, {
+        message: 'Would commit',
+        dry_run: 'true',
+        pull: 'true',
+        push: 'true',
+        ...(newBranch ? {new_branch: newBranch} : {}),
+      });
 
-    expect(result.status).toBe(0);
-    expect(result.outputs.committed).toBe('false');
-    expect(gitRevParse(f.local, 'HEAD')).toBe(before);
-    expect(listFilesAtHead(f.local)).not.toContain('dry-pull.txt');
-    expect(result.stdout).toMatch(/> Would pull from remote\./);
-    expect(result.stdout).not.toMatch(/with: true/);
-  });
+      expect(result.status).toBe(0);
+      expect(result.outputs.committed).toBe('false');
+      expect(result.outputs.pushed).toBe('false');
+      expect(gitRevParse(f.local, 'HEAD')).toBe(before);
+      expect(gitRevParse(f.remote, 'HEAD')).toBe(beforeRemote);
+      expect(fs.readFileSync(indexPath)).toEqual(beforeIndex);
+      expect(listFilesAtHead(f.local)).not.toContain('dry-pull.txt');
+      expect(fs.readFileSync(path.join(f.local, 'dry-pull.txt'), 'utf8')).toBe(
+        'preview\n',
+      );
+      if (newBranch) {
+        expect(result.stdout).toContain(
+          '> Would pull from remote unless a new branch is created',
+        );
+        expect(remoteHasRef(f.local, `refs/heads/${newBranch}`)).toBe(false);
+        expect(remoteHasRef(f.remote, `refs/heads/${newBranch}`)).toBe(false);
+      } else {
+        expect(result.stdout).toMatch(/> Would pull from remote\./);
+      }
+      expect(result.stdout).not.toMatch(/with: true/);
+    },
+  );
 
   it('commits when cwd is an absolute path and process.cwd differs', () => {
     const f = fixture!;

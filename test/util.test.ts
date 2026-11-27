@@ -9,10 +9,36 @@ import {
   parseInputArray,
   pickGitIdentityConfig,
   resolveBaseDir,
+  usesImplicitPullTarget,
 } from '../src/util';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+
+describe('usesImplicitPullTarget', () => {
+  it.each([
+    '',
+    '--rebase --autostash',
+    '--no-rebase --ff-only',
+    '-q -r',
+    '--rebase=merges',
+  ])('recognizes unambiguous options-only arguments: %s', input =>
+    expect(usesImplicitPullTarget(matchGitArgs(input))).toBe(true),
+  );
+
+  it.each([
+    '--rebase origin feature',
+    '--rebase --autostash upstream refs/heads/other',
+    '--depth 1 origin feature',
+    '--strategy recursive',
+    '-X ours',
+    '--reb --autostash',
+    '--future-option',
+    '-- origin feature',
+  ])('leaves explicit targets and unfamiliar syntax to Git: %s', input => {
+    expect(usesImplicitPullTarget(matchGitArgs(input))).toBe(false);
+  });
+});
 
 describe('resolveBaseDir', () => {
   const from = path.join(path.sep, 'home', 'runner', 'work', 'repo', 'repo');
